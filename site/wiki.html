@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en" data-theme="default" data-mode="auto">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>linkedui Wiki — using the library</title>
+  <meta name="description" content="Using linkedui: quick start, components, theming, JS API, no-JS matrix." />
+  <link rel="stylesheet" href="../src/linkedui.css?v=14" />
+  <script>
+    try {
+      const t = localStorage.getItem("lui-theme"), m = localStorage.getItem("lui-mode");
+      if (t) document.documentElement.dataset.theme = t;
+      if (m) document.documentElement.dataset.mode = m;
+    } catch (e) {}
+  </script>
+</head>
+<body>
+  <nav class="nav" aria-label="Main navigation">
+    <strong>linkedui</strong>
+    <a href="./index.html">Builder</a>
+    <a href="./wiki.html" aria-current="page">Wiki</a>
+    <a href="./wiki-de.html" hreflang="de">Deutsch</a>
+    <span style="flex:1"></span>
+    <label class="visually-hidden" for="wiki-theme">Theme</label>
+    <select id="wiki-theme" data-lui-theme>
+      <option value="default">default</option>
+      <option value="ocean">ocean</option>
+      <option value="squishy">squishy + squircle</option>
+    </select>
+    <label class="visually-hidden" for="wiki-mode">Mode</label>
+    <select id="wiki-mode" data-lui-mode>
+      <option value="auto">auto (system)</option>
+      <option value="light">light</option>
+      <option value="dark">dark</option>
+    </select>
+  </nav>
+
+  <main class="lui-container">
+    <h1>linkedui Wiki</h1>
+    <p>CSS-first UI library: classless base, variants via classes, theming via variables.
+      Usable without JS, better with JS. This page uses only the library itself —
+      everything below is live. Long version: <code>WIKI.md</code> in the repo.</p>
+
+    <h2 id="start">1. Quick start</h2>
+    <pre><code>&lt;link rel="stylesheet" href="linkedui/src/linkedui.css" /&gt;
+&lt;html data-theme="default" data-mode="auto"&gt;
+&lt;main class="lui-container"&gt;
+  &lt;button class="btn"&gt;Primary&lt;/button&gt;
+&lt;/main&gt;
+&lt;script src="linkedui/src/enhance.js" defer&gt;&lt;/script&gt;</code></pre>
+
+    <h2 id="buttons">2. Buttons <small>src/components/button.css</small></h2>
+    <div class="row" style="display:flex;gap:.5rem;flex-wrap:wrap">
+      <button class="btn" type="button">Primary</button>
+      <button class="btn" data-variant="secondary" type="button">Secondary</button>
+      <button class="btn" data-variant="ghost" type="button">Ghost</button>
+      <button class="btn" data-variant="outline" type="button">Outline</button>
+      <button class="btn" data-variant="danger" type="button">Danger</button>
+      <button class="btn" type="button" disabled>Disabled</button>
+      <button class="btn" type="button" data-loading="true">Loading</button>
+    </div>
+    <pre><code>&lt;button class="btn" data-variant="secondary" data-size="sm"&gt;…&lt;/button&gt;
+&lt;!-- variants: secondary ghost outline danger (= destructive) --&gt;
+&lt;!-- data-size: sm | (md) | lg · data-block · data-icon · data-loading · disabled --&gt;</code></pre>
+
+    <h2 id="forms">3. Forms <small>src/base.css (classless)</small></h2>
+    <div class="lui-grid">
+      <label class="field"><span>Name</span><input placeholder="Same height as buttons" /></label>
+      <label class="field"><span>Choice</span><select><option>One</option><option>Two</option></select></label>
+    </div>
+    <p>
+      <label style="display:flex;gap:.4rem;align-items:center;font-weight:400"><input type="checkbox" checked /> Checkbox</label>
+      <label style="display:flex;gap:.4rem;align-items:center;font-weight:400"><input type="radio" name="wiki-r" checked /> Radio A</label>
+      <label style="display:flex;gap:.4rem;align-items:center;font-weight:400"><input type="radio" name="wiki-r" /> Radio B</label>
+      <label class="switch"><input type="checkbox" role="switch" checked /> Switch</label>
+    </p>
+    <div class="field"><span>Volume</span><input type="range" min="0" max="100" value="60" aria-label="Volume" /></div>
+
+    <h2 id="feedback">4. Cards, alerts, badges</h2>
+    <div class="lui-grid">
+      <article class="card"><h3>Card</h3><p><code>&lt;article&gt;</code> without class looks the same.</p><span class="badge">Badge</span></article>
+      <div>
+        <div class="alert" data-tone="success"><span>Success — data-tone: success | warning | danger</span></div>
+      </div>
+    </div>
+
+    <h2 id="overlays">5. Nav, tooltip, dropdown, dialog</h2>
+    <nav class="nav"><a href="./wiki.html" aria-current="page">Active</a><a href="./index.html">Builder</a></nav>
+    <p><span data-tooltip="Pure CSS">Hover me for tooltip</span> ·
+      <details class="dropdown" style="display:inline-block"><summary>Dropdown</summary><div><a href="#overlays">Entry</a></div></details> ·
+      <button class="btn" data-variant="secondary" type="button" data-lui-open="wiki-dialog">Open dialog</button></p>
+
+    <h2 id="tabs">6. Tabs <small>keyboard-operable without JS via radio keys</small></h2>
+    <div class="tabs">
+      <input type="radio" name="wiki-tabs" id="wiki-tabs-1" checked /><label for="wiki-tabs-1">Markup</label><section><p>Order: <code>input → label → section</code>, label linked via <code>for/id</code>.</p></section>
+      <input type="radio" name="wiki-tabs" id="wiki-tabs-2" /><label for="wiki-tabs-2">JS</label><section><p>With <code>enhance.js</code>: tablist roles, roving tabindex, arrows/Home/End.</p></section>
+    </div>
+
+    <h2 id="otp">7. OTP <small>separate boxes — paste splits across all of them</small></h2>
+    <div class="otp" role="group" aria-label="One-time code, 6 digits">
+      <input inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" aria-label="Digit 1 of 6" />
+      <input inputmode="numeric" pattern="[0-9]*" aria-label="Digit 2 of 6" />
+      <input inputmode="numeric" pattern="[0-9]*" aria-label="Digit 3 of 6" />
+      <span aria-hidden="true">–</span>
+      <input inputmode="numeric" pattern="[0-9]*" aria-label="Digit 4 of 6" />
+      <input inputmode="numeric" pattern="[0-9]*" aria-label="Digit 5 of 6" />
+      <input inputmode="numeric" pattern="[0-9]*" aria-label="Digit 6 of 6" />
+    </div>
+    <pre><code>&lt;div class="otp" role="group" aria-label="One-time code, 6 digits"&gt;
+  &lt;input inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" aria-label="Digit 1 of 6" /&gt;
+  &lt;!-- … more inputs, optional &lt;span aria-hidden="true"&gt;–&lt;/span&gt; dash … --&gt;
+&lt;/div&gt;</code></pre>
+
+    <h2 id="segmented">8. Segmented control <small>radio pills, no JS needed</small></h2>
+    <div class="segmented" role="group" aria-label="Time range">
+      <input type="radio" name="wiki-range" id="wiki-r-1d" /><label for="wiki-r-1d">1D</label>
+      <input type="radio" name="wiki-range" id="wiki-r-7d" checked /><label for="wiki-r-7d">7D</label>
+      <input type="radio" name="wiki-range" id="wiki-r-1m" /><label for="wiki-r-1m">1M</label>
+    </div>
+    <pre><code>&lt;div class="segmented" role="group" aria-label="Time range"&gt;
+  &lt;input type="radio" name="range" id="r-7d" checked /&gt;&lt;label for="r-7d"&gt;7D&lt;/label&gt;
+  &lt;!-- … more input+label pairs, labels may contain icons … --&gt;
+&lt;/div&gt;</code></pre>
+
+    <h2 id="hints">9. Field hints <small>help + invalid states</small></h2>
+    <div class="lui-grid">
+      <label class="field"><span>Username</span><input placeholder="ada" aria-describedby="wiki-hint" /><small class="hint" id="wiki-hint">Lowercase only.</small></label>
+      <label class="field" data-invalid="true"><span>Email</span><input value="nope" aria-describedby="wiki-err" /><small class="hint" id="wiki-err">Enter a valid email.</small></label>
+    </div>
+    <pre><code>&lt;label class="field" data-invalid="true"&gt;
+  &lt;span&gt;Email&lt;/span&gt;&lt;input aria-describedby="e-hint" /&gt;
+  &lt;small class="hint" id="e-hint"&gt;Enter a valid email.&lt;/small&gt;
+&lt;/label&gt;
+&lt;!-- or aria-invalid="true" directly on the control --&gt;</code></pre>
+
+    <h2 id="toasts">10. Toasts <small>info | success | warning | danger</small></h2>
+    <div class="lui-grid">
+      <div class="toast" data-tone="info" role="status"><div><strong>Update available</strong><p>Version 2.4.1 is ready.</p></div></div>
+      <div class="toast" data-tone="success" role="status"><div><strong>Changes saved</strong><p>Done.</p></div></div>
+      <div class="toast" data-tone="warning" role="status"><div><strong>Storage almost full</strong><p>90% used.</p></div></div>
+      <div class="toast" data-tone="danger" role="status"><div><strong>Build failed</strong><p>3 tests failed.</p></div></div>
+    </div>
+    <p><button class="btn" data-variant="secondary" type="button" data-lui-toast="info" data-lui-toast-title="Hello" data-lui-toast-message="Live toast, auto-dismisses.">Show live toast</button></p>
+    <pre><code>&lt;button data-lui-toast="success" data-lui-toast-title="Done"
+        data-lui-toast-message="Saved."&gt;Show toast&lt;/button&gt;
+&lt;!-- JS API: luiToast({ tone, title, message, ms }) --&gt;</code></pre>
+    <h2 id="theming">11. Theming</h2>
+    <pre><code>&lt;html data-theme="default|ocean|squishy|custom" data-mode="auto|light|dark"&gt;
+&lt;select data-lui-theme&gt;…&lt;/select&gt;  &lt;!-- persistent via enhance.js --&gt;
+&lt;select data-lui-mode&gt;…&lt;/select&gt;</code></pre>
+    <p>Custom theme: <a href="./index.html">builder</a> → export to <code>src/themes.css</code>.
+      Shape rules: <code>--lui-radius</code> = boxes, <code>--lui-radius-control</code> = controls
+      (<code>999px</code> = pill for controls only), <code>--lui-corner-shape: round | superellipse(K)</code>
+      plus radius compensation (<code>base × (0.5 + 0.5 × K)</code>) only inside
+      <code>@supports (corner-shape: superellipse(1))</code>.</p>
+
+    <h2 id="tokens">12. Token reference (excerpt)</h2>
+    <table>
+      <thead><tr><th>Group</th><th>Tokens</th></tr></thead>
+      <tbody>
+        <tr><td>Colors</td><td><code>--lui-bg --lui-surface --lui-text --lui-muted --lui-border --lui-primary(-hover/-active) --lui-on-primary --lui-secondary(-…) --lui-on-secondary --lui-success --lui-warning --lui-danger --lui-ring --lui-chevron</code></td></tr>
+        <tr><td>Shape</td><td><code>--lui-radius(-sm/-md/-lg/-full) --lui-radius-control --lui-corner-shape</code></td></tr>
+        <tr><td>Size</td><td><code>--lui-density(-x/-y) --lui-control-h-sm/-md/-lg --lui-check --lui-contrast --lui-control-py/-px --lui-space-1..4 --lui-font-sans/-mono/-sm/-md/-lg --lui-border-width --lui-shadow-sm/-md --lui-maxw</code></td></tr>
+      </tbody>
+    </table>
+    <p><small>Complete with color values: <code>src/tokens.css</code> (header comments in every file).</small></p>
+
+    <h2 id="js">13. JS API</h2>
+    <table>
+      <thead><tr><th>Function (<code>enhance.js</code>)</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td><code>restoreTheme()</code></td><td>localStorage → <code>data-*</code> before paint</td></tr>
+        <tr><td><code>bindThemeSwitchers()</code></td><td><code>data-lui-theme</code>/<code>data-lui-mode</code> persistent + synced</td></tr>
+        <tr><td><code>bindDialogs()</code></td><td><code>data-lui-open</code>/<code>data-lui-close</code> + backdrop click</td></tr>
+        <tr><td><code>enhanceTabs()</code></td><td><code>.tabs</code> → tablist (ARIA, roving tabindex, keys)</td></tr>
+        <tr><td><code>enhanceOtp()</code></td><td><code>.otp</code> → advance, backspace, paste-split</td></tr>
+        <tr><td><code>bindToasts()</code> / <code>showToast()</code></td><td>toasts via <code>data-lui-toast</code> or <code>luiToast({tone,title,message,ms})</code></td></tr>
+      </tbody>
+    </table>
+    <p>Builder (<code>site/app.js</code>, JSDoc everywhere): <code>derived()</code>,
+      <code>snippet()</code>/<code>fullFile()</code>, <code>render()</code>,
+      <code>loadThemeIntoBuilder()</code>, <code>applyUrlState()</code>/<code>pushUrlState()</code>.</p>
+
+    <h2 id="nojs">14. No-JS matrix</h2>
+    <table>
+      <thead><tr><th>Works without JS</th><th>Needs JS</th></tr></thead>
+      <tbody>
+        <tr><td>System theme, content, accordion/dropdown, dialog via <code>open</code>, tabs (radio keys), OTP, forms</td><td>Persistent theme choice, <code>showModal()</code>, tablist ARIA, copy/download/share</td></tr>
+      </tbody>
+    </table>
+
+    <footer><hr /><p><small>linkedui · <a href="./index.html">Builder</a> · Full text: <code>WIKI.md</code></small></p></footer>
+  </main>
+
+  <dialog id="wiki-dialog" aria-label="Wiki dialog">
+    <h3>Dialog</h3>
+    <p>Native, ESC + backdrop click included.</p>
+    <button class="btn" type="button" data-lui-close>Close</button>
+  </dialog>
+
+  <script src="../src/enhance.js?v=10" defer></script>
+</body>
+</html>

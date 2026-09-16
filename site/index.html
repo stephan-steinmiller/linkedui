@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en" data-theme="default" data-mode="auto">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>linkedui — CSS-first UI + Theme Builder</title>
+  <meta name="description" content="Classless base, variants via classes, theming via CSS variables. Usable without JS, better with JS." />
+  <!-- Bump ?v= when assets change → avoids stale cache -->
+  <link rel="stylesheet" href="../src/linkedui.css?v=26" />
+  <script>
+    // Before paint: apply the stored choice (avoid FOUC). Without JS, data-mode="auto" → system.
+    try {
+      const t = localStorage.getItem("lui-theme"), m = localStorage.getItem("lui-mode");
+      if (t) document.documentElement.dataset.theme = t;
+      if (m) document.documentElement.dataset.mode = m;
+    } catch (e) {}
+  </script>
+  <style>
+    .builder { display: grid; gap: 1rem; grid-template-columns: 320px 1fr; align-items: start; }
+    @media (max-width: 900px) { .builder { grid-template-columns: 1fr; } }
+    /* Left panel scrolls independently from the preview on the right */
+    @media (min-width: 901px) {
+      .controls {
+        position: sticky;
+        top: 1rem;
+        max-height: calc(100dvh - 2rem);
+        overflow-y: auto;
+      }
+    }
+    .panel { background: var(--lui-surface); border: 1px solid var(--lui-border); border-radius: var(--lui-radius-lg); padding: 1rem; display: grid; gap: .75rem; }
+    .preview { background: var(--lui-bg); border: 1px dashed var(--lui-border); border-radius: var(--lui-radius-lg); padding: 1rem; display: grid; gap: 1rem; }
+    .row { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+    .controls label { display: grid; gap: .25rem; }
+    .controls input[type="range"] { max-width: none; }
+    .pair { display: flex; gap: .5rem; align-items: center; }
+    .pair input[type="range"] { flex: 1; min-width: 0; }
+    .pair input[type="number"] { width: 5.5rem; flex: none; }
+    .export-bar { display: flex; gap: .5rem; flex-wrap: wrap; }
+    footer { opacity: .8; font-size: .85rem; }
+  </style>
+</head>
+<body>
+  <nav class="nav" aria-label="Main navigation">
+    <strong>linkedui</strong>
+    <a href="#builder" aria-current="page">Builder</a>
+    <a href="#components">Components</a>
+    <a href="./wiki.html">Wiki</a>
+    <a href="./index-de.html" hreflang="de">Deutsch</a>
+    <span style="flex:1"></span>
+    <form method="get" action="#builder" style="display:flex;gap:.5rem;align-items:center">
+      <label class="visually-hidden" for="site-theme">Theme</label>
+      <select id="site-theme" name="theme" data-lui-theme>
+        <option value="default">default</option>
+        <option value="ocean">ocean</option>
+        <option value="squishy">squishy + squircle</option>
+      </select>
+      <label class="visually-hidden" for="site-mode">Mode</label>
+      <select id="site-mode" name="mode" data-lui-mode>
+        <option value="auto">auto (system)</option>
+        <option value="light">light</option>
+        <option value="dark">dark</option>
+      </select>
+      <noscript><button type="submit">OK</button></noscript>
+    </form>
+  </nav>
+
+  <main class="lui-container">
+    <h1>linkedui — CSS-first, classless base, themes via variables</h1>
+    <p>
+      Without JS: system theme (light/dark), all content, <code>details</code> accordion/dropdown and <code>dialog[open]</code> work.
+      With JS: persistent theme switch, modal helper, live builder with copy/download.
+    </p>
+    <div class="row">
+      <span class="badge">OKLCH + color-mix</span>
+      <span class="badge">one themes.css</span>
+      <span class="badge">data-theme + data-mode</span>
+      <span class="badge">vanilla, no build</span>
+    </div>
+
+    <hr />
+
+    <section id="builder" aria-label="Theme builder">
+      <h2>Theme Builder (dogfoods the lib)</h2>
+      <noscript><p><strong>Note:</strong> without JS you see defaults + the export snippet for manual copying. With JS everything goes live.</p></noscript>
+      <div class="builder">
+        <form class="panel controls" id="controls" method="get" action="#export">
+          <label>Name <input name="name" id="in-name" value="my-theme" maxlength="40" /></label>
+          <label>Primary <input type="color" id="in-primary" value="#4f7dd9" /></label>
+          <label>Secondary <input type="color" id="in-secondary" value="#58678d" /></label>
+          <label>Background <input type="color" id="in-bg" value="#161b28" /></label>
+          <label>Text <input type="color" id="in-text" value="#f2f3f5" /></label>
+          <label>Contrast (separation): <output id="out-contrast" for="in-contrast">50%</output>
+            <span class="pair">
+              <input type="range" id="in-contrast" min="0" max="100" step="1" value="50" />
+              <input type="number" id="in-contrast-num" min="0" max="100" step="1" value="50" aria-label="Exact contrast in percent" />
+            </span>
+          </label>
+          <label>Radius (boxes): <output id="out-radius" for="in-radius">12px</output>
+            <span class="pair">
+              <input type="range" id="in-radius" min="0" max="24" step="1" value="12" />
+              <input type="number" id="in-radius-num" min="0" max="64" step="1" value="12" aria-label="Exact radius in pixels" />
+            </span>
+          </label>
+          <label>Padding/density vertical: <output id="out-density-y" for="in-density-y">1.00</output>
+            <span class="pair">
+              <input type="range" id="in-density-y" min="0.85" max="1.3" step="0.05" value="1" />
+              <input type="number" id="in-density-y-num" min="0.5" max="2" step="0.05" value="1" aria-label="Exact vertical density" />
+            </span>
+          </label>
+          <label>Padding/density horizontal: <output id="out-density-x" for="in-density-x">1.00</output>
+            <span class="pair">
+              <input type="range" id="in-density-x" min="0.85" max="1.3" step="0.05" value="1" />
+              <input type="number" id="in-density-x-num" min="0.5" max="2" step="0.05" value="1" aria-label="Exact horizontal density" />
+            </span>
+          </label>
+          <label>Shape
+            <select id="in-shape">
+              <option value="rounded">rounded</option>
+              <option value="sharp">sharp</option>
+              <option value="pill">pill</option>
+              <option value="squircle">squircle (superellipse)</option>
+            </select>
+          </label>
+          <label>Squircle curve: <output id="out-curve" for="in-curve">1.3</output>
+            <span class="pair">
+              <input type="range" id="in-curve" min="0.8" max="2" step="0.1" value="1.3" />
+              <input type="number" id="in-curve-num" min="0.5" max="3" step="0.1" value="1.3" aria-label="Exact squircle curve" />
+            </span>
+          </label>
+          <label style="display:flex;gap:.5rem;align-items:center;font-weight:600">
+            <input type="checkbox" id="in-live-page" checked />
+            Apply live to the whole page
+          </label>
+          <div class="row">
+            <button class="btn" data-variant="secondary" type="button" id="btn-reset">Reset</button>
+          </div>
+        </form>
+
+        <div class="preview" id="preview" aria-label="Live preview">
+          <div class="row">
+            <button class="btn" type="button">Primary</button>
+            <button class="btn" data-variant="secondary" type="button">Secondary</button>
+            <button class="btn" data-variant="ghost" type="button">Ghost</button>
+            <button class="btn" data-variant="outline" type="button">Outline</button>
+            <button class="btn" data-variant="destructive" type="button">Destructive</button>
+            <button class="btn" type="button" disabled>Disabled</button>
+            <button class="btn" type="button" data-loading="true">Loading</button>
+            <button class="btn" type="button" data-icon="true" aria-label="Search">⌕</button>
+            <span class="badge">Badge</span>
+            <span data-tooltip="Pure CSS">Hover me for tooltip</span>
+          </div>
+          <div class="lui-grid">
+            <article class="card"><h3>Card</h3><p>Consistent heights, radius + density come from the theme.</p></article>
+            <div class="alert" data-tone="success"><span>OK — this is what alerts look like.</span></div>
+          </div>
+          <div class="row">
+            <input placeholder="Input (same height as button)" aria-label="Demo input" />
+            <select aria-label="Demo select"><option>Select</option><option>Second option</option></select>
+            <label style="display:flex;gap:.4rem;align-items:center;font-weight:400"><input type="checkbox" checked /> Checkbox on</label>
+            <label style="display:flex;gap:.4rem;align-items:center;font-weight:400"><input type="checkbox" /> Checkbox off</label>
+            <label style="display:flex;gap:.4rem;align-items:center;font-weight:400"><input type="radio" name="demo-radio" checked /> Radio on</label>
+            <label style="display:flex;gap:.4rem;align-items:center;font-weight:400"><input type="radio" name="demo-radio" /> Radio off</label>
+          </div>
+          <details><summary>Accordion (no JS)</summary><p>Content via <code>details/summary</code>.</p></details>
+          <div class="row">
+            <label class="switch"><input type="checkbox" role="switch" checked /> On</label>
+            <label class="switch"><input type="checkbox" role="switch" /> Off</label>
+            <label class="switch"><input type="checkbox" role="switch" disabled /> Disabled</label>
+          </div>
+          <div class="field"><span>Volume</span><input type="range" min="0" max="100" value="60" aria-label="Volume" /></div>
+          <div class="lui-grid">
+            <label class="field"><span>Username</span><input placeholder="ada_lovelace" aria-describedby="demo-hint" /><small class="hint" id="demo-hint">Lowercase letters, numbers and _ only.</small></label>
+            <label class="field" data-invalid="true"><span>Email</span><input value="not-an-email" aria-describedby="demo-err" /><small class="hint" id="demo-err">Enter a valid email address.</small></label>
+          </div>
+          <div class="row">
+            <div class="segmented" role="group" aria-label="Time range">
+              <input type="radio" name="demo-range" id="demo-r-1d" /><label for="demo-r-1d">1D</label>
+              <input type="radio" name="demo-range" id="demo-r-7d" checked /><label for="demo-r-7d">7D</label>
+              <input type="radio" name="demo-range" id="demo-r-1m" /><label for="demo-r-1m">1M</label>
+              <input type="radio" name="demo-range" id="demo-r-1y" /><label for="demo-r-1y">1Y</label>
+              <input type="radio" name="demo-range" id="demo-r-all" /><label for="demo-r-all">All</label>
+            </div>
+          </div>
+          <article class="card">
+            <h3>Verify account</h3>
+            <p><small>We've sent a code to a*****@gmail.com — pasting fills all boxes at once.</small></p>
+            <div class="otp" role="group" aria-label="One-time code, 6 digits">
+              <input inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" aria-label="Digit 1 of 6" />
+              <input inputmode="numeric" pattern="[0-9]*" aria-label="Digit 2 of 6" />
+              <input inputmode="numeric" pattern="[0-9]*" aria-label="Digit 3 of 6" />
+              <span aria-hidden="true">–</span>
+              <input inputmode="numeric" pattern="[0-9]*" aria-label="Digit 4 of 6" />
+              <input inputmode="numeric" pattern="[0-9]*" aria-label="Digit 5 of 6" />
+              <input inputmode="numeric" pattern="[0-9]*" aria-label="Digit 6 of 6" />
+            </div>
+          </article>
+          <div class="row">
+            <button class="btn" data-variant="secondary" type="button" data-lui-open="demo-dialog">Open dialog (JS enhanced)</button>
+            <button class="btn" data-variant="ghost" type="button" data-lui-toast="success" data-lui-toast-title="Changes saved" data-lui-toast-message="Your profile has been updated.">Toast it</button>
+          </div>
+          <div class="lui-grid">
+            <div class="toast" data-tone="info" role="status"><div><strong>Update available</strong><p>Version 2.4.1 is ready.</p></div></div>
+            <div class="toast" data-tone="success" role="status"><div><strong>Changes saved</strong><p>Profile updated successfully.</p></div></div>
+            <div class="toast" data-tone="warning" role="status"><div><strong>Storage almost full</strong><p>90% of your storage used.</p></div></div>
+            <div class="toast" data-tone="danger" role="status"><div><strong>Build failed</strong><p>3 tests did not pass.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <h3 id="export">Export</h3>
+      <div class="export-bar">
+        <button class="btn" id="btn-copy" type="button" data-variant="secondary">Copy</button>
+        <button class="btn" id="btn-download" type="button" data-variant="secondary">Download themes.css</button>
+        <button class="btn" id="btn-share" type="button" data-variant="secondary">Copy link</button>
+      </div>
+      <pre><code id="lui-export">[data-theme="my-theme"] {
+  --lui-primary: #4f7dd9;
+  --lui-on-primary: #ffffff;
+  --lui-secondary: #58678d;
+  --lui-on-secondary: #ffffff;
+  --lui-bg: #161b28;
+  --lui-surface: color-mix(in oklch, #4f7dd9 7%, #161b28);
+  --lui-surface: oklch(from color-mix(in oklch, #4f7dd9 7%, #161b28) max(l, 0.24) c h);
+  --lui-text: #f2f3f5;
+  --lui-muted: color-mix(in oklch, #f2f3f5 62%, #161b28);
+  --lui-border: color-mix(in oklch, #f2f3f5 18%, #161b28);
+  --lui-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23f2f3f5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  --lui-contrast: 0.50;
+  --lui-radius: 12px;
+  --lui-radius-control: 12px;
+  --lui-density-x: 1.00;
+  --lui-density-y: 1.00;
+  --lui-contrast: 0.50;
+  --lui-corner-shape: round;
+}</code></pre>
+      <p><small>Paste into <code>src/themes.css</code> → use via <code>&lt;html data-theme="my-theme" data-mode="auto"&gt;</code>. The builder generates the dark variant too (see full export after download).</small></p>
+    </section>
+
+    <hr />
+
+    <section id="components" aria-label="Component gallery">
+      <h2>Components (classless + variants)</h2>
+      <h3>Without classes</h3>
+      <article><h3>article as card</h3><p>Plain HTML, no <code>class</code> needed.</p><button type="button">native button</button></article>
+      <h3>Tabs (clickable + keyboard-operable without JS)</h3>
+      <div class="tabs">
+        <input type="radio" name="demo-tabs" id="demo-tabs-1" checked /><label for="demo-tabs-1">Overview</label><section><p>First panel — pure CSS via radio trick.</p></section>
+        <input type="radio" name="demo-tabs" id="demo-tabs-2" /><label for="demo-tabs-2">Details</label><section><p>Second panel. With JS, tablist roles + roving tabindex are added.</p></section>
+        <input type="radio" name="demo-tabs" id="demo-tabs-3" disabled /><label for="demo-tabs-3">Disabled</label><section><p>Never seen — tab is disabled.</p></section>
+      </div>
+      <table><thead><tr><th>Name</th><th>Role</th></tr></thead><tbody><tr><td>Ada</td><td>Admin</td></tr><tr><td>Lin</td><td>User</td></tr></tbody></table>
+    </section>
+
+    <footer><hr /><p>linkedui · <code>src/linkedui.css</code> + <code>src/enhance.js</code> · Local preview: VS Code Live Server on <code>/site</code>.</p></footer>
+  </main>
+
+  <dialog id="demo-dialog" aria-label="Demo dialog">
+    <h3>Dialog</h3>
+    <p>Native with <code>::backdrop</code>, closes via ESC + backdrop click (JS enhanced, usable without JS via the <code>open</code> attribute).</p>
+    <button class="btn" type="button" data-lui-close>Close</button>
+  </dialog>
+
+  <script src="../src/enhance.js?v=11" defer></script>
+  <script src="./app.js?v=7" defer></script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+/* linkedui — components/feedback.css — alert + badge.
+ *
+ * Markup:
+ *   <div class="alert" data-tone="success|warning|danger"><span>Text</span></div>
+ *   <span class="badge">New</span>
+ * Tones come from --lui-success/--lui-warning/--lui-danger.
+ */
+
+@layer components {
+  .alert {
+    border: var(--lui-border-width) solid var(--lui-border);
+    border-radius: var(--lui-radius-lg);
+    padding: var(--lui-space-2) var(--lui-space-3);
+    background: var(--lui-surface);
+    display: flex;
+    gap: var(--lui-space-2);
+    align-items: start;
+  }
+  .alert[data-tone="success"] { border-left: 4px solid var(--lui-success); }
+  .alert[data-tone="warning"] { border-left: 4px solid var(--lui-warning); }
+  .alert[data-tone="danger"] { border-left: 4px solid var(--lui-danger); }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--lui-control-h-sm);
+    padding: 0 var(--lui-space-2);
+    border-radius: var(--lui-radius-full);
+    background: var(--lui-surface);
+    border: var(--lui-border-width) solid var(--lui-border);
+    font-size: var(--lui-font-sm);
+    font-weight: 600;
+  }
+}

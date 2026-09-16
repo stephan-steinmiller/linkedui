@@ -1,0 +1,70 @@
+/* linkedui — components/card.css — layout + container.
+ *
+ * Classes: .lui-container (centered, max --lui-maxw), .lui-grid
+ * (responsive auto-fit grid), .card (box), .field (label + control,
+ * full width — ideal for forms and range demos).
+ *
+ * Markup:
+ *   <main class="lui-container">
+ *     <div class="lui-grid">
+ *       <article class="card"><h3>Title</h3><p>Text</p></article>
+ *     </div>
+ *     <label class="field"><span>Name</span><input … /></label>
+ *   </main>
+ * Note: bare <article> WITHOUT class already looks like .card via base.css.
+ */
+
+@layer components {
+  .lui-container {
+    max-width: var(--lui-maxw);
+    margin-inline: auto;
+    padding: var(--lui-space-4) var(--lui-space-3);
+  }
+
+  .lui-grid {
+    display: grid;
+    gap: var(--lui-space-3);
+    grid-template-columns: repeat(auto-fit, minmax(min(16rem, 100%), 1fr));
+  }
+
+  .card {
+    background: var(--lui-surface);
+    border: var(--lui-border-width) solid var(--lui-border);
+    border-radius: var(--lui-radius-lg);
+    padding: var(--lui-space-3);
+    box-shadow: var(--lui-shadow-sm);
+    display: grid;
+    gap: var(--lui-space-2);
+  }
+  .card > h3 { margin: 0; }
+
+  .field {
+    display: grid;
+    gap: var(--lui-space-1);
+    margin-block: var(--lui-space-2);
+  }
+  .field > span { font-size: var(--lui-font-sm); font-weight: 600; }
+  .field input, .field select, .field textarea { max-width: none; }
+
+  /* Hint under the control (help text or validation message).
+     Markup: <label class="field"><span>Name</span><input aria-describedby="x-hint" /><small class="hint" id="x-hint">…</small></label>
+     Invalid: <label class="field" data-invalid="true">…</label> (or aria-invalid="true" on the control) */
+  .field > .hint {
+    font-size: var(--lui-font-sm);
+    font-weight: 400;
+    color: var(--lui-muted);
+  }
+  .field[data-invalid="true"] > input,
+  .field[data-invalid="true"] > select,
+  .field[data-invalid="true"] > textarea,
+  .field > input[aria-invalid="true"],
+  .field > select[aria-invalid="true"],
+  .field > textarea[aria-invalid="true"] {
+    border-color: var(--lui-danger);
+  }
+  .field[data-invalid="true"] > .hint {
+    color: var(--lui-danger);
+  }
+
+  table.data { width: 100%; }
+}

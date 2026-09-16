@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="de" data-theme="default" data-mode="auto">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>linkedui Wiki — Verwendung der Library</title>
+  <meta name="description" content="linkedui verwenden: Schnellstart, Komponenten, Theming, JS-API, No-JS-Matrix." />
+  <link rel="stylesheet" href="../src/linkedui.css?v=14" />
+  <script>
+    try {
+      const t = localStorage.getItem("lui-theme"), m = localStorage.getItem("lui-mode");
+      if (t) document.documentElement.dataset.theme = t;
+      if (m) document.documentElement.dataset.mode = m;
+    } catch (e) {}
+  </script>
+</head>
+<body>
+  <nav class="nav" aria-label="Hauptnavigation">
+    <strong>linkedui</strong>
+    <a href="./index-de.html">Builder</a>
+    <a href="./wiki-de.html" aria-current="page">Wiki</a>
+    <a href="./wiki.html" hreflang="en">English</a>
+    <span style="flex:1"></span>
+    <label class="visually-hidden" for="wiki-theme">Theme</label>
+    <select id="wiki-theme" data-lui-theme>
+      <option value="default">default</option>
+      <option value="ocean">ocean</option>
+      <option value="squishy">squishy + squircle</option>
+    </select>
+    <label class="visually-hidden" for="wiki-mode">Modus</label>
+    <select id="wiki-mode" data-lui-mode>
+      <option value="auto">auto (System)</option>
+      <option value="light">light</option>
+      <option value="dark">dark</option>
+    </select>
+  </nav>
+
+  <main class="lui-container">
+    <h1>linkedui Wiki</h1>
+    <p>CSS-first UI-Library: classless Basis, Varianten per Klasse, Theming per Variable.
+      Ohne JS nutzbar, mit JS besser. Diese Seite nutzt nur die Library selbst —
+      alles unten ist live. Langfassung: <code>WIKI.md</code> (Englisch) im Repo.</p>
+
+    <h2 id="start">1. Schnellstart</h2>
+    <pre><code>&lt;link rel="stylesheet" href="linkedui/src/linkedui.css" /&gt;
+&lt;html data-theme="default" data-mode="auto"&gt;
+&lt;main class="lui-container"&gt;
+  &lt;button class="btn"&gt;Primary&lt;/button&gt;
+&lt;/main&gt;
+&lt;script src="linkedui/src/enhance.js" defer&gt;&lt;/script&gt;</code></pre>
+
+    <h2 id="buttons">2. Buttons <small>src/components/button.css</small></h2>
+    <div class="row" style="display:flex;gap:.5rem;flex-wrap:wrap">
+      <button class="btn" type="button">Primary</button>
+      <button class="btn" data-variant="secondary" type="button">Secondary</button>
+      <button class="btn" data-variant="ghost" type="button">Ghost</button>
+      <button class="btn" data-variant="outline" type="button">Outline</button>
+      <button class="btn" data-variant="danger" type="button">Danger</button>
+      <button class="btn" type="button" disabled>Disabled</button>
+      <button class="btn" type="button" data-loading="true">Loading</button>
+    </div>
+    <pre><code>&lt;button class="btn" data-variant="secondary" data-size="sm"&gt;…&lt;/button&gt;
+&lt;!-- Varianten: secondary ghost outline danger (= destructive) --&gt;
+&lt;!-- data-size: sm | (md) | lg · data-block · data-icon · data-loading · disabled --&gt;</code></pre>
+
+    <h2 id="forms">3. Formulare <small>src/base.css (classless)</small></h2>
+    <div class="lui-grid">
+      <label class="field"><span>Name</span><input placeholder="Gleiche Höhe wie Buttons" /></label>
+      <label class="field"><span>Auswahl</span><select><option>Eins</option><option>Zwei</option></select></label>
+    </div>
+    <p>
+      <label style="display:flex;gap:.4rem;align-items:center;font-weight:400"><input type="checkbox" checked /> Checkbox</label>
+      <label style="display:flex;gap:.4rem;align-items:center;font-weight:400"><input type="radio" name="wiki-r" checked /> Radio A</label>
+      <label style="display:flex;gap:.4rem;align-items:center;font-weight:400"><input type="radio" name="wiki-r" /> Radio B</label>
+      <label class="switch"><input type="checkbox" role="switch" checked /> Switch</label>
+    </p>
+    <div class="field"><span>Lautstärke</span><input type="range" min="0" max="100" value="60" aria-label="Lautstärke" /></div>
+
+    <h2 id="feedback">4. Cards, Alerts, Badges</h2>
+    <div class="lui-grid">
+      <article class="card"><h3>Card</h3><p><code>&lt;article&gt;</code> ohne Klasse sieht genauso aus.</p><span class="badge">Badge</span></article>
+      <div>
+        <div class="alert" data-tone="success"><span>Erfolg — data-tone: success | warning | danger</span></div>
+      </div>
+    </div>
+
+    <h2 id="overlays">5. Nav, Tooltip, Dropdown, Dialog</h2>
+    <nav class="nav"><a href="./wiki-de.html" aria-current="page">Aktiv</a><a href="./index-de.html">Builder</a></nav>
+    <p><span data-tooltip="Rein CSS">Tooltip-Hover mich</span> ·
+      <details class="dropdown" style="display:inline-block"><summary>Dropdown</summary><div><a href="#overlays">Eintrag</a></div></details> ·
+      <button class="btn" data-variant="secondary" type="button" data-lui-open="wiki-dialog">Dialog öffnen</button></p>
+
+    <h2 id="tabs">6. Tabs <small>ohne JS per Radio-Tastatur bedienbar</small></h2>
+    <div class="tabs">
+      <input type="radio" name="wiki-tabs" id="wiki-tabs-1" checked /><label for="wiki-tabs-1">Markup</label><section><p>Reihenfolge: <code>input → label → section</code>, Label per <code>for/id</code> gekoppelt.</p></section>
+      <input type="radio" name="wiki-tabs" id="wiki-tabs-2" /><label for="wiki-tabs-2">JS</label><section><p>Mit <code>enhance.js</code>: tablist-Rollen, Roving-Tabindex, Pfeile/Home/End.</p></section>
+    </div>
+
+    <h2 id="otp">7. OTP <small>separate Boxen — Einfügen verteilt auf alle</small></h2>
+    <div class="otp" role="group" aria-label="Einmal-Code, 6 Ziffern">
+      <input inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" aria-label="Ziffer 1 von 6" />
+      <input inputmode="numeric" pattern="[0-9]*" aria-label="Ziffer 2 von 6" />
+      <input inputmode="numeric" pattern="[0-9]*" aria-label="Ziffer 3 von 6" />
+      <span aria-hidden="true">–</span>
+      <input inputmode="numeric" pattern="[0-9]*" aria-label="Ziffer 4 von 6" />
+      <input inputmode="numeric" pattern="[0-9]*" aria-label="Ziffer 5 von 6" />
+      <input inputmode="numeric" pattern="[0-9]*" aria-label="Ziffer 6 von 6" />
+    </div>
+    <pre><code>&lt;div class="otp" role="group" aria-label="Einmal-Code, 6 Ziffern"&gt;
+  &lt;input inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" aria-label="Ziffer 1 von 6" /&gt;
+  &lt;!-- … mehr Inputs, optional &lt;span aria-hidden="true"&gt;–&lt;/span&gt; als Strich … --&gt;
+&lt;/div&gt;</code></pre>
+
+    <h2 id="segmented">8. Segmented Control <small>Radio-Pills, kein JS nötig</small></h2>
+    <div class="segmented" role="group" aria-label="Zeitraum">
+      <input type="radio" name="wiki-range" id="wiki-r-1d" /><label for="wiki-r-1d">1T</label>
+      <input type="radio" name="wiki-range" id="wiki-r-7d" checked /><label for="wiki-r-7d">7T</label>
+      <input type="radio" name="wiki-range" id="wiki-r-1m" /><label for="wiki-r-1m">1M</label>
+    </div>
+    <pre><code>&lt;div class="segmented" role="group" aria-label="Zeitraum"&gt;
+  &lt;input type="radio" name="range" id="r-7d" checked /&gt;&lt;label for="r-7d"&gt;7T&lt;/label&gt;
+  &lt;!-- … weitere input+label-Paare, Labels dürfen Icons enthalten … --&gt;
+&lt;/div&gt;</code></pre>
+
+    <h2 id="hints">9. Feld-Hinweise <small>Hilfe + Invalid-States</small></h2>
+    <div class="lui-grid">
+      <label class="field"><span>Benutzername</span><input placeholder="ada" aria-describedby="wiki-hint" /><small class="hint" id="wiki-hint">Nur Kleinbuchstaben.</small></label>
+      <label class="field" data-invalid="true"><span>E-Mail</span><input value="keine" aria-describedby="wiki-err" /><small class="hint" id="wiki-err">Gültige E-Mail eingeben.</small></label>
+    </div>
+    <pre><code>&lt;label class="field" data-invalid="true"&gt;
+  &lt;span&gt;E-Mail&lt;/span&gt;&lt;input aria-describedby="e-hint" /&gt;
+  &lt;small class="hint" id="e-hint"&gt;Gültige E-Mail eingeben.&lt;/small&gt;
+&lt;/label&gt;
+&lt;!-- oder aria-invalid="true" direkt am Control --&gt;</code></pre>
+
+    <h2 id="toasts">10. Toasts <small>info | success | warning | danger</small></h2>
+    <div class="lui-grid">
+      <div class="toast" data-tone="info" role="status"><div><strong>Update verfügbar</strong><p>Version 2.4.1 ist da.</p></div></div>
+      <div class="toast" data-tone="success" role="status"><div><strong>Gespeichert</strong><p>Fertig.</p></div></div>
+      <div class="toast" data-tone="warning" role="status"><div><strong>Speicher fast voll</strong><p>90 % belegt.</p></div></div>
+      <div class="toast" data-tone="danger" role="status"><div><strong>Build fehlgeschlagen</strong><p>3 Tests rot.</p></div></div>
+    </div>
+    <p><button class="btn" data-variant="secondary" type="button" data-lui-toast="info" data-lui-toast-title="Hallo" data-lui-toast-message="Live-Toast, blendet sich aus.">Live-Toast zeigen</button></p>
+    <pre><code>&lt;button data-lui-toast="success" data-lui-toast-title="Fertig"
+        data-lui-toast-message="Gespeichert."&gt;Toast zeigen&lt;/button&gt;
+&lt;!-- JS-API: luiToast({ tone, title, message, ms }) --&gt;</code></pre>
+
+    <h2 id="theming">11. Theming</h2>
+    <pre><code>&lt;html data-theme="default|ocean|squishy|eigenes" data-mode="auto|light|dark"&gt;
+&lt;select data-lui-theme&gt;…&lt;/select&gt;  &lt;!-- persistent via enhance.js --&gt;
+&lt;select data-lui-mode&gt;…&lt;/select&gt;</code></pre>
+    <p>Eigenes Theme: <a href="./index-de.html">Builder</a> → Export nach <code>src/themes.css</code>.
+      Shape-Regeln: <code>--lui-radius</code> = Boxen, <code>--lui-radius-control</code> = Controls
+      (<code>999px</code> = Pill nur dort), <code>--lui-corner-shape: round | superellipse(K)</code>
+      plus Radius-Kompensation (<code>Basis × (0,5 + 0,5 × K)</code>) nur in
+      <code>@supports (corner-shape: superellipse(1))</code>.</p>
+
+    <h2 id="tokens">12. Token-Referenz (Auszug)</h2>
+    <table>
+      <thead><tr><th>Gruppe</th><th>Tokens</th></tr></thead>
+      <tbody>
+        <tr><td>Farben</td><td><code>--lui-bg --lui-surface --lui-text --lui-muted --lui-border --lui-primary(-hover/-active) --lui-on-primary --lui-secondary(-…) --lui-on-secondary --lui-success --lui-warning --lui-danger --lui-ring --lui-chevron</code></td></tr>
+        <tr><td>Shape</td><td><code>--lui-radius(-sm/-md/-lg/-full) --lui-radius-control --lui-corner-shape</code></td></tr>
+        <tr><td>Größe</td><td><code>--lui-density(-x/-y) --lui-control-h-sm/-md/-lg --lui-check --lui-contrast --lui-control-py/-px --lui-space-1..4 --lui-font-sans/-mono/-sm/-md/-lg --lui-border-width --lui-shadow-sm/-md --lui-maxw</code></td></tr>
+      </tbody>
+    </table>
+    <p><small>Vollständig mit Farbwerten: <code>src/tokens.css</code> (Header-Kommentare in jeder Datei).</small></p>
+
+    <h2 id="js">13. JS-API</h2>
+    <table>
+      <thead><tr><th>Funktion (<code>enhance.js</code>)</th><th>Zweck</th></tr></thead>
+      <tbody>
+        <tr><td><code>restoreTheme()</code></td><td>localStorage → <code>data-*</code> vor dem Paint</td></tr>
+        <tr><td><code>bindThemeSwitchers()</code></td><td><code>data-lui-theme</code>/<code>data-lui-mode</code> persistent + sync</td></tr>
+        <tr><td><code>bindDialogs()</code></td><td><code>data-lui-open</code>/<code>data-lui-close</code> + Backdrop-Klick</td></tr>
+        <tr><td><code>enhanceTabs()</code></td><td><code>.tabs</code> → tablist (ARIA, Roving-Tabindex, Tasten)</td></tr>
+        <tr><td><code>enhanceOtp()</code></td><td><code>.otp</code> → Weiter, Backspace, Paste-Split</td></tr>
+        <tr><td><code>bindToasts()</code> / <code>showToast()</code></td><td>Toasts via <code>data-lui-toast</code> oder <code>luiToast({tone,title,message,ms})</code></td></tr>
+      </tbody>
+    </table>
+    <p>Builder (<code>site/app.js</code>, alles mit JSDoc): <code>derived()</code>,
+      <code>snippet()</code>/<code>fullFile()</code>, <code>render()</code>,
+      <code>loadThemeIntoBuilder()</code>, <code>applyUrlState()</code>/<code>pushUrlState()</code>.</p>
+
+    <h2 id="nojs">14. Ohne-JS-Matrix</h2>
+    <table>
+      <thead><tr><th>Geht ohne JS</th><th>Braucht JS</th></tr></thead>
+      <tbody>
+        <tr><td>System-Theme, Inhalte, Accordion/Dropdown, Dialog via <code>open</code>, Tabs (Radio-Tasten), OTP, Formulare</td><td>Persistente Theme-Wahl, <code>showModal()</code>, tablist-ARIA, Copy/Download/Share</td></tr>
+      </tbody>
+    </table>
+
+    <footer><hr /><p><small>linkedui · <a href="./index-de.html">Builder</a> · Volltext: <code>WIKI.md</code> (Englisch)</small></p></footer>
+  </main>
+
+  <dialog id="wiki-dialog" aria-label="Wiki-Dialog">
+    <h3>Dialog</h3>
+    <p>Nativ, ESC + Backdrop-Klick inklusive.</p>
+    <button class="btn" type="button" data-lui-close>Schließen</button>
+  </dialog>
+
+  <script src="../src/enhance.js?v=10" defer></script>
+</body>
+</html>

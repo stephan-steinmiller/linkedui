@@ -1,0 +1,46 @@
+/* linkedui — reset.css — minimal modern reset (layer `reset`).
+ *
+ * Covers: box-sizing, margin reset, body base font/colors from tokens,
+ * responsive media, form font inheritance, visible :focus-visible ring.
+ * No classes needed. Ordering note: `dialog { margin: auto }` is set in
+ * base.css AGAINST this margin:0 (otherwise no dialog centering).
+ */
+
+@layer reset {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  * {
+    margin: 0;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    min-height: 100dvh;
+    font-family: var(--lui-font-sans);
+    font-size: var(--lui-font-md);
+    line-height: 1.5;
+    background: var(--lui-bg);
+    color: var(--lui-text);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  img, svg, video {
+    display: block;
+    max-width: 100%;
+  }
+
+  input, button, select, textarea {
+    font: inherit;
+    color: inherit;
+  }
+
+  :where(:focus-visible) {
+    outline: 2px solid var(--lui-ring);
+    outline-offset: 2px;
+  }
+}

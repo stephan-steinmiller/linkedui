@@ -1,0 +1,195 @@
+/* linkedui — themes.css — ONE file for all themes.
+   Switch: <html data-theme="default|ocean|squishy" data-mode="auto|light|dark">
+   Default data-mode="auto" → system decides, pure CSS, no JS needed.
+ *
+ * ADDING YOUR OWN THEME (pattern, light + dark):
+ *   [data-theme="my-theme"] {
+ *     color-scheme: light;
+ *     --lui-primary: oklch(0.6 0.16 255);
+ *     --lui-on-primary: oklch(0.99 0 0);
+ *     --lui-bg: oklch(0.99 0.005 95);
+ *     --lui-surface: #edf1f7; /* fallback */
+ *     --lui-surface: color-mix(in oklch, var(--lui-primary) 7%, var(--lui-bg));
+ *     --lui-text: oklch(0.27 0.03 260);
+ *     --lui-radius: 12px;            (boxes)
+ *     --lui-radius-control: 12px;    (buttons/inputs; 999px = pill)
+ *     --lui-density-x: 1; --lui-density-y: 1;
+ *     --lui-corner-shape: round;     (or superellipse(1.3) + @supports compensation!)
+ *   }
+ *   [data-mode="dark"][data-theme="my-theme"] { color-scheme: dark; …dark values… }
+ *   @media (prefers-color-scheme: dark) {
+ *     [data-mode="auto"][data-theme="my-theme"] { …dark values… }
+ *   }
+ * Easier: site/index.html (theme builder) → copy the export.
+ * Squircle rule: compensate radius (base × (0.5 + 0.5 × K)) ONLY inside
+ * @supports — otherwise it gets too round where shapes are unsupported.
+ * See squishy block below.
+ */
+
+@layer themes {
+  /* ---------- Light: Default ---------- */
+  :root, [data-theme="default"] {
+    color-scheme: light;
+    --lui-bg: oklch(0.99 0.005 95);
+    --lui-surface: #edf1f7;
+    --lui-surface: color-mix(in oklch, var(--lui-primary) 7%, var(--lui-bg));
+    --lui-text: oklch(0.27 0.03 260);
+    --lui-muted: oklch(0.55 0.03 260);
+    --lui-border: #e2e5ea;
+    --lui-border: color-mix(in oklch, var(--lui-text) calc(8% + var(--lui-contrast, 0.5) * 20%), var(--lui-bg));
+    --lui-primary: oklch(0.6 0.16 255);
+    --lui-primary-hover: #3f6fd8;
+    --lui-primary-hover: color-mix(in oklch, var(--lui-primary) 88%, black);
+    --lui-primary-active: #355cb8;
+    --lui-primary-active: color-mix(in oklch, var(--lui-primary) 78%, black);
+    --lui-on-primary: oklch(0.99 0 0);
+    --lui-secondary: oklch(0.55 0.06 260);
+    --lui-on-secondary: oklch(0.99 0 0);
+    --lui-radius: 12px;
+    --lui-density: 1;
+    --lui-corner-shape: normal;
+  }
+
+  /* ---------- Light: Ocean ---------- */
+  [data-theme="ocean"] {
+    color-scheme: light;
+    --lui-bg: oklch(0.985 0.01 210);
+    --lui-surface: #e8f1f5;
+    --lui-surface: color-mix(in oklch, var(--lui-primary) 7%, var(--lui-bg));
+    --lui-text: oklch(0.26 0.04 230);
+    --lui-muted: oklch(0.53 0.04 220);
+    --lui-primary: oklch(0.65 0.14 200);
+    --lui-primary-hover: #1f7a9e;
+    --lui-primary-hover: color-mix(in oklch, var(--lui-primary) 88%, black);
+    --lui-primary-active: #1a6887;
+    --lui-primary-active: color-mix(in oklch, var(--lui-primary) 78%, black);
+    --lui-on-primary: oklch(0.99 0 0);
+    --lui-secondary: oklch(0.52 0.07 210);
+    --lui-on-secondary: oklch(0.99 0 0);
+    --lui-radius: 10px;
+    --lui-density: 1;
+    --lui-corner-shape: normal;
+  }
+
+  /* ---------- Light: Squishy (Squircle optional) ---------- */
+  [data-theme="squishy"] {
+    color-scheme: light;
+    --lui-bg: oklch(0.99 0.01 350);
+    --lui-surface: #f9edf1;
+    --lui-surface: color-mix(in oklch, var(--lui-primary) 7%, var(--lui-bg));
+    --lui-text: oklch(0.28 0.05 350);
+    --lui-muted: oklch(0.56 0.05 350);
+    --lui-primary: oklch(0.65 0.2 10);
+    --lui-primary-hover: #d14a7a;
+    --lui-primary-hover: color-mix(in oklch, var(--lui-primary) 88%, black);
+    --lui-primary-active: #b23e68;
+    --lui-primary-active: color-mix(in oklch, var(--lui-primary) 78%, black);
+    --lui-on-primary: oklch(0.99 0 0);
+    --lui-secondary: oklch(0.58 0.12 10);
+    --lui-on-secondary: oklch(0.99 0 0);
+    --lui-radius: 18px;
+    --lui-density: 1.15;
+    --lui-corner-shape: superellipse(1.3);
+  }
+
+  /* ---------- Dark: explicit override ---------- */
+  [data-mode="dark"], [data-mode="dark"][data-theme="default"] {
+    color-scheme: dark;
+    --lui-bg: oklch(0.22 0.02 260);
+    --lui-surface: #232c40;
+    --lui-surface: color-mix(in oklch, var(--lui-primary) 7%, var(--lui-bg));
+    --lui-text: oklch(0.95 0.01 95);
+    --lui-muted: oklch(0.7 0.03 260);
+    --lui-border: #3a4152;
+    --lui-border: color-mix(in oklch, var(--lui-text) calc(8% + var(--lui-contrast, 0.5) * 20%), var(--lui-bg));
+    --lui-primary: oklch(0.7 0.15 255);
+    --lui-on-primary: oklch(0.2 0.03 260);
+  }
+  [data-mode="dark"][data-theme="ocean"] {
+    color-scheme: dark;
+    --lui-bg: oklch(0.22 0.03 220);
+    --lui-surface: #213040;
+    --lui-surface: color-mix(in oklch, var(--lui-primary) 7%, var(--lui-bg));
+    --lui-text: oklch(0.95 0.01 210);
+    --lui-muted: oklch(0.7 0.04 220);
+    --lui-primary: oklch(0.75 0.13 200);
+    --lui-on-primary: oklch(0.2 0.03 220);
+  }
+  [data-mode="dark"][data-theme="squishy"] {
+    color-scheme: dark;
+    --lui-bg: oklch(0.23 0.03 350);
+    --lui-surface: #2c2633;
+    --lui-surface: color-mix(in oklch, var(--lui-primary) 7%, var(--lui-bg));
+    --lui-text: oklch(0.95 0.015 350);
+    --lui-muted: oklch(0.72 0.04 350);
+    --lui-primary: oklch(0.72 0.18 10);
+    --lui-on-primary: oklch(0.22 0.03 350);
+  }
+
+  /* ---------- System auto (only when data-mode=auto or missing) ---------- */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-mode]), [data-mode="auto"], [data-mode="auto"][data-theme="default"] {
+      color-scheme: dark;
+      --lui-bg: oklch(0.22 0.02 260);
+      --lui-surface: #232c40;
+    --lui-surface: color-mix(in oklch, var(--lui-primary) 7%, var(--lui-bg));
+      --lui-text: oklch(0.95 0.01 95);
+      --lui-muted: oklch(0.7 0.03 260);
+      --lui-border: #3a4152;
+      --lui-border: color-mix(in oklch, var(--lui-text) 16%, var(--lui-bg));
+      --lui-primary: oklch(0.7 0.15 255);
+      --lui-on-primary: oklch(0.2 0.03 260);
+    }
+    [data-mode="auto"][data-theme="ocean"] {
+      color-scheme: dark;
+      --lui-bg: oklch(0.22 0.03 220);
+      --lui-surface: #213040;
+    --lui-surface: color-mix(in oklch, var(--lui-primary) 7%, var(--lui-bg));
+      --lui-text: oklch(0.95 0.01 210);
+      --lui-muted: oklch(0.7 0.04 220);
+      --lui-primary: oklch(0.75 0.13 200);
+      --lui-on-primary: oklch(0.2 0.03 220);
+    }
+    [data-mode="auto"][data-theme="squishy"] {
+      color-scheme: dark;
+      --lui-bg: oklch(0.23 0.03 350);
+      --lui-surface: #2c2633;
+    --lui-surface: color-mix(in oklch, var(--lui-primary) 7%, var(--lui-bg));
+      --lui-text: oklch(0.95 0.015 350);
+      --lui-muted: oklch(0.72 0.04 350);
+      --lui-primary: oklch(0.72 0.18 10);
+      --lui-on-primary: oklch(0.22 0.03 350);
+    }
+  }
+
+  /* ---------- Light-Force: makes sure light really stays light ---------- */
+  [data-mode="light"][data-theme="ocean"] { color-scheme: light; }
+  [data-mode="light"][data-theme="squishy"] { color-scheme: light; }
+
+  /* ---------- Select-Chevron: hell im Dark-Mode ---------- */
+  [data-mode="dark"] {
+    --lui-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23e8eaf0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-mode]), [data-mode="auto"] {
+      --lui-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23e8eaf0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    }
+  }
+  /* ---------- Corner shape: applies to literally every element (+pseudos) ----------
+     Only where supported. Default `round` = no visible difference. */
+  @supports (corner-shape: superellipse(1)) {
+    :where(*, *::before, *::after) {
+      corner-shape: var(--lui-corner-shape);
+    }
+  }
+
+  /* ---------- Squircle radius compensation (only where supported) ----------
+     K=1.3 looks more square → 18px × (0.5 + 0.5 × 1.3) = 20.7px. Without shape
+     support the base radius stays, otherwise it would get too round there. */
+  @supports (corner-shape: superellipse(1)) {
+    [data-theme="squishy"] {
+      --lui-radius: 20.7px;
+      --lui-radius-control: 20.7px;
+    }
+  }
+}

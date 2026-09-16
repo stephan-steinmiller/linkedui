@@ -1,0 +1,24 @@
+/* linkedui — entry point: include ONE file and you're done.
+ *
+ * Usage:
+ *   <link rel="stylesheet" href="linkedui/src/linkedui.css" />
+ *   <html data-theme="default" data-mode="auto">
+ *
+ * Order + @layer drive the cascade (later = stronger):
+ * tokens → reset → base-classless → components → themes.
+ * Custom styles go either UNLAYERED (beats everything) or in your own layer
+ * imported after `themes`. Docs: WIKI.md + site/wiki.html
+ */
+@layer tokens, reset, base-classless, components, themes;
+
+@import "./tokens.css" layer(tokens);
+@import "./reset.css" layer(reset);
+@import "./base.css" layer(base-classless);
+@import "./components/button.css" layer(components);
+@import "./components/card.css" layer(components);
+@import "./components/feedback.css" layer(components);
+@import "./components/nav-overlays.css" layer(components);
+@import "./components/tabs.css" layer(components);
+@import "./components/segmented.css" layer(components);
+@import "./components/otp.css" layer(components);
+@import "./themes.css" layer(themes);

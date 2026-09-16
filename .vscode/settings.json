@@ -1,0 +1,18 @@
+{
+  "editor.formatOnSave": true,
+  "editor.tabSize": 2,
+  "css.lint.unknownAtRules": "ignore",
+  "files.associations": {
+    "*.css": "css"
+  },
+  "liveServer.settings.root": "/site",
+
+  "html.hover.references": false,
+  "css.hover.references": false,
+  "scss.hover.references": false,
+  "less.hover.references": false,
+
+
+  "html.hover.documentation": false,
+  "css.hover.documentation": false
+}

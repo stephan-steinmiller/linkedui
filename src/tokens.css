@@ -1,0 +1,116 @@
+/* linkedui — tokens.css — design token reference (layer `tokens`).
+ * Light defaults; dark + custom themes live in themes.css.
+ * Everything OKLCH, derivations via color-mix with HEX fallback (old browsers take line 1).
+ *
+  * Groups: fonts (--lui-font-*) · colors (--lui-bg/surface/field/text/muted/border,
+ * primary + secondary each with hover/active/on-*, status, --lui-ring) · decor chevron
+ * (--lui-chevron, SVG data URI in text color) · shape (--lui-radius + sm/md/lg/full,
+ * --lui-radius-control for buttons/inputs, --lui-corner-shape) · size
+ * (--lui-density as master, --lui-density-x/-y split; --lui-control-h-sm/md/lg,
+ * --lui-check (compact controls), --lui-control-py/-px, --lui-space-1..4) · decor (border-width, shadows, maxw).
+ */
+
+@layer tokens {
+  :root {
+    color-scheme: light dark;
+
+    /* Fonts */
+    --lui-font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --lui-font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --lui-font-sm: 0.8125rem;
+    --lui-font-md: 1rem;
+    --lui-font-lg: 1.125rem;
+
+    /* Base colors (light) */
+    --lui-bg: oklch(0.99 0.005 95);
+    /* Surface is tinted with primary (never colorless, even on #000) */
+    --lui-surface: #edf1f7;
+    --lui-surface: color-mix(in oklch, var(--lui-primary) 7%, var(--lui-bg));
+    /* Field (inputs, slider/segment tracks, checkbox/radio, otp boxes):
+       same primary+bg family as surface, but stronger — so fields stand out
+       both on the page (--lui-bg) AND on cards (--lui-surface).
+       Fallback first: old browsers fall back to surface (previous behavior). */
+    --lui-field: var(--lui-surface);
+    --lui-field: color-mix(in oklch, var(--lui-primary) 14%, var(--lui-bg));
+    --lui-text: oklch(0.27 0.03 260);
+    --lui-muted: oklch(0.55 0.03 260);
+
+    /* Border follows contrast (static fallback first for old browsers) */
+    --lui-border: #e2e5ea;
+    --lui-border: color-mix(in oklch, var(--lui-text) calc(8% + var(--lui-contrast, 0.5) * 20%), var(--lui-bg));
+
+    /* Primary */
+    --lui-primary: oklch(0.6 0.16 255);
+    --lui-primary-hover: #3f6fd8;
+    --lui-primary-hover: color-mix(in oklch, var(--lui-primary) 88%, black);
+    --lui-primary-active: #355cb8;
+    --lui-primary-active: color-mix(in oklch, var(--lui-primary) 78%, black);
+    --lui-on-primary: oklch(0.99 0 0);
+
+    /* Secondary (own hue, own hover/active) */
+    --lui-secondary: oklch(0.55 0.06 260);
+    --lui-secondary-hover: #4c5c7d;
+    --lui-secondary-hover: color-mix(in oklch, var(--lui-secondary) 88%, black);
+    --lui-secondary-active: #3f4c68;
+    --lui-secondary-active: color-mix(in oklch, var(--lui-secondary) 78%, black);
+    --lui-on-secondary: oklch(0.99 0 0);
+
+    /* Status */
+    --lui-success: oklch(0.65 0.15 150);
+    --lui-warning: oklch(0.75 0.15 80);
+    --lui-danger: oklch(0.62 0.2 25);
+    --lui-ring: #9db8f0;
+    --lui-ring: color-mix(in oklch, var(--lui-primary) 45%, white);
+
+    /* Select chevron as data URI (themeable via --lui-chevron override) */
+    --lui-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23333a48' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+
+    /* Shape / size — globally overridable per theme */
+    --lui-radius: 12px;
+    --lui-radius-sm: calc(var(--lui-radius) * 0.5);
+    --lui-radius-md: var(--lui-radius);
+    --lui-radius-lg: calc(var(--lui-radius) * 1.5);
+    --lui-radius-full: 999px;
+
+    /* Control radius (buttons, inputs, selects): follows shape choice.
+       Boxes (cards, panels, dialogs) always use --lui-radius-*. */
+    --lui-radius-control: var(--lui-radius);
+
+    --lui-density: 1;
+    /* Vertical (heights, Y padding, spaces) vs. horizontal (X padding) split.
+       Fall back to --lui-density so old themes keep working. */
+    --lui-density-x: var(--lui-density);
+    --lui-density-y: var(--lui-density);
+    --lui-control-py: calc(0.55rem * var(--lui-density-y));
+    --lui-control-px: calc(0.9rem * var(--lui-density-x));
+    --lui-control-h-sm: calc(2rem * var(--lui-density-y));
+    --lui-control-h-md: calc(2.5rem * var(--lui-density-y));
+    --lui-control-h-lg: calc(3rem * var(--lui-density-y));
+
+    /* Compact form controls (checkbox, radio, switch track, slider):
+       text-sized (1.5rem, like running text) and density-scaled. */
+    --lui-check: calc(1.5rem * var(--lui-density-y));
+
+    /* Contrast 0..1: drives separation everywhere (borders, segmented,
+       toasts). The builder exports it per theme; components use calc()
+       shares with a 0.5 fallback so themes without it still work. */
+    --lui-contrast: 0.5;
+
+    /* Squircle: off by default. Theme sets e.g. superellipse(1.3).
+       NOTE: higher K looks more square → compensate radius with
+       compensated = base × (0.5 + 0.5 × K), but ONLY inside @supports
+       (corner-shape: superellipse(1)) — otherwise it gets too round without shape.
+       The initial value of corner-shape is `round` (= plain border-radius). */
+    --lui-corner-shape: round;
+
+    /* Decor */
+    --lui-border-width: 1px;
+    --lui-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.06);
+    --lui-shadow-md: 0 4px 16px rgb(0 0 0 / 0.08);
+    --lui-maxw: 72rem;
+    --lui-space-1: calc(0.25rem * var(--lui-density-y));
+    --lui-space-2: calc(0.5rem * var(--lui-density-y));
+    --lui-space-3: calc(1rem * var(--lui-density-y));
+    --lui-space-4: calc(1.5rem * var(--lui-density-y));
+  }
+}

@@ -1,0 +1,60 @@
+/* linkedui — components/tabs.css — tab switcher, CSS-only.
+   Markup: input+label+section groups (label linked via for/id).
+   Without JS: native radio group (Tab + arrow keys work).
+   With JS (enhance.js): real tablist roles, roving tabindex, Home/End. */
+
+@layer components {
+  .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--lui-space-1);
+    border-bottom: var(--lui-border-width) solid var(--lui-border);
+  }
+  /* Radios teilnehmend aber unsichtbar (kein display:none → Tastatur bleibt) */
+  .tabs > input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+  }
+  .tabs > label {
+    order: 1;
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--lui-control-h-md);
+    padding: var(--lui-control-py) var(--lui-control-px);
+    margin-bottom: calc(-1 * var(--lui-border-width));
+    border-bottom: 2px solid transparent;
+    color: var(--lui-muted);
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .tabs > label:hover {
+    color: var(--lui-text);
+  }
+  .tabs > input:checked + label {
+    color: var(--lui-primary);
+    border-bottom-color: var(--lui-primary);
+  }
+  .tabs > input:focus-visible + label {
+    outline: 2px solid var(--lui-ring);
+    outline-offset: 2px;
+    border-radius: var(--lui-radius-sm);
+  }
+  .tabs > input:disabled + label {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .tabs > section {
+    order: 2;
+    flex-basis: 100%;
+    display: none;
+    padding-block: var(--lui-space-3);
+  }
+  /* Generisch: Panel direkt nach seinem Label zeigen */
+  .tabs > input:checked + label + section {
+    display: block;
+  }
+}

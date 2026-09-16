@@ -1,0 +1,144 @@
+/* linkedui — components/button.css — variants via classes/data attributes.
+ *
+ * Markup:
+ *   <button class="btn">Primary</button>
+ *   <button class="btn" data-variant="secondary|ghost|outline|danger|destructive">…</button>
+ *   <button class="btn" data-size="sm|lg">…</button>          (default: md)
+ *   <button class="btn" data-block="true">Full width</button>
+ *   <button class="btn" data-icon="true" aria-label="Search">⌕</button>
+ *   <button class="btn" data-loading="true">Loading…</button> (spinner, pure CSS)
+ *   <button class="btn" disabled>Not clickable</button>      (or aria-disabled="true")
+ * Also works on <a class="btn" href="…"> (decoration: none).
+ * All variants: hover color shift + :active press (1px) + reduced-motion respect.
+ */
+
+@layer components {
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+    height: var(--lui-control-h-md);
+    padding: var(--lui-control-py) var(--lui-control-px);
+    border-radius: var(--lui-radius-control);
+    border: var(--lui-border-width) solid transparent;
+    background: var(--lui-primary);
+    color: var(--lui-on-primary);
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+  .btn:hover { background: var(--lui-primary-hover); }
+  .btn:active { background: var(--lui-primary-active); transform: translateY(1px); }
+
+  .btn[data-variant="secondary"] {
+    background: var(--lui-secondary);
+    color: var(--lui-on-secondary);
+    border-color: transparent;
+  }
+  .btn[data-variant="secondary"]:hover { background: var(--lui-secondary-hover); }
+  .btn[data-variant="secondary"]:active { background: var(--lui-secondary-active); transform: translateY(1px); }
+
+  .btn[data-variant="ghost"] {
+    background: transparent;
+    color: var(--lui-primary);
+  }
+  .btn[data-variant="ghost"]:hover {
+    background: rgb(128 128 128 / 0.12);
+    background: color-mix(in oklch, var(--lui-primary) 12%, transparent);
+  }
+  .btn[data-variant="ghost"]:active {
+    background: rgb(128 128 128 / 0.2);
+    background: color-mix(in oklch, var(--lui-primary) 22%, transparent);
+    transform: translateY(1px);
+  }
+  .btn[data-variant="danger"], .btn[data-variant="destructive"] {
+    background: var(--lui-danger);
+    color: oklch(0.99 0 0);
+  }
+  .btn[data-variant="danger"]:hover, .btn[data-variant="destructive"]:hover {
+    background: color-mix(in oklch, var(--lui-danger) 88%, black);
+  }
+  .btn[data-variant="danger"]:active, .btn[data-variant="destructive"]:active {
+    background: color-mix(in oklch, var(--lui-danger) 78%, black);
+    transform: translateY(1px);
+  }
+
+  /* Outline: transparent with colored border (secondary hue) */
+  .btn[data-variant="outline"] {
+    background: transparent;
+    color: var(--lui-secondary);
+    border-color: var(--lui-secondary);
+  }
+  .btn[data-variant="outline"]:hover {
+    background: rgb(128 128 128 / 0.12);
+    background: color-mix(in oklch, var(--lui-secondary) 12%, transparent);
+  }
+  .btn[data-variant="outline"]:active {
+    background: rgb(128 128 128 / 0.2);
+    background: color-mix(in oklch, var(--lui-secondary) 22%, transparent);
+    transform: translateY(1px);
+  }
+
+  .btn[data-size="sm"] {
+    height: var(--lui-control-h-sm);
+    font-size: var(--lui-font-sm);
+  }
+  .btn[data-size="lg"] {
+    height: var(--lui-control-h-lg);
+    font-size: var(--lui-font-lg);
+  }
+
+  /* Full width */
+  .btn[data-block="true"] {
+    display: flex;
+    width: 100%;
+  }
+
+  /* Icon button: square, exactly control height.
+     Glyphs like ⌕ fill only half the em box → much larger font so the glyph
+     visually matches the 1em spinner (data-loading). */
+  .btn[data-icon="true"] {
+    width: var(--lui-control-h-md);
+    padding: 0;
+    flex: none;
+    font-size: 1.8rem;
+    line-height: 1;
+  }
+  .btn[data-icon="true"][data-size="sm"] { width: var(--lui-control-h-sm); font-size: 1.4rem; }
+  .btn[data-icon="true"][data-size="lg"] { width: var(--lui-control-h-lg); font-size: 2.2rem; }
+
+  /* Loading: spinner via ::before (currentColor), clicks blocked — pure CSS */
+  .btn[data-loading="true"] {
+    pointer-events: none;
+  }
+  .btn[data-loading="true"]::before {
+    content: "";
+    width: 1em;
+    height: 1em;
+    flex: none;
+    border-radius: 50%;
+    border: 2px solid currentColor;
+    border-top-color: transparent;
+    animation: lui-spin 0.7s linear infinite;
+  }
+  @keyframes lui-spin {
+    to { transform: rotate(360deg); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .btn[data-loading="true"]::before { animation: none; }
+    .btn:active { transform: none; }
+  }
+
+  /* Disabled: applies to all variants (late in the cascade → beats hover/active) */
+  .btn:disabled, .btn[aria-disabled="true"] {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+  .btn:disabled:active, .btn[aria-disabled="true"]:active {
+    transform: none;
+  }
+}

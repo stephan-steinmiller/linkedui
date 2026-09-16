@@ -1,0 +1,17 @@
+# Deps / Build
+node_modules/
+dist/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/*-local.json
+*.code-workspace
+
+# Env / Secrets
+.env
+.env.*
+!.env.example

@@ -1,0 +1,48 @@
+/* linkedui — components/otp.css — one-time-code boxes.
+   Separate boxes (per-box focus ring like iOS); JS (enhance.js enhanceOtp)
+   handles auto-advance, backspace nav, arrows and paste-split across boxes.
+   Without JS: type one digit per box, Tab advances — fully usable.
+   NOTE: no maxlength on purpose — autofill/paste overflow must reach the
+   JS distributor (maxlength would truncate it to the first char).
+   <div class="otp" role="group" aria-label="One-time code, 6 digits">
+     <input inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" aria-label="Digit 1 of 6" />
+     … (repeat inputs; dash between groups:)
+     <span aria-hidden="true">–</span>
+     …
+   </div> */
+@layer components {
+  .otp {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--lui-space-2);
+    /* Box size follows vertical density (2.75rem ≈ 44px at density 1) */
+    --lui-otp: calc(2.75rem * var(--lui-density-y));
+  }
+  .otp > span[aria-hidden="true"] {
+    color: var(--lui-muted);
+    font: 1.25rem var(--lui-font-mono);
+    user-select: none;
+  }
+  .otp > input {
+    width: var(--lui-otp);
+    height: var(--lui-otp);
+    flex: none;
+    padding: 0;
+    text-align: center;
+    font: 1.25rem/1 var(--lui-font-mono);
+    color: var(--lui-text);
+    background: var(--lui-field);
+    border: var(--lui-border-width) solid var(--lui-border);
+    border-radius: var(--lui-radius-lg);
+    caret-color: var(--lui-primary);
+  }
+  .otp > input:focus {
+    outline: none;
+    border-color: var(--lui-primary);
+  }
+  .otp > input:focus-visible {
+    outline: none;
+    border-color: var(--lui-primary);
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--lui-primary) 40%, transparent);
+  }
+}

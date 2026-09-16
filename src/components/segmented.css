@@ -1,0 +1,78 @@
+/* linkedui — components/segmented.css — segmented control (pill switcher).
+   Radio-based, no JS needed (native radiogroup: Tab + arrows work).
+   Unlike .tabs there are no panels — it only selects a value.
+   Sizing rule: container is exactly control height (density-driven via
+   --lui-control-h-md) like inputs/buttons/selects; segments fill it.
+   Uniform 0.25rem inset on both axes. No px anywhere — rem only.
+   <div class="segmented" role="group" aria-label="Range">
+     <input type="radio" name="range" id="range-7d" checked />
+     <label for="range-7d">7D</label>
+     <input type="radio" name="range" id="range-1m" />
+     <label for="range-1m">1M</label>
+   </div> */
+@layer components {
+  .segmented {
+    display: inline-flex;
+    align-items: stretch;
+    gap: 0.25rem;
+    /* Uniform inset on both axes. 0.25rem is the max that still fits control
+       height with a tall pill (0.5rem uniform would leave only ~22px for
+       the pill at density 1). */
+    padding: 0.25rem;
+    /* Exactly control height like inputs/buttons/selects (density-driven).
+       Border is inside (border-box) like inputs, pill fills the rest. */
+    height: var(--lui-control-h-md);
+    /* Field tint (primary+bg, stronger than cards) + input-like edge */
+    background: var(--lui-field);
+    border: var(--lui-border-width) solid var(--lui-border);
+    border-radius: var(--lui-radius-full);
+    corner-shape: var(--lui-corner-shape);
+  }
+  /* Radios participate but stay invisible (no display:none → keyboard works) */
+  .segmented > input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+  }
+  .segmented > label {
+    flex: 1 1 0;
+    align-self: stretch;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+    /* Reset base label (margin-block + small font) — the margin was insetting
+       the pill and making it look vertically narrow. */
+    margin: 0;
+    font-size: var(--lui-font-md);
+    line-height: 1.2;
+    /* Fill the container: segments grow with vertical density because the
+       container does (control height). Padding only spaces inner content. */
+    padding: var(--lui-control-py) var(--lui-control-px);
+    border-radius: var(--lui-radius-full);
+    corner-shape: var(--lui-corner-shape);
+    color: var(--lui-muted);
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .segmented > label:hover {
+    color: var(--lui-text);
+  }
+  .segmented > input:checked + label {
+    /* Active pill in card color — sits cleanly on the field-tinted track */
+    background: var(--lui-surface);
+    color: var(--lui-text);
+    box-shadow: var(--lui-shadow-sm);
+  }
+  .segmented > input:focus-visible + label {
+    outline: 2px solid var(--lui-ring);
+    outline-offset: 2px;
+  }
+  .segmented > input:disabled + label {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}

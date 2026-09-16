@@ -1,0 +1,445 @@
+/* linkedui — base.css — classless: good defaults via element selectors only.
+ * No JS needed. Class-based variants live in components/*.css
+ *
+ * Styled elements (selection): body/h1-h4/p/a/small, button, input/select/
+ * textarea/label/fieldset, article (as card), table, details/summary
+ * (accordion), dialog (+::backdrop), code/kbd/pre, hr, checkbox/radio
+ * (custom, text-sized), color/range inputs, .switch (label wrapper).
+ *
+ * Design rules: single-line controls share exactly ONE height
+ * (fixed `height` instead of min-height, see tradeoff note at button);
+ * select chevron + checkbox check are theme variables (no external assets).
+ */
+
+@layer base-classless {
+  main, .lui-container {
+    max-width: var(--lui-maxw);
+    margin-inline: auto;
+    padding: var(--lui-space-4) var(--lui-space-3);
+  }
+
+  :where(h1, h2, h3, h4) {
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    margin-block: var(--lui-space-3) var(--lui-space-2);
+  }
+  :where(h1) { font-size: 2rem; }
+  :where(h2) { font-size: 1.5rem; }
+  :where(h3) { font-size: 1.25rem; }
+  :where(p) { margin-block: var(--lui-space-2); }
+  :where(small) { font-size: var(--lui-font-sm); color: var(--lui-muted); }
+
+  :where(a) {
+    color: var(--lui-primary);
+    text-underline-offset: 0.15em;
+  }
+
+  /* Buttons + inputs share heights → consistent */
+  :where(button) {
+    border-radius: var(--lui-radius-control);
+  }
+  :where(input, select, textarea) {
+    border-radius: var(--lui-radius-control);
+  }
+
+  :where(button) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+    /* Fixed height instead of min-height → buttons, inputs and selects are
+       exactly the same height. (Large fonts may clip — standard tradeoff
+       for aligned controls.) */
+    height: var(--lui-control-h-md);
+    line-height: 1.2;
+    padding: var(--lui-control-py) var(--lui-control-px);
+    background: var(--lui-primary);
+    color: var(--lui-on-primary);
+    border: var(--lui-border-width) solid transparent;
+    cursor: pointer;
+  }
+  :where(button:hover) { background: var(--lui-primary-hover); }
+  :where(button:active) { background: var(--lui-primary-active); transform: translateY(1px); }
+  :where(button:disabled) { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  :where(input:not([type="checkbox"], [type="radio"], [type="color"], [type="range"]), select) {
+    height: var(--lui-control-h-md);
+    line-height: 1.2;
+    padding: var(--lui-control-py) var(--lui-control-px);
+    background: var(--lui-field);
+    border: var(--lui-border-width) solid var(--lui-border);
+    color: var(--lui-text);
+    width: 100%;
+    max-width: 28rem;
+  }
+  :where(textarea) {
+    min-height: calc(var(--lui-control-h-md) * 2);
+    line-height: 1.5;
+    padding: var(--lui-control-py) var(--lui-control-px);
+    background: var(--lui-field);
+    border: var(--lui-border-width) solid var(--lui-border);
+    color: var(--lui-text);
+    width: 100%;
+    max-width: 28rem;
+  }
+
+  /* Custom select chevron: the native arrow can't be positioned, hence
+     appearance:none + chevron from --lui-chevron (follows the theme). */
+  :where(select) {
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    padding-right: calc(var(--lui-control-px) * 2 + 1em);
+    background-image: var(--lui-chevron);
+    background-repeat: no-repeat;
+    background-position: right var(--lui-control-px) center;
+    background-size: 0.9em auto;
+  }
+
+  :where(label) {
+    display: grid;
+    gap: var(--lui-space-1);
+    font-size: var(--lui-font-sm);
+    font-weight: 600;
+    margin-block: var(--lui-space-2);
+  }
+
+  /* Custom checkbox/radio (native styling allows no radius/squircle).
+     Text-sized (1.5rem via --lui-check), 2px visible border. */
+  :where(input[type="checkbox"]:not([role="switch"]), input[type="radio"]) {
+    appearance: none;
+    -webkit-appearance: none;
+    width: var(--lui-check);
+    height: var(--lui-check);
+    flex: none;
+    padding: 0;
+    margin: 0;
+    background: var(--lui-field);
+    border: 2px solid var(--lui-text);
+    /* Same radius as all other controls (buttons, inputs) —
+       squircle applies automatically via the global corner-shape rule. */
+    border-radius: var(--lui-radius-control);
+    cursor: pointer;
+    vertical-align: middle;
+    transition: border-color 0.1s ease, border-width 0.1s ease, background-color 0.1s ease;
+  }
+  :where(input[type="checkbox"]:not([role="switch"]):hover, input[type="radio"]:hover) {
+    border-color: var(--lui-primary);
+  }
+  :where(input[type="radio"]) {
+    border-radius: 50%;
+  }
+  :where(input[type="checkbox"]:not([role="switch"]):checked) {
+    background-color: var(--lui-primary);
+    border-color: var(--lui-primary);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
+    background-size: 72%;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  /* Radio dot as border technique: the "dot" is the box itself with a thick
+     border — it automatically follows border-radius AND corner-shape
+     (superellipse). Relative units so density scaling carries it along. */
+  :where(input[type="radio"]:checked, input[type="radio"]:hover) {
+    border-color: var(--lui-primary);
+    border-width: calc(var(--lui-check) * 0.25);
+    background-color: var(--lui-text);
+  }
+  :where(input[type="radio"]:active) {
+    border-color: var(--lui-primary);
+    border-width: calc(var(--lui-check) * 0.18);
+    background-color: var(--lui-text);
+  }
+
+  :where(input[type="color"]) {
+    appearance: none;
+    -webkit-appearance: none;
+    width: calc(var(--lui-control-h-md) * 1.5);
+    height: var(--lui-control-h-sm);
+    padding: 2px;
+    background: var(--lui-field);
+    border: var(--lui-border-width) solid var(--lui-border);
+    border-radius: var(--lui-radius-sm);
+    cursor: pointer;
+  }
+  :where(input[type="color"]::-webkit-color-swatch-wrapper) { padding: 0; }
+  :where(input[type="color"]::-webkit-color-swatch) { border: 0; border-radius: var(--lui-radius-sm); }
+  :where(input[type="color"]::-moz-color-swatch) { border: 0; border-radius: var(--lui-radius-sm); }
+  /* Range: the input IS the track (pill + overflow hidden), fill = huge
+     primary shadow left of the thumb — structurally exact, zero JS.
+     Thumb color = text (like the switch knob). */
+  :where(input[type="range"]) {
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+    height: var(--lui-check);
+    padding: 0;
+    /* Field tint (primary+bg family, stronger than cards) + input-like edge */
+    border: var(--lui-border-width) solid var(--lui-border);
+    width: 100%;
+    max-width: 28rem;
+    border-radius: var(--lui-radius-full);
+    corner-shape: var(--lui-corner-shape);
+    background: var(--lui-field);
+    overflow: hidden;
+    /* Thumb: never narrower than round (ratio min. 1), wider only when X density > Y density */
+    --lui-thumb: var(--lui-check);
+    --lui-thumbw: calc(var(--lui-thumb) * max(1, var(--lui-density-x) / var(--lui-density-y)));
+  }
+  :where(input[type="range"])::-webkit-slider-runnable-track {
+    height: var(--lui-check);
+    background: transparent;
+  }
+  :where(input[type="range"])::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: var(--lui-thumbw);
+    height: var(--lui-thumb);
+    /* full instead of 50%: square = circle, wider = real pill (no ellipse) */
+    border-radius: var(--lui-radius-full);
+    corner-shape: var(--lui-corner-shape);
+    background: var(--lui-text);
+    border: var(--lui-primary) calc(var(--lui-thumb) / 5) solid;
+
+    /* Fill ends at thumb center (half thumb width as joint), rounded by the track pill */
+    box-shadow: calc(-400px - var(--lui-thumbw) * 0.5) 0 0 400px var(--lui-primary);
+    transition: all 0.1s ease-in-out;
+  }
+  :where(input[type="range"]:hover)::-webkit-slider-thumb {
+    width: calc(var(--lui-thumbw) * 1.25);
+  }
+  :where(input[type="range"]:active)::-webkit-slider-thumb {
+    border-width: calc(var(--lui-thumb) / 8);
+  }
+  :where(input[type="range"])::-moz-range-track {
+    height: var(--lui-check);
+    background: transparent;
+    border: 0;
+  }
+  :where(input[type="range"])::-moz-range-thumb {
+    width: var(--lui-thumbw);
+    height: var(--lui-thumb);
+    border-radius: var(--lui-radius-full);
+    corner-shape: var(--lui-corner-shape);
+    background: var(--lui-text);
+    border: 0;
+    box-shadow: calc(-400px - var(--lui-thumbw) / 2) 0 0 400px var(--lui-primary);
+    transition: filter 0.1s ease-in-out;
+  }
+  :where(input[type="range"]:hover)::-moz-range-thumb {
+    filter: brightness(1.12);
+  }
+  :where(input[type="range"]:active)::-moz-range-thumb {
+    border-width: calc(var(--lui-thumb) / 8);
+  }
+  :where(input[type="range"]:disabled) {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Switch: label wrapper + native checkbox input (CSS-only, no JS).
+     <label class="switch"><input type="checkbox" role="switch"> Text</label> */
+  /* Switch: input-only (role="switch") — track = input, fill = ::before,
+     knob = ::after. Motion: margin-left slide + fill-width sweep. */
+  :where(.switch) {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--lui-space-2);
+    min-height: var(--lui-control-h-md);
+    cursor: pointer;
+    position: relative;
+    font-weight: 400;
+  }
+  :where(input[type="checkbox"][role="switch"]) {
+    appearance: none;
+    -webkit-appearance: none;
+    /* Track grows with the knob ratio so travel never runs out */
+    width: calc(var(--lui-check) * 5 / 3 * max(1, var(--lui-density-x) / var(--lui-density-y)));
+    height: var(--lui-check);
+    border: 2px solid var(--lui-text);
+    border-radius: var(--lui-radius-full);
+    corner-shape: var(--lui-corner-shape);
+    background-color: var(--lui-field);
+    margin: 0;
+    vertical-align: middle;
+    cursor: pointer;
+    position: relative;
+    flex: none;
+    transition: border-color 0.1s ease, background-color 0.1s ease;
+    /* Knob width like the slider thumb: round at equal density,
+       pill when horizontal density exceeds vertical */
+    --lui-knobw: calc((var(--lui-check) - 4px) * max(1, var(--lui-density-x) / var(--lui-density-y)));
+  }
+  :where(input[type="checkbox"][role="switch"])::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: calc(var(--lui-check) - 4px);
+    height: calc(var(--lui-check) - 4px);
+    border-radius: inherit;
+    corner-shape: var(--lui-corner-shape);
+    background-color: var(--lui-primary);
+    transition: width 0.1s ease-in-out;
+  }
+  :where(input[type="checkbox"][role="switch"]:checked) {
+    border-color: var(--lui-primary);
+    background-color: var(--lui-primary);
+    transition: background-color 0s 0.2s step-start, border-color 0.1s ease;
+  }
+  :where(input[type="checkbox"][role="switch"]:checked)::before {
+    width: calc(var(--lui-check) + 8px);
+  }
+  :where(input[type="checkbox"][role="switch"])::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    /* Positioning ONLY via margin-left — no translate,
+       hence no stretch-and-snap when toggling */
+    margin-left: 0;
+    width: var(--lui-knobw);
+    height: calc(var(--lui-check) - 4px);
+    /* Pill radius (99rem): square = circle, wide = stadium */
+    border-radius: var(--lui-radius-full);
+    corner-shape: var(--lui-corner-shape);
+    box-sizing: border-box;
+    /* Text-colored knob, ring in track color as joint */
+    background-color: var(--lui-text);
+    border: 3px solid var(--lui-field);
+    box-shadow: var(--lui-shadow-sm);
+    /* Narrow transition props (not `all`): fewer interpolations → fewer glitch frames */
+    transition: margin-left 0.1s ease-in-out, width 0.1s ease-in-out, border-width 0.1s ease-in-out, border-color 0.1s ease;
+  }
+  /* Hover: tighter joint (knob looks bigger) */
+  :where(input[type="checkbox"][role="switch"]:hover)::after {
+    border-width: 2px;
+  }
+  /* Press: knob briefly stretches in travel direction */
+  :where(input[type="checkbox"][role="switch"]:active)::after {
+    border-width: 2px;
+    width: calc(var(--lui-knobw) + 4px);
+  }
+  /* On: right-anchored (pure lengths → animatable) */
+  :where(input[type="checkbox"][role="switch"]:checked)::after {
+    margin-left: calc(100% - var(--lui-knobw));
+    border-color: var(--lui-primary);
+  }
+  :where(input[type="checkbox"][role="switch"]:checked:hover)::after {
+    border-width: 2px;
+  }
+  :where(input[type="checkbox"][role="switch"]:checked:active)::after {
+    width: calc(var(--lui-knobw) + 4px);
+    margin-left: calc(100% - var(--lui-knobw) - 4px);
+  }
+  :where(input[type="checkbox"][role="switch"]:focus-visible) {
+    outline: 2px solid var(--lui-ring);
+    outline-offset: 2px;
+  }
+  .switch:has(> input:disabled) {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :where(input[type="checkbox"][role="switch"], input[type="checkbox"][role="switch"]::before, input[type="checkbox"][role="switch"]::after) { transition: none; }
+  }
+
+  :where(fieldset) {
+    border: var(--lui-border-width) solid var(--lui-border);
+    border-radius: var(--lui-radius-lg);
+    padding: var(--lui-space-3);
+  }
+  :where(legend) { padding-inline: 0.5em; font-weight: 700; }
+
+  /* Card default without class */
+  :where(article) {
+    background: var(--lui-surface);
+    border: var(--lui-border-width) solid var(--lui-border);
+    border-radius: var(--lui-radius-lg);
+    padding: var(--lui-space-3);
+    box-shadow: var(--lui-shadow-sm);
+  }
+
+  :where(table) {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--lui-font-sm);
+    background: var(--lui-surface);
+    border: var(--lui-border-width) solid var(--lui-border);
+    border-radius: var(--lui-radius-lg);
+    overflow: hidden;
+  }
+  :where(th, td) {
+    padding: var(--lui-space-2) var(--lui-space-3);
+    border-bottom: var(--lui-border-width) solid var(--lui-border);
+    text-align: left;
+  }
+  :where(thead th) { background: var(--lui-bg); font-weight: 700; }
+  :where(tr:last-child td) { border-bottom: 0; }
+
+  :where(details) {
+    border: var(--lui-border-width) solid var(--lui-border);
+    border-radius: var(--lui-radius-lg);
+    padding-inline: var(--lui-space-3);
+    background: var(--lui-surface);
+  }
+  /* Closed exactly as tall as a button: subtract the details border. */
+  :where(details) > :where(summary) {
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    min-height: calc(var(--lui-control-h-md) - (2 * var(--lui-border-width)));
+    padding-block: var(--lui-space-1);
+  }
+  :where(details) > :where(:not(summary)) {
+    margin-block: 0 var(--lui-space-2);
+  }
+
+  :where(dialog) {
+    /* margin:auto — our reset (margin:0) would otherwise kill native centering */
+    margin: auto;
+    border: var(--lui-border-width) solid var(--lui-border);
+    border-radius: var(--lui-radius-lg);
+    background: var(--lui-surface);
+    color: var(--lui-text);
+    padding: var(--lui-space-4);
+    max-width: min(32rem, calc(100vw - 2rem));
+    max-height: min(40rem, calc(100dvh - 2rem));
+    box-shadow: var(--lui-shadow-md);
+  }
+  /* NOTE: :where() wraps only `dialog` — ::backdrop itself must stay
+     outside (:where(dialog::backdrop) never matches in Chrome). */
+  :where(dialog)::backdrop {
+    background: rgb(0 0 0 / 0.6);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+  }
+  /* Fallback path (no JS / no showModal): a non-modal dialog[open] gets no
+     ::backdrop from the browser, so dim + blur the page behind it instead.
+     Scoped to :not(:modal) so real modals don't double-darken on top of
+     ::backdrop. Values mirror the backdrop (60% black ≈ brightness(.4)). */
+  body:has(dialog[open]:not(:modal)) > :not(dialog):not(script) {
+    filter: blur(4px) brightness(0.4);
+  }
+
+  :where(code, kbd) {
+    font-family: var(--lui-font-mono);
+    font-size: 0.9em;
+    background: var(--lui-surface);
+    border: var(--lui-border-width) solid var(--lui-border);
+    border-radius: var(--lui-radius-sm);
+    padding: 0.1em 0.35em;
+  }
+  :where(pre) {
+    font-family: var(--lui-font-mono);
+    font-size: 0.85rem;
+    background: var(--lui-surface);
+    border: var(--lui-border-width) solid var(--lui-border);
+    border-radius: var(--lui-radius-lg);
+    padding: var(--lui-space-3);
+    overflow: auto;
+  }
+
+  :where(hr) { border: 0; border-top: var(--lui-border-width) solid var(--lui-border); margin-block: var(--lui-space-3); }
+}

@@ -1,0 +1,181 @@
+/* linkedui — components/nav.css + overlays.css (one file).
+ *
+ * Markup:
+ *   <nav class="nav"><a href="…" aria-current="page">Active</a><a …>…</a></nav>
+ *   <span data-tooltip="Text">Hover me</span>              (pure CSS, :hover/:focus)
+ *   <details class="dropdown"><summary>Menu</summary><div>…links…</div></details>
+ *   <div class="toast">Saved</div>                          (static; queue needs JS)
+ *   <span class="visually-hidden">Screen readers only</span>
+ * Dialogs/popovers: native <dialog> (see base.css + enhance.js data-lui-open).
+ */
+
+@layer components {
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: var(--lui-space-2);
+    padding: var(--lui-space-2) var(--lui-space-3);
+    background: var(--lui-surface);
+    border-bottom: var(--lui-border-width) solid var(--lui-border);
+  }
+  .nav a { text-decoration: none; color: var(--lui-text); font-weight: 600; }
+  .nav a[aria-current="page"] { color: var(--lui-primary); }
+
+  /* Pure-CSS tooltip */
+  [data-tooltip] { position: relative; }
+  [data-tooltip]:hover::after, [data-tooltip]:focus-visible::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    /* transform instead of the translate property (works on pseudos everywhere) */
+    transform: translateX(-50%);
+    background: var(--lui-text);
+    color: var(--lui-bg);
+    font-size: var(--lui-font-sm);
+    padding: 0.25em 0.6em;
+    border-radius: var(--lui-radius-sm);
+    white-space: nowrap;
+    z-index: 10;
+  }
+
+  /* Dropdown via <details> — no JS */
+  details.dropdown { position: relative; padding: 0; border: 0; background: none; }
+  details.dropdown > summary {
+    list-style: none;
+    display: inline-flex;
+    align-items: center;
+    height: var(--lui-control-h-md);
+    line-height: 1.2;
+    padding: var(--lui-control-py) var(--lui-control-px);
+    border: var(--lui-border-width) solid var(--lui-border);
+    border-radius: var(--lui-radius-control);
+    background: var(--lui-field);
+    cursor: pointer;
+  }
+  details.dropdown[open] > div {
+    position: absolute;
+    top: calc(100% + 6px);
+    min-width: 12rem;
+    background: var(--lui-surface);
+    border: var(--lui-border-width) solid var(--lui-border);
+    border-radius: var(--lui-radius-lg);
+    box-shadow: var(--lui-shadow-md);
+    padding: var(--lui-space-1);
+    z-index: 20;
+  }
+
+  /* Toasts: tinted cards with icon + title + message.
+     Static in flow, or live stacked via .toasts container
+     + enhance.js showToast() (auto-dismiss, close button).
+     Placement (corners + edge centers) follows the repo standard for
+     variants: a data attribute on the tray, default bottom-right.
+     Markup:
+       <div class="toasts" data-placement="top-center">
+         <div class="toast" data-tone="success" role="status">
+           <div><strong>Done</strong><p>Saved.</p></div>
+           <button type="button" data-lui-toast-close aria-label="Dismiss">×</button>
+         </div>
+       </div>
+     Placements: top-left | top-center | top-right
+                 | bottom-left | bottom-center | bottom-right.
+     No attribute (or bottom-right) = current default spot.
+     Tones: info (default) | success | warning | danger */
+  .toasts {
+    position: fixed;
+    bottom: var(--lui-space-3);
+    right: var(--lui-space-3);
+    display: flex;
+    flex-direction: column;
+    gap: var(--lui-space-2);
+    z-index: 50;
+    max-width: min(24rem, calc(100vw - 2rem));
+  }
+  .toasts[data-placement="top-left"] {
+    top: var(--lui-space-3);
+    bottom: auto;
+    left: var(--lui-space-3);
+    right: auto;
+  }
+  .toasts[data-placement="top-center"] {
+    top: var(--lui-space-3);
+    bottom: auto;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+  }
+  .toasts[data-placement="top-right"] {
+    top: var(--lui-space-3);
+    bottom: auto;
+    left: auto;
+    right: var(--lui-space-3);
+  }
+  .toasts[data-placement="bottom-left"] {
+    top: auto;
+    bottom: var(--lui-space-3);
+    left: var(--lui-space-3);
+    right: auto;
+  }
+  .toasts[data-placement="bottom-center"] {
+    top: auto;
+    bottom: var(--lui-space-3);
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+  }
+  .toasts[data-placement="bottom-right"] {
+    top: auto;
+    bottom: var(--lui-space-3);
+    left: auto;
+    right: var(--lui-space-3);
+  }
+  .toast {
+    --lui-toast-tone: var(--lui-primary);
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: var(--lui-space-2);
+    align-items: start;
+    background: var(--lui-surface);
+    background: color-mix(in oklch, var(--lui-toast-tone) calc(8% + var(--lui-contrast, 0.5) * 16%), var(--lui-surface));
+    border: var(--lui-border-width) solid var(--lui-border);
+    border: var(--lui-border-width) solid color-mix(in oklch, var(--lui-toast-tone) calc(20% + var(--lui-contrast, 0.5) * 24%), var(--lui-surface));
+    border-radius: var(--lui-radius-lg);
+    padding: var(--lui-space-2) var(--lui-space-3);
+    box-shadow: var(--lui-shadow-md);
+  }
+  .toast::before {
+    content: "ⓘ";
+    font-size: 1.25em;
+    font-weight: 700;
+    line-height: 1.4;
+    color: var(--lui-toast-tone);
+  }
+  .toast[data-tone="info"]::before { content: "ⓘ"; }
+  .toast[data-tone="success"] { --lui-toast-tone: var(--lui-success); }
+  .toast[data-tone="success"]::before { content: "✓"; }
+  .toast[data-tone="warning"] { --lui-toast-tone: var(--lui-warning); }
+  .toast[data-tone="warning"]::before { content: "⚠"; }
+  .toast[data-tone="danger"] { --lui-toast-tone: var(--lui-danger); }
+  .toast[data-tone="danger"]::before { content: "✕"; }
+  .toast strong { display: block; }
+  .toast p { margin: 0; font-size: var(--lui-font-sm); color: var(--lui-muted); }
+  .toast [data-lui-toast-close] {
+    background: none;
+    border: 0;
+    padding: 0 0.25em;
+    cursor: pointer;
+    color: inherit;
+    opacity: 0.6;
+    font-size: 1.1em;
+    line-height: 1.4;
+  }
+  .toast [data-lui-toast-close]:hover { opacity: 1; }
+
+  .visually-hidden {
+    position: absolute !important;
+    width: 1px; height: 1px;
+    clip-path: inset(50%);
+    overflow: hidden;
+    white-space: nowrap;
+  }
+}
