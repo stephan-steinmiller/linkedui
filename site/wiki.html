@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>linkedui Wiki — using the library</title>
   <meta name="description" content="Using linkedui: quick start, components, theming, JS API, no-JS matrix." />
-  <link rel="stylesheet" href="../src/linkedui.css?v=14" />
+  <link rel="stylesheet" href="../src/linkedui.css?v=77" />
   <script>
     try {
       const t = localStorage.getItem("lui-theme"), m = localStorage.getItem("lui-mode");
@@ -15,6 +15,7 @@
   </script>
 </head>
 <body>
+  <a href="#main">Skip to content</a>
   <nav class="nav" aria-label="Main navigation">
     <strong>linkedui</strong>
     <a href="./index.html">Builder</a>
@@ -35,11 +36,25 @@
     </select>
   </nav>
 
-  <main class="lui-container">
+  <main class="lui-container" id="main">
     <h1>linkedui Wiki</h1>
     <p>CSS-first UI library: classless base, variants via classes, theming via variables.
       Usable without JS, better with JS. This page uses only the library itself —
       everything below is live. Long version: <code>WIKI.md</code> in the repo.</p>
+    <nav class="menu" aria-label="On this page">
+      <a href="#start">1. Quick start</a>
+      <a href="#buttons">2. Buttons</a>
+      <a href="#forms">3. Forms &amp; input</a>
+      <a href="#layout">4. Layout</a>
+      <a href="#navigation">5. Navigation</a>
+      <a href="#overlays">6. Overlays &amp; disclosure</a>
+      <a href="#content">7. Content &amp; data</a>
+      <a href="#feedback">8. Feedback</a>
+      <a href="#theming">9. Theming</a>
+      <a href="#tokens">10. Token reference</a>
+      <a href="#js">11. JS API</a>
+      <a href="#nojs">12. No-JS matrix</a>
+    </nav>
 
     <h2 id="start">1. Quick start</h2>
     <pre><code>&lt;link rel="stylesheet" href="linkedui/src/linkedui.css" /&gt;
@@ -49,54 +64,111 @@
 &lt;/main&gt;
 &lt;script src="linkedui/src/enhance.js" defer&gt;&lt;/script&gt;</code></pre>
 
-    <h2 id="buttons">2. Buttons <small>src/components/button.css</small></h2>
+    <h2 id="buttons">2. Buttons</h2>
+    <h3 id="btn">Variants <small>src/components/button.css</small></h3>
     <div class="row" style="display:flex;gap:.5rem;flex-wrap:wrap">
       <button class="btn" type="button">Primary</button>
       <button class="btn" data-variant="secondary" type="button">Secondary</button>
+      <button class="btn" data-variant="accent" type="button">Accent</button>
       <button class="btn" data-variant="ghost" type="button">Ghost</button>
       <button class="btn" data-variant="outline" type="button">Outline</button>
       <button class="btn" data-variant="danger" type="button">Danger</button>
       <button class="btn" type="button" disabled>Disabled</button>
       <button class="btn" type="button" data-loading="true">Loading</button>
+      <button class="btn" type="button" data-size="sm">Small</button>
+      <button class="btn" type="button" data-size="lg">Large</button>
     </div>
     <pre><code>&lt;button class="btn" data-variant="secondary" data-size="sm"&gt;…&lt;/button&gt;
 &lt;!-- variants: secondary ghost outline danger (= destructive) --&gt;
 &lt;!-- data-size: sm | (md) | lg · data-block · data-icon · data-loading · disabled --&gt;</code></pre>
 
-    <h2 id="forms">3. Forms <small>src/base.css (classless)</small></h2>
+    <h2 id="forms">3. Forms &amp; input <small>src/base.css, classless unless noted</small></h2>
+    <h3 id="fields">Fields</h3>
     <div class="lui-grid">
       <label class="field"><span>Name</span><input placeholder="Same height as buttons" /></label>
       <label class="field"><span>Choice</span><select><option>One</option><option>Two</option></select></label>
     </div>
+    <h3 id="hints">Hints &amp; errors</h3>
+    <div class="lui-grid">
+      <label class="field"><span>Username</span><input placeholder="ada" aria-describedby="wiki-hint" /><small class="hint" id="wiki-hint">Lowercase only.</small></label>
+      <label class="field" data-invalid="true"><span>Email</span><input value="nope" aria-describedby="wiki-err" /><small class="hint" id="wiki-err">Enter a valid email.</small></label>
+    </div>
+    <pre><code>&lt;label class="field" data-invalid="true"&gt;
+  &lt;span&gt;Email&lt;/span&gt;&lt;input aria-describedby="e-hint" /&gt;
+  &lt;small class="hint" id="e-hint"&gt;Enter a valid email.&lt;/small&gt;
+&lt;/label&gt;
+&lt;!-- or aria-invalid="true" directly on the control --&gt;</code></pre>
+    <h3 id="input-group">Input groups <small>src/components/card.css</small></h3>
+    <div class="input-group" style="margin-block:var(--lui-space-2)">
+      <span aria-hidden="true">$</span>
+      <input aria-label="Amount" placeholder="0.00" />
+      <button class="btn" type="button">Send</button>
+    </div>
+    <pre><code>&lt;div class="input-group"&gt;&lt;span aria-hidden="true"&gt;$&lt;/span&gt;&lt;input aria-label="Amount" /&gt;&lt;button class="btn"&gt;Send&lt;/button&gt;&lt;/div&gt;</code></pre>
+    <h3 id="form-grid">Form grid <small>src/components/card.css</small></h3>
+    <div class="form-grid">
+      <label class="field"><span>First</span><input placeholder="Ada" /></label>
+      <label class="field"><span>Last</span><input placeholder="Lovelace" /></label>
+      <label class="field" data-span="all"><span>Bio</span><input placeholder="Mathematician" /></label>
+    </div>
+    <pre><code>&lt;div class="form-grid"&gt;&lt;label class="field" data-span="all"&gt;…&lt;/label&gt;&lt;/div&gt;</code></pre>
+    <h3 id="checks">Checkbox, radio, switch</h3>
     <p>
       <label style="display:flex;gap:.4rem;align-items:center;font-weight:400"><input type="checkbox" checked /> Checkbox</label>
       <label style="display:flex;gap:.4rem;align-items:center;font-weight:400"><input type="radio" name="wiki-r" checked /> Radio A</label>
       <label style="display:flex;gap:.4rem;align-items:center;font-weight:400"><input type="radio" name="wiki-r" /> Radio B</label>
       <label class="switch"><input type="checkbox" role="switch" checked /> Switch</label>
+      <label style="display:flex;gap:.4rem;align-items:center;font-weight:400"><input type="checkbox" data-variant="secondary" checked /> Secondary</label>
+      <label class="switch"><input type="checkbox" role="switch" data-variant="secondary" checked /> Secondary</label>
     </p>
+    <h3 id="check-chips">Toggle chips <small>multi-select pills — segmented is single-select</small></h3>
+    <div class="check-chips" role="group" aria-label="Filters">
+      <input type="checkbox" id="wiki-f-photo" checked /><label for="wiki-f-photo">Photo</label>
+      <input type="checkbox" id="wiki-f-video" /><label for="wiki-f-video">Video</label>
+      <input type="checkbox" id="wiki-f-audio" /><label for="wiki-f-audio">Audio</label>
+    </div>
+    <pre><code>&lt;div class="check-chips" role="group" aria-label="Filters"&gt;
+  &lt;input type="checkbox" id="f-photo" checked /&gt;&lt;label for="f-photo"&gt;Photo&lt;/label&gt;
+&lt;/div&gt;</code></pre>
+    <h3 id="rating">Star rating <small>radio-based, no JS — stars 5→1 in the DOM</small></h3>
+    <div class="rating" role="radiogroup" aria-label="Rate this demo">
+      <input type="radio" name="wiki-rate" id="wiki-rate-5" value="5" /><label for="wiki-rate-5" aria-label="5 stars">★</label>
+      <input type="radio" name="wiki-rate" id="wiki-rate-4" value="4" /><label for="wiki-rate-4" aria-label="4 stars">★</label>
+      <input type="radio" name="wiki-rate" id="wiki-rate-3" value="3" checked /><label for="wiki-rate-3" aria-label="3 stars">★</label>
+      <input type="radio" name="wiki-rate" id="wiki-rate-2" value="2" /><label for="wiki-rate-2" aria-label="2 stars">★</label>
+      <input type="radio" name="wiki-rate" id="wiki-rate-1" value="1" /><label for="wiki-rate-1" aria-label="1 star">★</label>
+    </div>
+    <pre><code>&lt;div class="rating" role="radiogroup" aria-label="Rate this"&gt;
+  &lt;input type="radio" name="rate" id="r5" value="5" /&gt;&lt;label for="r5" aria-label="5 stars"&gt;★&lt;/label&gt;
+  &lt;!-- … down to 1 … --&gt;
+&lt;/div&gt;</code></pre>
+    <h3 id="range">Range</h3>
     <div class="field"><span>Volume</span><input type="range" min="0" max="100" value="60" aria-label="Volume" /></div>
-
-    <h2 id="feedback">4. Cards, alerts, badges</h2>
+    <div class="field"><span>Bass (secondary)</span><input type="range" min="0" max="100" value="30" aria-label="Bass" data-variant="secondary" /></div>
+    <div class="field"><span>Quality (stepped)</span><input type="range" min="0" max="100" step="25" value="50" aria-label="Quality" /><div class="ticks" style="--lui-ticks: 5" aria-hidden="true"></div></div>
+    <pre><code>&lt;input type="range" min="0" max="100" step="25" value="50" aria-label="Quality" /&gt;
+&lt;div class="ticks" style="--lui-ticks: 5" aria-hidden="true"&gt;&lt;/div&gt;
+&lt;!-- --lui-ticks = stop count, matching min/max/step; ticks are decorative --&gt;</code></pre>
+    <h3 id="meters">Progress &amp; meter</h3>
     <div class="lui-grid">
-      <article class="card"><h3>Card</h3><p><code>&lt;article&gt;</code> without class looks the same.</p><span class="badge">Badge</span></article>
-      <div>
-        <div class="alert" data-tone="success"><span>Success — data-tone: success | warning | danger</span></div>
-      </div>
+      <label class="field"><span>Uploading</span><progress value="60" max="100">60%</progress></label>
+      <label class="field"><span>Waiting</span><progress>Loading…</progress></label>
+      <label class="field"><span>Quota</span><meter value="0.8" min="0" max="1" low="0.3" high="0.75" optimum="0.9">80%</meter></label>
     </div>
-
-    <h2 id="overlays">5. Nav, tooltip, dropdown, dialog</h2>
-    <nav class="nav"><a href="./wiki.html" aria-current="page">Active</a><a href="./index.html">Builder</a></nav>
-    <p><span data-tooltip="Pure CSS">Hover me for tooltip</span> ·
-      <details class="dropdown" style="display:inline-block"><summary>Dropdown</summary><div><a href="#overlays">Entry</a></div></details> ·
-      <button class="btn" data-variant="secondary" type="button" data-lui-open="wiki-dialog">Open dialog</button></p>
-
-    <h2 id="tabs">6. Tabs <small>keyboard-operable without JS via radio keys</small></h2>
-    <div class="tabs">
-      <input type="radio" name="wiki-tabs" id="wiki-tabs-1" checked /><label for="wiki-tabs-1">Markup</label><section><p>Order: <code>input → label → section</code>, label linked via <code>for/id</code>.</p></section>
-      <input type="radio" name="wiki-tabs" id="wiki-tabs-2" /><label for="wiki-tabs-2">JS</label><section><p>With <code>enhance.js</code>: tablist roles, roving tabindex, arrows/Home/End.</p></section>
+    <pre><code>&lt;progress value="60" max="100"&gt;60%&lt;/progress&gt; &lt;!-- no value = indeterminate --&gt;
+&lt;meter value="0.8" min="0" max="1" low="0.3" high="0.75" optimum="0.9"&gt;80%&lt;/meter&gt;</code></pre>
+    <h3 id="pickers">File &amp; date inputs</h3>
+    <div class="lui-grid">
+      <label class="field"><span>Attachment</span><input type="file" /></label>
+      <label class="field"><span>Due</span><input type="date" /></label>
     </div>
-
-    <h2 id="otp">7. OTP <small>separate boxes — paste splits across all of them</small></h2>
+    <label class="dropzone" style="margin-block:var(--lui-space-2)"><input type="file" aria-label="Upload files" />
+      <span aria-hidden="true">⇪</span>
+      <span><strong>Drop files here</strong><small>or click to browse</small></span>
+    </label>
+    <pre><code>&lt;label class="dropzone"&gt;&lt;input type="file" /&gt;&lt;span aria-hidden="true"&gt;⇪&lt;/span&gt;
+  &lt;span&gt;&lt;strong&gt;Drop files here&lt;/strong&gt;&lt;small&gt;or click to browse&lt;/small&gt;&lt;/span&gt;&lt;/label&gt;</code></pre>
+    <h3 id="otp">One-time codes <small>separate boxes — paste splits across all of them</small></h3>
     <div class="otp" role="group" aria-label="One-time code, 6 digits">
       <input inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" aria-label="Digit 1 of 6" />
       <input inputmode="numeric" pattern="[0-9]*" aria-label="Digit 2 of 6" />
@@ -111,7 +183,106 @@
   &lt;!-- … more inputs, optional &lt;span aria-hidden="true"&gt;–&lt;/span&gt; dash … --&gt;
 &lt;/div&gt;</code></pre>
 
-    <h2 id="segmented">8. Segmented control <small>radio pills, no JS needed</small></h2>
+    <h2 id="layout">4. Layout <small>src/components/card.css</small></h2>
+    <h3 id="container">Container, grid, card</h3>
+    <p>Bare <code>&lt;article&gt;</code> without class already looks like <code>.card</code>:</p>
+    <div class="lui-grid">
+      <article class="card"><h3>Card</h3><p>Centered container, auto-fit grid, surface box.</p></article>
+      <article><h3>Classless</h3><p>No class at all — same look, via <code>base.css</code>.</p></article>
+    </div>
+    <pre><code>&lt;main class="lui-container"&gt;&lt;div class="lui-grid"&gt;
+  &lt;article class="card"&gt;…&lt;/article&gt; &lt;!-- or bare &lt;article&gt; --&gt;
+&lt;/div&gt;&lt;/main&gt;</code></pre>
+    <h3 id="stat">Stats</h3>
+    <div class="lui-grid">
+      <div class="stat"><span>ARR</span><strong>$1.2M</strong><small data-trend="up">+12% MoM</small></div>
+      <div class="stat"><span>Churn</span><strong>1.4%</strong><small data-trend="down">−0.3 pts</small></div>
+      <div class="stat"><span>Uptime</span><strong>99.9%</strong><small>90 days</small></div>
+    </div>
+    <pre><code>&lt;div class="stat"&gt;&lt;span&gt;ARR&lt;/span&gt;&lt;strong&gt;$1.2M&lt;/strong&gt;&lt;small data-trend="up"&gt;+12%&lt;/small&gt;&lt;/div&gt;</code></pre>
+    <h3 id="toolbar">Toolbar</h3>
+    <div class="toolbar" style="margin-block:var(--lui-space-3)">
+      <h3 class="toolbar-title">Users</h3>
+      <input type="search" aria-label="Search users" placeholder="Search" />
+      <button class="btn" type="button">Invite</button>
+    </div>
+    <pre><code>&lt;div class="toolbar"&gt;&lt;h3 class="toolbar-title"&gt;Users&lt;/h3&gt;…&lt;/div&gt;</code></pre>
+    <h3 id="footer">Footer</h3>
+    <footer class="footer"><div>
+      <span>© 2026 linkedui</span><span style="flex:1"></span><a href="#footer">Imprint</a><a href="#footer">Privacy</a>
+    </div></footer>
+    <pre><code>&lt;footer class="footer"&gt;&lt;div&gt;&lt;span&gt;©…&lt;/span&gt;&lt;span style="flex:1"&gt;&lt;/span&gt;&lt;a&gt;…&lt;/div&gt;&lt;/footer&gt;</code></pre>
+
+    <h2 id="navigation">5. Navigation</h2>
+    <h3 id="nav">Top bar <small>src/components/nav-overlays.css</small></h3>
+    <nav class="nav"><a href="./wiki.html" aria-current="page">Active</a><a href="./index.html">Builder</a></nav>
+    <pre><code>&lt;nav class="nav"&gt;&lt;a href="/" aria-current="page"&gt;Active&lt;/a&gt;&lt;a&gt;…&lt;/nav&gt;</code></pre>
+    <h3 id="app-nav">App nav <small>src/components/app-nav.css — sidebar on desktop, bottom bar on mobile</small></h3>
+    <p>Resize to see it switch. The <code>»</code> toggle collapses the rail, no JS involved:</p>
+    <div style="position:relative;height:16rem;overflow:hidden;border:var(--lui-border-width) solid var(--lui-border);border-radius:var(--lui-radius-lg)">
+      <nav class="app-nav" aria-label="Demo" style="position:absolute">
+        <a href="#app-nav" aria-current="page"><span aria-hidden="true">⌂</span><span>Home</span></a>
+        <a href="#app-nav"><span aria-hidden="true">⌕</span><span>Search</span></a>
+        <a href="#app-nav"><span aria-hidden="true">⚙</span><span>Settings</span></a>
+        <details class="app-nav-toggle"><summary aria-label="Toggle navigation"></summary></details>
+      </nav>
+    </div>
+    <pre><code>&lt;nav class="app-nav" aria-label="Primary"&gt;
+  &lt;a href="/" aria-current="page"&gt;&lt;span aria-hidden="true"&gt;⌂&lt;/span&gt;&lt;span&gt;Home&lt;/span&gt;&lt;/a&gt;
+  &lt;!-- … up to 5 links, icon span + label span each … --&gt;
+  &lt;details class="app-nav-toggle"&gt;&lt;summary aria-label="Toggle navigation"&gt;&lt;/summary&gt;&lt;/details&gt;
+&lt;/nav&gt;
+&lt;!-- direct body child: page padding follows rail/open/bottom-bar via body:has() --&gt;
+&lt;!-- widths: --lui-app-nav-w / --lui-app-nav-w-rail · breakpoint: 48rem, width only --&gt;</code></pre>
+    <h3 id="menu">Section menu <small>src/components/nav-overlays.css — in-flow, never leaves the page</small></h3>
+    <nav class="menu" aria-label="Demo settings">
+      <span>Account</span>
+      <a href="#menu" aria-current="page">Profile</a>
+      <a href="#menu">Billing</a>
+      <span>Workspace</span>
+      <a href="#menu">Members</a>
+    </nav>
+    <pre><code>&lt;nav class="menu" aria-label="Settings"&gt;&lt;span&gt;Account&lt;/span&gt;
+  &lt;a href="…" aria-current="page"&gt;Profile&lt;/a&gt;&lt;/nav&gt;</code></pre>
+    <h3 id="breadcrumb">Breadcrumb</h3>
+    <p><nav class="breadcrumb" aria-label="Wiki breadcrumb">
+      <ol>
+        <li><a href="#breadcrumb">Home</a></li>
+        <li><span aria-current="page">Wiki</span></li>
+      </ol>
+    </nav></p>
+    <h3 id="pagination">Pagination</h3>
+    <p><nav class="pagination" aria-label="Wiki pages">
+      <a href="#pagination" aria-label="Previous">‹</a>
+      <a href="#pagination">1</a>
+      <span aria-current="page">2</span>
+      <a href="#pagination">3</a>
+      <span aria-hidden="true">…</span>
+      <a href="#pagination">9</a>
+      <a href="#pagination" aria-label="Next">›</a>
+    </nav></p>
+    <h3 id="steps">Steps</h3>
+    <p><ol class="steps">
+      <li data-state="done"><span>Cart</span></li>
+      <li aria-current="step"><span>Payment</span></li>
+      <li><span>Done</span></li>
+    </ol></p>
+    <pre><code>&lt;nav class="breadcrumb" aria-label="…"&gt;&lt;ol&gt;&lt;li&gt;&lt;a&gt;…&lt;span aria-current="page"&gt;…&lt;/ol&gt;&lt;/nav&gt;
+&lt;nav class="pagination" aria-label="Pages"&gt;&lt;a&gt;1&lt;/a&gt;&lt;span aria-current="page"&gt;2&lt;/span&gt;…&lt;/nav&gt;
+&lt;ol class="steps"&gt;&lt;li data-state="done"&gt;…&lt;li aria-current="step"&gt;…&lt;/ol&gt;</code></pre>
+    <h3 id="tabs">Tabs <small>keyboard-operable without JS via radio keys</small></h3>
+    <div class="tabs">
+      <input type="radio" name="wiki-tabs" id="wiki-tabs-1" checked /><label for="wiki-tabs-1">Markup</label><section><p>Order: <code>input → label → section</code>, label linked via <code>for/id</code>.</p></section>
+      <input type="radio" name="wiki-tabs" id="wiki-tabs-2" /><label for="wiki-tabs-2">JS</label><section><p>With <code>enhance.js</code>: tablist roles, roving tabindex, arrows/Home/End.</p></section>
+    </div>
+    <pre><code>&lt;div class="tabs"&gt;&lt;input type="radio" id="t1" checked /&gt;&lt;label for="t1"&gt;…&lt;/label&gt;&lt;section&gt;…&lt;/section&gt;…&lt;/div&gt;</code></pre>
+    <p>Vertical variant for settings pages (horizontal again under 48rem):</p>
+    <div class="tabs" data-orientation="vertical">
+      <input type="radio" name="wiki-vtabs" id="wiki-vtabs-1" checked /><label for="wiki-vtabs-1">Profile</label><section><p>Profile panel.</p></section>
+      <input type="radio" name="wiki-vtabs" id="wiki-vtabs-2" /><label for="wiki-vtabs-2">Billing</label><section><p>Billing panel.</p></section>
+    </div>
+    <pre><code>&lt;div class="tabs" data-orientation="vertical"&gt;…same markup…&lt;/div&gt;</code></pre>
+    <h3 id="segmented">Segmented control <small>radio pills, no JS needed</small></h3>
     <div class="segmented" role="group" aria-label="Time range">
       <input type="radio" name="wiki-range" id="wiki-r-1d" /><label for="wiki-r-1d">1D</label>
       <input type="radio" name="wiki-range" id="wiki-r-7d" checked /><label for="wiki-r-7d">7D</label>
@@ -122,18 +293,33 @@
   &lt;!-- … more input+label pairs, labels may contain icons … --&gt;
 &lt;/div&gt;</code></pre>
 
-    <h2 id="hints">9. Field hints <small>help + invalid states</small></h2>
-    <div class="lui-grid">
-      <label class="field"><span>Username</span><input placeholder="ada" aria-describedby="wiki-hint" /><small class="hint" id="wiki-hint">Lowercase only.</small></label>
-      <label class="field" data-invalid="true"><span>Email</span><input value="nope" aria-describedby="wiki-err" /><small class="hint" id="wiki-err">Enter a valid email.</small></label>
-    </div>
-    <pre><code>&lt;label class="field" data-invalid="true"&gt;
-  &lt;span&gt;Email&lt;/span&gt;&lt;input aria-describedby="e-hint" /&gt;
-  &lt;small class="hint" id="e-hint"&gt;Enter a valid email.&lt;/small&gt;
-&lt;/label&gt;
-&lt;!-- or aria-invalid="true" directly on the control --&gt;</code></pre>
-
-    <h2 id="toasts">10. Toasts <small>info | success | warning | danger</small></h2>
+    <h2 id="overlays">6. Overlays &amp; disclosure</h2>
+    <h3 id="tooltip">Tooltip <small>pure CSS, :hover/:focus</small></h3>
+    <p><span data-tooltip="Pure CSS">Hover me for tooltip</span></p>
+    <h3 id="dropdown">Dropdown <small>details-first, no JS</small></h3>
+    <p><details class="dropdown" style="display:inline-block"><summary>Dropdown</summary><div><a href="#dropdown">Entry</a></div></details></p>
+    <h3 id="popover">Popover <small>details-first; ESC + outside-click via enhance.js</small></h3>
+    <p><details class="popover" data-placement="bottom" style="display:inline-block"><summary class="btn" data-variant="secondary">Popover</summary><div role="menu"><a href="#popover" role="menuitem">Entry</a><button type="button" role="menuitem">Action</button></div></details></p>
+    <pre><code>&lt;details class="popover" data-placement="bottom"&gt; &lt;!-- top | bottom | left | right --&gt;
+  &lt;summary&gt;Trigger&lt;/summary&gt;
+  &lt;div role="menu"&gt;&lt;a href="…" role="menuitem"&gt;Entry&lt;/a&gt;&lt;/div&gt;
+&lt;/details&gt;
+&lt;!-- ESC + outside-click close via enhance.js (toggle is native) --&gt;</code></pre>
+    <h3 id="dialog">Dialog <small>native, enhance.js for showModal + backdrop close</small></h3>
+    <p><button class="btn" data-variant="secondary" type="button" data-lui-open="wiki-dialog">Open dialog</button></p>
+    <h3 id="drawer">Drawer <small>dialog sheet via data-side</small></h3>
+    <p><button class="btn" data-variant="secondary" type="button" data-lui-open="wiki-drawer">Open drawer</button> ·
+      <button class="btn" data-variant="secondary" type="button" data-lui-open="wiki-sheet">Open sheet</button></p>
+    <pre><code>&lt;button data-lui-open="info"&gt;Open&lt;/button&gt;
+&lt;dialog id="info"&gt;…&lt;button data-lui-close&gt;Close&lt;/button&gt;&lt;/dialog&gt;
+&lt;!-- data-size="sm" for confirms, "lg" for wide content --&gt;
+&lt;dialog class="drawer" data-side="left" id="nav"&gt; &lt;!-- left | right | bottom --&gt;
+  … &lt;button data-lui-close&gt;Close&lt;/button&gt;
+&lt;/dialog&gt;</code></pre>
+    <h3 id="accordion">Accordion <small>details-first, no JS</small></h3>
+    <details><summary>How does theming work?</summary><p>Tokens on <code>:root</code>, overrides per <code>data-theme</code> — same file, no build.</p></details>
+    <pre><code>&lt;details&gt;&lt;summary&gt;More&lt;/summary&gt;&lt;p&gt;Content&lt;/p&gt;&lt;/details&gt;</code></pre>
+    <h3 id="toasts">Toasts <small>info | success | warning | danger</small></h3>
     <div class="lui-grid">
       <div class="toast" data-tone="info" role="status"><div><strong>Update available</strong><p>Version 2.4.1 is ready.</p></div></div>
       <div class="toast" data-tone="success" role="status"><div><strong>Changes saved</strong><p>Done.</p></div></div>
@@ -144,7 +330,108 @@
     <pre><code>&lt;button data-lui-toast="success" data-lui-toast-title="Done"
         data-lui-toast-message="Saved."&gt;Show toast&lt;/button&gt;
 &lt;!-- JS API: luiToast({ tone, title, message, ms }) --&gt;</code></pre>
-    <h2 id="theming">11. Theming</h2>
+
+    <h2 id="content">7. Content &amp; data <small>src/base.css, classless unless noted</small></h2>
+    <h3 id="table">Tables <small>src/components/card.css for frame + modifiers</small></h3>
+    <div class="table-wrap" style="margin-block:var(--lui-space-3)">
+      <table data-stripes="true" data-hover="true">
+        <caption>Q3 revenue by plan</caption>
+        <thead><tr><th>Plan</th><th data-numeric="true">MRR</th><th data-numeric="true">Churn</th></tr></thead>
+        <tbody>
+          <tr><td>Starter</td><td data-numeric="true">4,120</td><td data-numeric="true">2.1%</td></tr>
+          <tr><td>Pro</td><td data-numeric="true">12,400</td><td data-numeric="true">1.4%</td></tr>
+          <tr><td>Team</td><td data-numeric="true">8,930</td><td data-numeric="true">0.9%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <pre><code>&lt;div class="table-wrap"&gt;&lt;table data-stripes="true" data-hover="true" data-sticky="true"&gt;
+  &lt;caption&gt;…&lt;/caption&gt;&lt;th data-numeric="true"&gt;…&lt;/table&gt;&lt;/div&gt;</code></pre>
+    <h3 id="lists">Lists</h3>
+    <ul>
+      <li>Markers and rhythm, classless</li>
+      <li>Nested lists indent further
+        <ol>
+          <li>First</li>
+          <li>Second</li>
+        </ol>
+      </li>
+    </ul>
+    <h3 id="blockquote">Quotes</h3>
+    <blockquote><p>Stay classy.</p><cite>— San Diego</cite></blockquote>
+    <h3 id="divider">Divider</h3>
+    <hr data-text="or" />
+    <h3 id="timeline">Timeline</h3>
+    <ol class="timeline">
+      <li><strong>Shipped</strong><p>Version 2.0 is live.</p><small>10:24</small></li>
+      <li aria-current="step"><strong>Rolling out</strong><p>60% of traffic.</p><small>now</small></li>
+    </ol>
+    <pre><code>&lt;hr data-text="or" /&gt;
+&lt;ol class="timeline"&gt;&lt;li&gt;&lt;strong&gt;…&lt;/strong&gt;&lt;p&gt;…&lt;/p&gt;&lt;small&gt;…&lt;/small&gt;&lt;/li&gt;
+  &lt;li aria-current="step"&gt;…&lt;/li&gt;&lt;/ol&gt;</code></pre>
+    <h3 id="carousel">Carousel <small>scroll-snap — prev/next are plain anchor links</small></h3>
+    <div class="carousel" role="region" aria-label="Demo gallery" tabindex="0">
+      <figure id="wiki-shot-1"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='180'%3E%3Crect width='320' height='180' fill='%234f7dd9'/%3E%3C/svg%3E" alt="Blue swatch" /><figcaption>One</figcaption></figure>
+      <figure id="wiki-shot-2"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='180'%3E%3Crect width='320' height='180' fill='%2358678d'/%3E%3C/svg%3E" alt="Slate swatch" /><figcaption>Two</figcaption></figure>
+      <figure id="wiki-shot-3"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='180'%3E%3Crect width='320' height='180' fill='%23065f46'/%3E%3C/svg%3E" alt="Green swatch" /><figcaption>Three</figcaption></figure>
+    </div>
+    <p><a href="#wiki-shot-1">1</a> · <a href="#wiki-shot-2">2</a> · <a href="#wiki-shot-3">3</a></p>
+    <pre><code>&lt;div class="carousel" role="region" aria-label="Gallery" tabindex="0"&gt;
+  &lt;figure id="shot-1"&gt;&lt;img …&gt;&lt;figcaption&gt;…&lt;/figure&gt;…
+&lt;/div&gt;&lt;p&gt;&lt;a href="#shot-1"&gt;1&lt;/a&gt;…&lt;/p&gt;</code></pre>
+    <h3 id="figure">Figures</h3>
+    <figure>
+      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='180'%3E%3Crect width='320' height='180' fill='%234f7dd9'/%3E%3C/svg%3E" alt="Blue placeholder swatch" />
+      <figcaption>Rounded, bordered, captioned — offline-safe demo via data URI.</figcaption>
+    </figure>
+    <h3 id="code">Code &amp; keys</h3>
+    <p>Run <code>npm test</code>, then quit with <kbd>Ctrl</kbd> + <kbd>C</kbd>:</p>
+    <pre><code>npm test -- --watch</code></pre>
+    <pre><code>&lt;code&gt;…&lt;/code&gt; &lt;kbd&gt;…&lt;/kbd&gt; &lt;pre&gt;&lt;code&gt;…&lt;/code&gt;&lt;/pre&gt;</code></pre>
+    <h3 id="dl">Definition lists</h3>
+    <dl><dt>Plan</dt><dd>Pro, monthly</dd></dl>
+    <h3 id="avatar">Avatars <small>src/components/avatar.css</small></h3>
+    <p><span class="avatar" data-size="sm">AL</span>
+      <span class="avatar" data-status="online">BO</span>
+      <span class="avatar-stack" aria-label="3 collaborators"><span class="avatar" aria-hidden="true">AL</span><span class="avatar" aria-hidden="true">BO</span><span class="avatar" data-more="+3" aria-hidden="true"></span></span></p>
+    <pre><code>&lt;ul&gt;&lt;li&gt;… &lt;blockquote&gt;&lt;p&gt;…&lt;cite&gt;… &lt;figure&gt;&lt;img&gt;&lt;figcaption&gt;…
+&lt;dl&gt;&lt;dt&gt;Plan&lt;/dt&gt;&lt;dd&gt;Pro, monthly&lt;/dd&gt;&lt;/dl&gt;
+&lt;span class="avatar" data-status="online"&gt;BO&lt;/span&gt; &lt;!-- data-size: sm | (md) | lg --&gt;
+&lt;span class="avatar-stack"&gt;&lt;span class="avatar"&gt;AL&lt;/span&gt;&lt;span class="avatar" data-more="+3"&gt;&lt;/span&gt;&lt;/span&gt;</code></pre>
+    <h3 id="chat">Chat bubbles <small>src/components/chat.css</small></h3>
+    <div class="chat" role="log" aria-label="Demo conversation">
+      <div class="bubble" data-side="left"><p>Is the new theme live yet?</p><small>10:24</small></div>
+      <div class="bubble" data-side="right"><p>Just shipped it.</p><small>10:25 ✓✓</small></div>
+      <div class="bubble" data-side="right"><p>Try the builder!</p><small>10:25 ✓✓</small></div>
+    </div>
+    <pre><code>&lt;div class="chat" role="log" aria-label="Support chat"&gt;
+  &lt;div class="bubble" data-side="left"&gt;&lt;p&gt;Hi!&lt;/p&gt;&lt;small&gt;10:24&lt;/small&gt;&lt;/div&gt;
+  &lt;div class="bubble" data-side="right"&gt;&lt;p&gt;Hello!&lt;/p&gt;&lt;small&gt;10:25&lt;/small&gt;&lt;/div&gt;
+&lt;/div&gt;</code></pre>
+
+    <h2 id="feedback">8. Feedback <small>src/components/feedback.css</small></h2>
+    <h3 id="alert">Alerts</h3>
+    <div class="alert" data-tone="success"><span>Success — data-tone: success | warning | danger</span></div>
+    <pre><code>&lt;div class="alert" data-tone="success"&gt;&lt;span&gt;Done!&lt;/span&gt;&lt;/div&gt;</code></pre>
+    <h3 id="badge">Badges</h3>
+    <p><span class="badge">New</span></p>
+    <pre><code>&lt;span class="badge"&gt;New&lt;/span&gt;</code></pre>
+    <h3 id="chip">Chips <small>removal is app JS</small></h3>
+    <p><span class="chip">Photo<button type="button" data-lui-chip-close aria-label="Remove photo filter" onclick="this.closest('.chip').remove()">×</button></span></p>
+    <pre><code>&lt;span class="chip"&gt;Photo&lt;button data-lui-chip-close aria-label="Remove …"&gt;×&lt;/button&gt;&lt;/span&gt;
+&lt;!-- chip removal is app JS (el.remove()); the × above works --&gt;</code></pre>
+    <h3 id="skeleton">Skeleton</h3>
+    <p><span class="skeleton" style="width:10rem" aria-hidden="true"></span><span class="visually-hidden">Loading…</span> <span class="spinner" role="status" aria-label="Loading"></span></p>
+    <pre><code>&lt;span class="skeleton" style="width:12rem" aria-hidden="true"&gt;&lt;/span&gt;&lt;span class="visually-hidden"&gt;Loading…&lt;/span&gt;
+&lt;span class="spinner" role="status" aria-label="Loading"&gt;&lt;/span&gt;</code></pre>
+    <h3 id="empty">Empty states</h3>
+    <div class="empty">
+      <span aria-hidden="true">○</span>
+      <h3>No results</h3>
+      <p>Try a different search term.</p>
+    </div>
+    <pre><code>&lt;div class="empty"&gt;&lt;span aria-hidden="true"&gt;○&lt;/span&gt;&lt;h3&gt;…&lt;/h3&gt;&lt;p&gt;…&lt;/p&gt;&lt;button class="btn"&gt;…&lt;/div&gt;</code></pre>
+
+    <h2 id="theming">9. Theming</h2>
     <pre><code>&lt;html data-theme="default|ocean|squishy|custom" data-mode="auto|light|dark"&gt;
 &lt;select data-lui-theme&gt;…&lt;/select&gt;  &lt;!-- persistent via enhance.js --&gt;
 &lt;select data-lui-mode&gt;…&lt;/select&gt;</code></pre>
@@ -154,24 +441,25 @@
       plus radius compensation (<code>base × (0.5 + 0.5 × K)</code>) only inside
       <code>@supports (corner-shape: superellipse(1))</code>.</p>
 
-    <h2 id="tokens">12. Token reference (excerpt)</h2>
+    <h2 id="tokens">10. Token reference (excerpt)</h2>
     <table>
       <thead><tr><th>Group</th><th>Tokens</th></tr></thead>
       <tbody>
-        <tr><td>Colors</td><td><code>--lui-bg --lui-surface --lui-text --lui-muted --lui-border --lui-primary(-hover/-active) --lui-on-primary --lui-secondary(-…) --lui-on-secondary --lui-success --lui-warning --lui-danger --lui-ring --lui-chevron</code></td></tr>
+        <tr><td>Colors</td><td><code>--lui-bg --lui-surface --lui-field --lui-text --lui-muted --lui-border --lui-primary(-hover/-active) --lui-on-primary --lui-secondary(-…) --lui-on-secondary --lui-accent(-hover/-active) --lui-on-accent --lui-success --lui-warning --lui-danger --lui-info --lui-ring --lui-chevron</code></td></tr>
         <tr><td>Shape</td><td><code>--lui-radius(-sm/-md/-lg/-full) --lui-radius-control --lui-corner-shape</code></td></tr>
-        <tr><td>Size</td><td><code>--lui-density(-x/-y) --lui-control-h-sm/-md/-lg --lui-check --lui-contrast --lui-control-py/-px --lui-space-1..4 --lui-font-sans/-mono/-sm/-md/-lg --lui-border-width --lui-shadow-sm/-md --lui-maxw</code></td></tr>
+        <tr><td>Size</td><td><code>--lui-density(-x/-y) --lui-control-h-sm/-md/-lg --lui-check --lui-contrast --lui-control-py/-px --lui-space-1..4 --lui-font-sans/-mono/-sm/-md/-lg --lui-border-width --lui-shadow-sm/-md --lui-maxw --lui-app-nav-w/-w-rail</code></td></tr>
       </tbody>
     </table>
     <p><small>Complete with color values: <code>src/tokens.css</code> (header comments in every file).</small></p>
 
-    <h2 id="js">13. JS API</h2>
+    <h2 id="js">11. JS API</h2>
     <table>
       <thead><tr><th>Function (<code>enhance.js</code>)</th><th>Purpose</th></tr></thead>
       <tbody>
         <tr><td><code>restoreTheme()</code></td><td>localStorage → <code>data-*</code> before paint</td></tr>
         <tr><td><code>bindThemeSwitchers()</code></td><td><code>data-lui-theme</code>/<code>data-lui-mode</code> persistent + synced</td></tr>
         <tr><td><code>bindDialogs()</code></td><td><code>data-lui-open</code>/<code>data-lui-close</code> + backdrop click</td></tr>
+        <tr><td><code>bindPopovers()</code></td><td><code>.popover</code> ESC + outside-click close</td></tr>
         <tr><td><code>enhanceTabs()</code></td><td><code>.tabs</code> → tablist (ARIA, roving tabindex, keys)</td></tr>
         <tr><td><code>enhanceOtp()</code></td><td><code>.otp</code> → advance, backspace, paste-split</td></tr>
         <tr><td><code>bindToasts()</code> / <code>showToast()</code></td><td>toasts via <code>data-lui-toast</code> or <code>luiToast({tone,title,message,ms})</code></td></tr>
@@ -181,15 +469,17 @@
       <code>snippet()</code>/<code>fullFile()</code>, <code>render()</code>,
       <code>loadThemeIntoBuilder()</code>, <code>applyUrlState()</code>/<code>pushUrlState()</code>.</p>
 
-    <h2 id="nojs">14. No-JS matrix</h2>
+    <h2 id="nojs">12. No-JS matrix</h2>
     <table>
       <thead><tr><th>Works without JS</th><th>Needs JS</th></tr></thead>
       <tbody>
-        <tr><td>System theme, content, accordion/dropdown, dialog via <code>open</code>, tabs (radio keys), OTP, forms</td><td>Persistent theme choice, <code>showModal()</code>, tablist ARIA, copy/download/share</td></tr>
+        <tr><td>System theme, content, skip link, lists/quotes/figures, accordion/dropdown, popover toggle, dialog/drawer via <code>open</code>, tabs (radio keys), OTP, forms (input-group, meter), app-nav + menu, tables, pagination</td><td>Persistent theme choice, <code>showModal()</code>, tablist ARIA, chip removal, copy/download/share</td></tr>
       </tbody>
     </table>
 
-    <footer><hr /><p><small>linkedui · <a href="./index.html">Builder</a> · Full text: <code>WIKI.md</code></small></p></footer>
+    <footer class="footer"><div>
+      <span>linkedui</span><span style="flex:1"></span><span><a href="./index.html">Builder</a></span><span>Full text: <code>WIKI.md</code></span>
+    </div></footer>
   </main>
 
   <dialog id="wiki-dialog" aria-label="Wiki dialog">
@@ -198,6 +488,18 @@
     <button class="btn" type="button" data-lui-close>Close</button>
   </dialog>
 
-  <script src="../src/enhance.js?v=10" defer></script>
+  <dialog class="drawer" data-side="left" id="wiki-drawer" aria-label="Wiki drawer">
+    <h3>Drawer</h3>
+    <p>Side sheet, same plumbing as dialog.</p>
+    <button class="btn" type="button" data-lui-close>Close</button>
+  </dialog>
+
+  <dialog class="sheet" id="wiki-sheet" aria-label="Wiki sheet">
+    <h3>Sheet</h3>
+    <p>Bottom sheet on mobile, centered modal from 48rem up.</p>
+    <button class="btn" type="button" data-lui-close>Done</button>
+  </dialog>
+
+  <script src="../src/enhance.js?v=12" defer></script>
 </body>
 </html>

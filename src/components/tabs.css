@@ -1,10 +1,21 @@
 /* linkedui — components/tabs.css — tab switcher, CSS-only.
    Markup: input+label+section groups (label linked via for/id).
    Without JS: native radio group (Tab + arrow keys work).
-   With JS (enhance.js): real tablist roles, roving tabindex, Home/End. */
+   With JS (enhance.js): real tablist roles, roving tabindex, Home/End.
+   Selection is a sliding pill like .segmented (same anchor technique):
+   the checked label becomes the anchor, a ::before pill tracks it.
+   Falls back to a static pill where anchors are unsupported. */
 
 @layer components {
   .tabs {
+    /* Single source for pill paint. Same neutral family as .segmented:
+       pill and hover carry no primary — visibility comes from neutral
+       depth steps, consistent in every theme. */
+    --tab-pill: var(--lui-surface);
+    --tab-pill: color-mix(in oklch, var(--lui-text) 12%, var(--lui-bg));
+    --tab-edge: var(--lui-border);
+    --tab-hover: color-mix(in oklch, var(--lui-text) 6%, var(--lui-bg));
+    position: relative;
     display: flex;
     flex-wrap: wrap;
     gap: 0 var(--lui-space-1);
@@ -20,12 +31,18 @@
   }
   .tabs > label {
     order: 1;
+    position: relative;
+    z-index: 1;
     display: inline-flex;
     align-items: center;
     min-height: var(--lui-control-h-md);
     padding: var(--lui-control-py) var(--lui-control-px);
     margin-bottom: calc(-1 * var(--lui-border-width));
-    border-bottom: 2px solid transparent;
+    /* Permanent transparent border (see segmented): only its color toggles,
+       so selecting a tab never resizes the content box. */
+    border: var(--lui-border-width) solid transparent;
+    border-radius: var(--lui-radius-control);
+    corner-shape: var(--lui-corner-shape);
     color: var(--lui-muted);
     font-weight: 600;
     cursor: pointer;
@@ -33,10 +50,15 @@
   }
   .tabs > label:hover {
     color: var(--lui-text);
+    background: var(--tab-hover);
   }
   .tabs > input:checked + label {
+    /* Fallback pill (no anchor support): fill + edge. Where anchors work,
+       the ::before slider takes over and this goes transparent. */
+    background: var(--tab-pill);
+    border-color: var(--tab-edge);
     color: var(--lui-primary);
-    border-bottom-color: var(--lui-primary);
+    box-shadow: var(--lui-shadow-sm);
   }
   .tabs > input:focus-visible + label {
     outline: 2px solid var(--lui-ring);
@@ -56,5 +78,85 @@
   /* Generisch: Panel direkt nach seinem Label zeigen */
   .tabs > input:checked + label + section {
     display: block;
+  }
+
+  /* Sliding pill: the checked label becomes the anchor (--tab-active),
+     the ::before pill tracks it. anchor-scope keeps each .tabs resolving
+     to its own checked label. */
+  @supports (position-anchor: --tab-active) and (anchor-scope: --tab-active) {
+    .tabs {
+      anchor-scope: --tab-active;
+    }
+    .tabs > input:checked + label {
+      anchor-name: --tab-active;
+      background: transparent;
+      border-color: transparent;
+      box-shadow: none;
+    }
+    .tabs::before {
+      content: "";
+      position: absolute;
+      position-anchor: --tab-active;
+      top: anchor(top);
+      left: anchor(left);
+      right: anchor(right);
+      bottom: anchor(bottom);
+      z-index: 0;
+      pointer-events: none;
+      background: var(--tab-pill);
+      border: var(--lui-border-width) solid var(--tab-edge);
+      border-radius: var(--lui-radius-control);
+      corner-shape: var(--lui-corner-shape);
+      box-shadow: var(--lui-shadow-sm);
+      transition:
+        top 0.25s ease,
+        left 0.25s ease,
+        right 0.25s ease,
+        bottom 0.25s ease;
+    }
+    .tabs:not(:has(> input:checked))::before {
+      display: none;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .tabs::before {
+        transition: none;
+      }
+    }
+  }
+
+  /* Vertical variant (settings pages, docs sidebar): labels form a left
+     rail, all panels stack in the right cell with only the active shown.
+     The pill slider follows automatically (it tracks the anchor box).
+     Falls back to the horizontal layout on narrow screens.
+     <div class="tabs" data-orientation="vertical">…same markup…</div> */
+  .tabs[data-orientation="vertical"] {
+    display: grid;
+    grid-template-columns: minmax(10rem, auto) 1fr;
+    gap: 0 var(--lui-space-3);
+    border-bottom: 0;
+  }
+  .tabs[data-orientation="vertical"] > label {
+    grid-column: 1;
+    order: 0;
+    margin-bottom: 0;
+  }
+  .tabs[data-orientation="vertical"] > section {
+    grid-column: 2;
+    grid-row: 1 / -1;
+    padding-block: var(--lui-space-1) var(--lui-space-3);
+  }
+  @media (max-width: 48rem) {
+    .tabs[data-orientation="vertical"] {
+      display: flex;
+      border-bottom: var(--lui-border-width) solid var(--lui-border);
+    }
+    .tabs[data-orientation="vertical"] > label {
+      order: 1;
+      margin-bottom: calc(-1 * var(--lui-border-width));
+    }
+    .tabs[data-orientation="vertical"] > section {
+      order: 2;
+      flex-basis: 100%;
+    }
   }
 }

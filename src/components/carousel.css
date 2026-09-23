@@ -1,0 +1,31 @@
+/* linkedui — components/carousel.css — scroll-snap slider, CSS-only.
+   Overflow + mandatory snap do the work; prev/next are plain anchor links
+   to slide ids (smooth except under reduced motion). No JS needed.
+   <div class="carousel" role="region" aria-label="Gallery" tabindex="0">
+     <figure id="shot-1"><img src="…" alt="…" /><figcaption>One</figcaption></figure>
+     <figure id="shot-2"><img src="…" alt="…" /><figcaption>Two</figcaption></figure>
+   </div>
+   <p><a href="#shot-1">1</a> <a href="#shot-2">2</a></p> */
+@layer components {
+  .carousel {
+    display: flex;
+    gap: var(--lui-space-3);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding: var(--lui-space-3);
+    padding-bottom: var(--lui-space-2);
+  }
+  .carousel > * {
+    flex: 0 0 min(85%, 24rem);
+    scroll-snap-align: center;
+  }
+  /* Figures lose their block margins inside the track */
+  .carousel > figure {
+    margin-block: 0;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .carousel {
+      scroll-behavior: smooth;
+    }
+  }
+}

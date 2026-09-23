@@ -1,0 +1,47 @@
+/* linkedui — components/rating.css — star rating, CSS-only.
+   Radio-based like tabs/segmented (Tab + arrows work natively, no JS).
+   DOM order 5→1 with row-reverse: :checked and :hover fill the hovered
+   star and everything below it. Full stars only.
+   <div class="rating" role="radiogroup" aria-label="Rate this">
+     <input type="radio" name="rate" id="rate-5" value="5" /><label for="rate-5" aria-label="5 stars">★</label>
+     <input type="radio" name="rate" id="rate-4" value="4" /><label for="rate-4" aria-label="4 stars">★</label>
+     <!-- … down to 1 … -->
+   </div> */
+@layer components {
+  .rating {
+    display: inline-flex;
+    flex-direction: row-reverse;
+    gap: 0.25rem;
+  }
+  /* Radios participate but stay invisible (no display:none → keyboard works) */
+  .rating > input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+  }
+  .rating > label {
+    font-size: 1.5rem;
+    line-height: 1;
+    color: var(--lui-muted);
+    opacity: 0.45;
+    cursor: pointer;
+  }
+  /* Filled: the checked star + all below it; hover previews the same */
+  .rating > input:checked ~ label,
+  .rating > label:hover,
+  .rating > label:hover ~ label {
+    color: var(--lui-warning);
+    opacity: 1;
+  }
+  .rating > input:focus-visible + label {
+    outline: 2px solid var(--lui-ring);
+    outline-offset: 2px;
+    border-radius: var(--lui-radius-sm);
+  }
+  .rating > input:disabled + label {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+}

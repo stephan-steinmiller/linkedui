@@ -17,8 +17,17 @@
 @import "./components/button.css" layer(components);
 @import "./components/card.css" layer(components);
 @import "./components/feedback.css" layer(components);
+@import "./components/chat.css" layer(components);
 @import "./components/nav-overlays.css" layer(components);
+@import "./components/app-nav.css" layer(components);
 @import "./components/tabs.css" layer(components);
+@import "./components/popover.css" layer(components);
 @import "./components/segmented.css" layer(components);
+@import "./components/rating.css" layer(components);
+@import "./components/timeline.css" layer(components);
+@import "./components/carousel.css" layer(components);
 @import "./components/otp.css" layer(components);
+@import "./components/drawer.css" layer(components);
+@import "./components/avatar.css" layer(components);
+@import "./components/steps.css" layer(components);
 @import "./themes.css" layer(themes);

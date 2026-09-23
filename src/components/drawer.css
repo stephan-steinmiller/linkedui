@@ -1,0 +1,134 @@
+/* linkedui — components/drawer.css — side/bottom sheet + modal sheet via <dialog>.
+   Reuses the dialog plumbing: open with data-lui-open (showModal),
+   close with data-lui-close, ESC + backdrop click native. Without JS:
+   set the `open` attribute (non-modal, dimmed via the base.css fallback).
+   <button data-lui-open="nav">Menu</button>
+   <dialog class="drawer" data-side="left" id="nav" aria-label="Menu">
+     … <button type="button" data-lui-close>Close</button>
+   </dialog>
+   Sides: left | right (default) | bottom. .sheet is the responsive sibling:
+   bottom sheet with grab handle on mobile, centered modal from 48rem up.
+   <button data-lui-open="filters">Filters</button>
+   <dialog class="sheet" id="filters" aria-label="Filters">
+     … <button type="button" data-lui-close>Done</button>
+   </dialog>
+   No px anywhere — rem only. */
+@layer components {
+  dialog.drawer {
+    margin: 0;
+    padding: var(--lui-space-4);
+    border: 0;
+    background: var(--lui-surface);
+    color: var(--lui-text);
+    box-shadow: var(--lui-shadow-md);
+  }
+  /* Sides (right default — full viewport height, edge-anchored) */
+  dialog.drawer[data-side="right"],
+  dialog.drawer:not([data-side]) {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: auto;
+    width: min(24rem, calc(100vw - 4rem));
+    max-width: none;
+    max-height: none;
+    height: 100dvh;
+    border-left: var(--lui-border-width) solid var(--lui-border);
+  }
+  dialog.drawer[data-side="left"] {
+    top: 0;
+    right: auto;
+    bottom: 0;
+    left: 0;
+    width: min(24rem, calc(100vw - 4rem));
+    max-width: none;
+    max-height: none;
+    height: 100dvh;
+    border-right: var(--lui-border-width) solid var(--lui-border);
+  }
+  dialog.drawer[data-side="bottom"] {
+    top: auto;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    max-width: none;
+    max-height: 80dvh;
+    border-top: var(--lui-border-width) solid var(--lui-border);
+    border-top-left-radius: var(--lui-radius-lg);
+    border-top-right-radius: var(--lui-radius-lg);
+  }
+  /* Slide-in on open (no close animation — native close is instant) */
+  dialog.drawer[open][data-side="right"],
+  dialog.drawer[open]:not([data-side]) {
+    animation: lui-drawer-right 0.2s ease;
+  }
+  dialog.drawer[open][data-side="left"] {
+    animation: lui-drawer-left 0.2s ease;
+  }
+  dialog.drawer[open][data-side="bottom"] {
+    animation: lui-drawer-bottom 0.2s ease;
+  }
+  @keyframes lui-drawer-right {
+    from { transform: translateX(100%); }
+  }
+  @keyframes lui-drawer-left {
+    from { transform: translateX(-100%); }
+  }
+  @keyframes lui-drawer-bottom {
+    from { transform: translateY(100%); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    dialog.drawer[open] { animation: none; }
+  }
+
+  /* Modal sheet: bottom sheet with grab handle on mobile, centered modal
+     card from 48rem up. Same open/close plumbing as drawer/dialog. */
+  dialog.sheet {
+    margin: auto auto 0 auto;
+    padding: var(--lui-space-4);
+    width: 100%;
+    max-width: none;
+    max-height: min(92dvh, 40rem);
+    border: 0;
+    border-top: var(--lui-border-width) solid var(--lui-border);
+    border-top-left-radius: var(--lui-radius-lg);
+    border-top-right-radius: var(--lui-radius-lg);
+    corner-shape: var(--lui-corner-shape);
+    background: var(--lui-surface);
+    color: var(--lui-text);
+    box-shadow: var(--lui-shadow-md);
+  }
+  /* Grab handle (mobile only — hidden on the desktop modal below) */
+  dialog.sheet::before {
+    content: "";
+    display: block;
+    width: 2.5rem;
+    height: 0.25rem;
+    margin: 0 auto var(--lui-space-3);
+    border-radius: var(--lui-radius-full);
+    background: var(--lui-border);
+  }
+  dialog.sheet[open] {
+    animation: lui-sheet-up 0.2s ease;
+  }
+  @keyframes lui-sheet-up {
+    from { transform: translateY(1rem); opacity: 0; }
+  }
+  @media (min-width: 48.01rem) {
+    dialog.sheet {
+      margin: auto;
+      width: auto;
+      max-width: min(32rem, calc(100vw - 2rem));
+      max-height: min(40rem, calc(100dvh - 2rem));
+      border: var(--lui-border-width) solid var(--lui-border);
+      border-radius: var(--lui-radius-lg);
+    }
+    dialog.sheet::before {
+      display: none;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    dialog.sheet[open] { animation: none; }
+  }
+}

@@ -1,0 +1,59 @@
+/* linkedui — components/timeline.css — vertical activity feed, CSS-only.
+   Rail + dots are pure CSS (no markers needed — plain <ol> works, the
+   reset strips native markers and this file draws its own). The current
+   item opts in via aria-current="step" (same vocabulary as .steps).
+   <ol class="timeline">
+     <li><strong>Shipped</strong><p>Version 2.0 is live.</p><small>10:24</small></li>
+     <li aria-current="step"><strong>Rolling out</strong><p>60% of traffic.</p><small>now</small></li>
+   </ol> */
+@layer components {
+  .timeline {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 0 var(--lui-space-4);
+    position: relative;
+    display: grid;
+    gap: var(--lui-space-3);
+  }
+  /* Rail */
+  .timeline::before {
+    content: "";
+    position: absolute;
+    top: 0.5rem;
+    bottom: 0.5rem;
+    left: calc(var(--lui-space-4) / 2);
+    width: var(--lui-border-width);
+    background: var(--lui-border);
+  }
+  .timeline > li {
+    position: relative;
+    display: grid;
+    gap: var(--lui-space-1);
+  }
+  /* Dot, centered on the rail */
+  .timeline > li::before {
+    content: "";
+    position: absolute;
+    top: 0.25rem;
+    left: calc(-1 * var(--lui-space-4) + var(--lui-space-4) / 2 - 0.375rem);
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    background: var(--lui-surface);
+    border: 2px solid var(--lui-primary);
+    box-sizing: border-box;
+  }
+  .timeline > li[aria-current="step"]::before {
+    background: var(--lui-primary);
+  }
+  .timeline > li > strong {
+    font-weight: 700;
+  }
+  .timeline > li > p {
+    margin: 0;
+  }
+  .timeline > li > small {
+    font-size: var(--lui-font-sm);
+    color: var(--lui-muted);
+  }
+}

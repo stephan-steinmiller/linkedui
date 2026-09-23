@@ -3,6 +3,7 @@
  * Markup:
  *   <button class="btn">Primary</button>
  *   <button class="btn" data-variant="secondary|ghost|outline|danger|destructive">…</button>
+ *   <button class="btn" data-variant="accent">…</button>               (accent hue)
  *   <button class="btn" data-size="sm|lg">…</button>          (default: md)
  *   <button class="btn" data-block="true">Full width</button>
  *   <button class="btn" data-icon="true" aria-label="Search">⌕</button>
@@ -40,6 +41,14 @@
   }
   .btn[data-variant="secondary"]:hover { background: var(--lui-secondary-hover); }
   .btn[data-variant="secondary"]:active { background: var(--lui-secondary-active); transform: translateY(1px); }
+
+  .btn[data-variant="accent"] {
+    background: var(--lui-accent);
+    color: var(--lui-on-accent);
+    border-color: transparent;
+  }
+  .btn[data-variant="accent"]:hover { background: var(--lui-accent-hover); }
+  .btn[data-variant="accent"]:active { background: var(--lui-accent-active); transform: translateY(1px); }
 
   .btn[data-variant="ghost"] {
     background: transparent;
@@ -82,12 +91,14 @@
     transform: translateY(1px);
   }
 
+  /* Size variants scale height + type only — horizontal padding stays on
+     the base token so all sizes align in a row. Ladder 44 / 48 / 56. */
   .btn[data-size="sm"] {
-    height: var(--lui-control-h-sm);
+    height: 2.75rem;
     font-size: var(--lui-font-sm);
   }
   .btn[data-size="lg"] {
-    height: var(--lui-control-h-lg);
+    height: 3.5rem;
     font-size: var(--lui-font-lg);
   }
 
@@ -107,8 +118,9 @@
     font-size: 1.8rem;
     line-height: 1;
   }
-  .btn[data-icon="true"][data-size="sm"] { width: var(--lui-control-h-sm); font-size: 1.4rem; }
-  .btn[data-icon="true"][data-size="lg"] { width: var(--lui-control-h-lg); font-size: 2.2rem; }
+  .btn[data-icon="true"][data-size="sm"] { width: 2.75rem; font-size: 2rem; }
+  .btn[data-icon="true"]:not([data-size]) { font-size: 2.2rem; }
+  .btn[data-icon="true"][data-size="lg"] { width: 3.5rem; font-size: 2.5rem; }
 
   /* Loading: spinner via ::before (currentColor), clicks blocked — pure CSS */
   .btn[data-loading="true"] {

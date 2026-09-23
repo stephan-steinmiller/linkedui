@@ -1,0 +1,51 @@
+/* linkedui — components/chat.css — chat bubbles (static, no JS).
+   The container is a live log; bubbles align by data-side (left =
+   incoming on surface, right = outgoing on primary). Corners pinch on
+   the sender's side (radius only, no tail hacks). Consecutive same-side
+   messages tighten via :has(). Timestamps are plain <small>.
+   <div class="chat" role="log" aria-label="Support chat">
+     <div class="bubble" data-side="left"><p>Hi there!</p><small>10:24</small></div>
+     <div class="bubble" data-side="right"><p>Hello!</p><small>10:25 ✓✓</small></div>
+   </div> */
+@layer components {
+  .chat {
+    display: flex;
+    flex-direction: column;
+    gap: var(--lui-space-2);
+  }
+  .bubble {
+    align-self: flex-start;
+    max-width: min(75%, 32rem);
+    padding: var(--lui-space-2) var(--lui-space-3);
+    background: var(--lui-surface);
+    border: var(--lui-border-width) solid var(--lui-border);
+    border-radius: var(--lui-radius-lg) var(--lui-radius-lg) var(--lui-radius-lg) var(--lui-radius-sm);
+    corner-shape: var(--lui-corner-shape);
+  }
+  .bubble[data-side="right"] {
+    align-self: flex-end;
+    background: var(--lui-primary);
+    border-color: transparent;
+    color: var(--lui-on-primary);
+    border-radius: var(--lui-radius-lg) var(--lui-radius-lg) var(--lui-radius-sm) var(--lui-radius-lg);
+  }
+  /* Stacked paragraphs keep a rhythm (the reset zeroes margins) */
+  .bubble > p + p {
+    margin-top: var(--lui-space-1);
+  }
+  .bubble > small {
+    display: block;
+    margin-top: var(--lui-space-1);
+    font-size: var(--lui-font-sm);
+    color: var(--lui-muted);
+  }
+  .bubble[data-side="right"] > small {
+    color: var(--lui-on-primary);
+    opacity: 0.75;
+  }
+  /* Same sender twice in a row reads as one group: halve the gap below */
+  .bubble[data-side="left"]:has(+ .bubble[data-side="left"]),
+  .bubble[data-side="right"]:has(+ .bubble[data-side="right"]) {
+    margin-bottom: calc(-1 * var(--lui-space-1));
+  }
+}

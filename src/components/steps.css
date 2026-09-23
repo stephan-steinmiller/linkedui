@@ -1,0 +1,63 @@
+/* linkedui — components/steps.css — stepper (numbered progress).
+   Pure CSS counters, no JS. Current step via aria-current, finished
+   steps via data-state="done".
+   <ol class="steps">
+     <li data-state="done"><span>Cart</span></li>
+     <li aria-current="step"><span>Payment</span></li>
+     <li><span>Done</span></li>
+   </ol> */
+@layer components {
+  .steps {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    counter-reset: step;
+  }
+  .steps > li {
+    flex: 1 1 0;
+    counter-increment: step;
+    display: grid;
+    gap: var(--lui-space-1);
+    justify-items: center;
+    text-align: center;
+    position: relative;
+    font-size: var(--lui-font-sm);
+    color: var(--lui-muted);
+  }
+  .steps > li::before {
+    content: counter(step);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--lui-control-h-sm);
+    height: var(--lui-control-h-sm);
+    border-radius: 50%;
+    border: 2px solid var(--lui-border);
+    background: var(--lui-field);
+    font-weight: 700;
+  }
+  /* Connector between markers */
+  .steps > li:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    top: calc(var(--lui-control-h-sm) / 2);
+    left: calc(50% + var(--lui-control-h-sm) / 2 + var(--lui-space-1));
+    right: calc(-50% + var(--lui-control-h-sm) / 2 + var(--lui-space-1));
+    height: 2px;
+    background: var(--lui-border);
+  }
+  .steps > li[aria-current="step"] {
+    color: var(--lui-text);
+  }
+  .steps > li[aria-current="step"]::before {
+    border-color: var(--lui-primary);
+    color: var(--lui-primary);
+  }
+  .steps > li[data-state="done"]::before {
+    content: "✓";
+    background: var(--lui-primary);
+    border-color: transparent;
+    color: var(--lui-on-primary);
+  }
+}

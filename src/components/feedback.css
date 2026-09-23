@@ -1,9 +1,11 @@
-/* linkedui — components/feedback.css — alert + badge.
+/* linkedui — components/feedback.css — alert + badge + chip.
  *
  * Markup:
  *   <div class="alert" data-tone="success|warning|danger"><span>Text</span></div>
  *   <span class="badge">New</span>
+ *   <span class="chip">Filter<button type="button" data-lui-chip-close aria-label="Remove filter">×</button></span>
  * Tones come from --lui-success/--lui-warning/--lui-danger.
+ * Chip removal is app JS (one .remove() on click) — no library JS needed.
  */
 
 @layer components {
@@ -16,9 +18,35 @@
     gap: var(--lui-space-2);
     align-items: start;
   }
-  .alert[data-tone="success"] { border-left: 4px solid var(--lui-success); }
-  .alert[data-tone="warning"] { border-left: 4px solid var(--lui-warning); }
-  .alert[data-tone="danger"] { border-left: 4px solid var(--lui-danger); }
+  /* Alerts follow the same status rule as toasts (tone + scheme-neutral,
+     contrast-scaled): tinted fill + tinted edge, pure-tone left bar. */
+  .alert[data-tone="success"] {
+    border: var(--lui-border-width) solid var(--lui-border);
+    border: var(--lui-border-width) solid color-mix(in oklch, var(--lui-success) calc(70% + var(--lui-contrast, 0.5) * 25%), var(--lui-bg));
+    border: var(--lui-border-width) solid color-mix(in oklch, var(--lui-success) calc(70% + var(--lui-contrast, 0.5) * 25%), light-dark(#ffffff, #000000));
+    border-left: 4px solid var(--lui-success);
+    background: var(--lui-surface);
+    background: color-mix(in oklch, var(--lui-success) calc(50% + var(--lui-contrast, 0.5) * 30%), var(--lui-bg));
+    background: color-mix(in oklch, var(--lui-success) calc(50% + var(--lui-contrast, 0.5) * 30%), light-dark(#ffffff, #000000));
+  }
+  .alert[data-tone="warning"] {
+    border: var(--lui-border-width) solid var(--lui-border);
+    border: var(--lui-border-width) solid color-mix(in oklch, var(--lui-warning) calc(70% + var(--lui-contrast, 0.5) * 25%), var(--lui-bg));
+    border: var(--lui-border-width) solid color-mix(in oklch, var(--lui-warning) calc(70% + var(--lui-contrast, 0.5) * 25%), light-dark(#ffffff, #000000));
+    border-left: 4px solid var(--lui-warning);
+    background: var(--lui-surface);
+    background: color-mix(in oklch, var(--lui-warning) calc(50% + var(--lui-contrast, 0.5) * 30%), var(--lui-bg));
+    background: color-mix(in oklch, var(--lui-warning) calc(50% + var(--lui-contrast, 0.5) * 30%), light-dark(#ffffff, #000000));
+  }
+  .alert[data-tone="danger"] {
+    border: var(--lui-border-width) solid var(--lui-border);
+    border: var(--lui-border-width) solid color-mix(in oklch, var(--lui-danger) calc(70% + var(--lui-contrast, 0.5) * 25%), var(--lui-bg));
+    border: var(--lui-border-width) solid color-mix(in oklch, var(--lui-danger) calc(70% + var(--lui-contrast, 0.5) * 25%), light-dark(#ffffff, #000000));
+    border-left: 4px solid var(--lui-danger);
+    background: var(--lui-surface);
+    background: color-mix(in oklch, var(--lui-danger) calc(50% + var(--lui-contrast, 0.5) * 30%), var(--lui-bg));
+    background: color-mix(in oklch, var(--lui-danger) calc(50% + var(--lui-contrast, 0.5) * 30%), light-dark(#ffffff, #000000));
+  }
 
   .badge {
     display: inline-flex;
@@ -26,9 +54,102 @@
     min-height: var(--lui-control-h-sm);
     padding: 0 var(--lui-space-2);
     border-radius: var(--lui-radius-full);
-    background: var(--lui-surface);
+    background: var(--lui-field);
     border: var(--lui-border-width) solid var(--lui-border);
     font-size: var(--lui-font-sm);
     font-weight: 600;
+  }
+
+  /* Chip: removable token (active filters, selections). Static badge look
+     plus a close button; removal itself is app JS (el.remove()).
+     <span class="chip">Photo<button type="button" data-lui-chip-close aria-label="Remove photo filter">×</button></span> */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--lui-space-2);
+    min-height: var(--lui-control-h-sm);
+    padding: 0 var(--lui-space-2) 0 var(--lui-control-px);
+    border-radius: var(--lui-radius-full);
+    corner-shape: var(--lui-corner-shape);
+    background: var(--lui-field);
+    border: var(--lui-border-width) solid var(--lui-border);
+    font-size: var(--lui-font-sm);
+    font-weight: 600;
+  }
+  .chip [data-lui-chip-close] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-left: auto;
+    padding: 0;
+    background: none;
+    border: 0;
+    border-radius: var(--lui-radius-full);
+    corner-shape: var(--lui-corner-shape);
+    color: inherit;
+    font-size: 1.1em;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0.6;
+  }
+  .chip [data-lui-chip-close]:hover {
+    opacity: 1;
+    background: rgb(128 128 128 / 0.12);
+    background: color-mix(in oklch, var(--lui-primary) 12%, transparent);
+  }
+  .chip [data-lui-chip-close]:focus-visible {
+    outline: 2px solid var(--lui-ring);
+    outline-offset: 2px;
+    opacity: 1;
+  }
+
+  /* Skeleton: loading placeholder (pure CSS shimmer). Pair with
+     aria-hidden + a visually-hidden "Loading…" for screen readers.
+     <span class="skeleton" style="width: 12rem" aria-hidden="true"></span>
+     <span class="skeleton" data-shape="circle" style="width:2.5rem;height:2.5rem" aria-hidden="true"></span> */
+  .skeleton {
+    display: block;
+    min-height: 1em;
+    border-radius: var(--lui-radius-sm);
+    corner-shape: var(--lui-corner-shape);
+    background: var(--lui-surface);
+    background-image: linear-gradient(100deg, transparent 20%, rgb(128 128 128 / 0.18) 50%, transparent 80%);
+    background-size: 200% 100%;
+    animation: lui-shimmer 1.4s linear infinite;
+    color: transparent;
+    user-select: none;
+  }
+  .skeleton[data-shape="circle"] {
+    border-radius: 50%;
+  }
+  @keyframes lui-shimmer {
+    from { background-position: 100% 0; }
+    to { background-position: -100% 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .skeleton { animation: none; }
+  }
+
+  /* Spinner: standalone loading indicator (the button spinner is ::before
+     on .btn[data-loading] — same construction, currentColor ring).
+     <span class="spinner" role="status" aria-label="Loading"></span> */
+  .spinner {
+    display: inline-block;
+    width: var(--lui-check);
+    height: var(--lui-check);
+    border-radius: 50%;
+    border: 3px solid var(--lui-border);
+    border-top-color: var(--lui-primary);
+    animation: lui-spin 0.8s linear infinite;
+    vertical-align: middle;
+  }
+  @keyframes lui-spin {
+    to { transform: rotate(360deg); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .spinner { animation: none; }
   }
 }

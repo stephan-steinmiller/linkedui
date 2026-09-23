@@ -9,7 +9,8 @@
  * Modules (initialized in order):
  * 1. {@link restoreTheme} — apply the stored theme before first paint
  * 2. {@link bindThemeSwitchers} — `data-lui-theme` / `data-lui-mode` selects
- * 3. {@link bindDialogs} — `data-lui-open` / `data-lui-close` + backdrop click
+  * 3. {@link bindDialogs} — `data-lui-open` / `data-lui-close` + backdrop click
+  * 3b. {@link bindPopovers} — `.popover` ESC + outside-click to close
  * 4. {@link enhanceTabs} — `.tabs` as a real `tablist` (roles, roving tabindex)
  * 5. {@link enhanceOtp} — `.otp` boxes (advance, backspace, paste-split)
  * 6. {@link bindToasts} + {@link showToast} — toasts (also as `window.luiToast`)
@@ -127,6 +128,33 @@
     document.querySelectorAll("dialog").forEach((dlg) => {
       dlg.addEventListener("click", (e) => {
         if (e.target === dlg) dlg.close();
+      });
+    });
+  }
+
+  /**
+   * Popover niceties for `details.popover` (the toggle itself is native):
+   * - ESC closes the open popover
+   * - pointerdown outside closes it (native `<details>` has no light-dismiss)
+   *
+   * @example
+   * ```html
+   * <details class="popover" data-placement="bottom">
+   *   <summary>Trigger</summary>
+   *   <div role="menu"><a href="…" role="menuitem">Entry</a></div>
+   * </details>
+   * ```
+   * @returns {void}
+   */
+  function bindPopovers() {
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        document.querySelectorAll("details.popover[open]").forEach((d) => d.removeAttribute("open"));
+      }
+    });
+    document.addEventListener("pointerdown", (e) => {
+      document.querySelectorAll("details.popover[open]").forEach((d) => {
+        if (!d.contains(e.target)) d.removeAttribute("open");
       });
     });
   }
@@ -366,6 +394,7 @@
   restoreTheme();
   bindThemeSwitchers();
   bindDialogs();
+  bindPopovers();
   enhanceTabs();
   enhanceOtp();
   bindToasts();

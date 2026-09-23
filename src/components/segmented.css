@@ -4,6 +4,14 @@
    Sizing rule: container is exactly control height (density-driven via
    --lui-control-h-md) like inputs/buttons/selects; segments fill it.
    Uniform 0.25rem inset on both axes. No px anywhere — rem only.
+   Roundness follows --lui-radius-control, so the builder's radius/shape
+   slider drives it (pill shape keeps the classic pill look).
+   Active segment: a sliding pill (::before) anchored to the checked label
+   via anchor positioning (anchor-scope + position-anchor + anchor()).
+   Falls back to a static pill background where anchors are unsupported.
+   All pill paint comes from --seg-* vars (one place): --seg-pill (fill),
+   --seg-edge (edge), --seg-hover (inactive hover step toward the pill).
+   Hover uses an opaque color-mix, never transparency.
    <div class="segmented" role="group" aria-label="Range">
      <input type="radio" name="range" id="range-7d" checked />
      <label for="range-7d">7D</label>
@@ -12,6 +20,15 @@
    </div> */
 @layer components {
   .segmented {
+    /* Single source for all pill paint (fallback label, slider, hover).
+       Deliberately primary-free: neutral text-ink mixes read as selected
+       in every theme, where primary tints wash out. */
+    --seg-track: var(--lui-field);
+    --seg-track: color-mix(in oklch, var(--lui-text) 12%, var(--lui-bg));
+    --seg-pill: var(--lui-surface);
+    --seg-pill: var(--lui-bg);
+    --seg-edge: var(--lui-border);
+    --seg-hover: color-mix(in oklch, var(--lui-text) 6%, var(--lui-bg));
     display: inline-flex;
     align-items: stretch;
     gap: 0.25rem;
@@ -22,10 +39,10 @@
     /* Exactly control height like inputs/buttons/selects (density-driven).
        Border is inside (border-box) like inputs, pill fills the rest. */
     height: var(--lui-control-h-md);
-    /* Field tint (primary+bg, stronger than cards) + input-like edge */
-    background: var(--lui-field);
+    /* Neutral track + input-like edge (see --seg-* above) */
+    background: var(--seg-track);
     border: var(--lui-border-width) solid var(--lui-border);
-    border-radius: var(--lui-radius-full);
+    border-radius: var(--lui-radius-control);
     corner-shape: var(--lui-corner-shape);
   }
   /* Radios participate but stay invisible (no display:none → keyboard works) */
@@ -51,7 +68,10 @@
     /* Fill the container: segments grow with vertical density because the
        container does (control height). Padding only spaces inner content. */
     padding: var(--lui-control-py) var(--lui-control-px);
-    border-radius: var(--lui-radius-full);
+    /* Permanent transparent border: the checked pill only swaps its color,
+       so toggling never resizes the content box (no letter jiggle). */
+    border: var(--lui-border-width) solid transparent;
+    border-radius: var(--lui-radius-control);
     corner-shape: var(--lui-corner-shape);
     color: var(--lui-muted);
     font-weight: 600;
@@ -60,10 +80,15 @@
   }
   .segmented > label:hover {
     color: var(--lui-text);
+    /* Opaque step toward the pill (unsupported browsers keep the color shift) */
+    background: var(--seg-hover);
   }
   .segmented > input:checked + label {
-    /* Active pill in card color — sits cleanly on the field-tinted track */
-    background: var(--lui-surface);
+    /* Fallback pill (no anchor support): fill + edge + lift.
+       Where anchors work, the ::before slider takes over and this goes
+       transparent (see @supports block below). */
+    background: var(--seg-pill);
+    border-color: var(--seg-edge);
     color: var(--lui-text);
     box-shadow: var(--lui-shadow-sm);
   }
@@ -74,5 +99,59 @@
   .segmented > input:disabled + label {
     opacity: 0.5;
     cursor: not-allowed;
+  }
+
+  /* Animated slider: the checked label becomes the anchor (--seg-active),
+     the ::before pill tracks it and glides on selection change.
+     anchor-scope keeps each .segmented resolving to its own checked label,
+     so multiple controls on one page don't steal each other's slider. */
+  @supports (position-anchor: --seg-active) and (anchor-scope: --seg-active) {
+    .segmented {
+      position: relative;
+      anchor-scope: --seg-active;
+    }
+    .segmented > label {
+      /* Sit above the sliding pill; background comes from the slider. */
+      position: relative;
+      z-index: 1;
+      background: transparent;
+    }
+    .segmented > input:checked + label {
+      anchor-name: --seg-active;
+      /* Slider paints fill + edge — keep the label itself clear. */
+      background: transparent;
+      border-color: transparent;
+      box-shadow: none;
+    }
+    .segmented::before {
+      content: "";
+      position: absolute;
+      position-anchor: --seg-active;
+      top: anchor(top);
+      left: anchor(left);
+      right: anchor(right);
+      bottom: anchor(bottom);
+      z-index: 0;
+      pointer-events: none;
+      background: var(--seg-pill);
+      border: var(--lui-border-width) solid var(--seg-edge);
+      border-radius: var(--lui-radius-control);
+      corner-shape: var(--lui-corner-shape);
+      box-shadow: var(--lui-shadow-sm);
+      transition:
+        top 0.25s ease,
+        left 0.25s ease,
+        right 0.25s ease,
+        bottom 0.25s ease;
+    }
+    /* No selection → no anchor → hide the pill. */
+    .segmented:not(:has(> input:checked))::before {
+      display: none;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .segmented::before {
+        transition: none;
+      }
+    }
   }
 }

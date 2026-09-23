@@ -12,6 +12,25 @@
  */
 
 @layer base-classless {
+  /* Skip link: first link to the #main landmark, revealed on focus.
+     <body><a href="#main">Skip to content</a><main id="main">… */
+  :where(body) > :where(a[href^="#"]:first-child) {
+    position: absolute;
+    top: -100%;
+    left: var(--lui-space-3);
+    z-index: 100;
+    padding: var(--lui-control-py) var(--lui-control-px);
+    background: var(--lui-primary);
+    color: var(--lui-on-primary);
+    border-radius: var(--lui-radius-control);
+    corner-shape: var(--lui-corner-shape);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  :where(body) > :where(a[href^="#"]:first-child:focus-visible) {
+    top: var(--lui-space-2);
+  }
+
   main, .lui-container {
     max-width: var(--lui-maxw);
     margin-inline: auto;
@@ -32,6 +51,23 @@
   :where(a) {
     color: var(--lui-primary);
     text-underline-offset: 0.15em;
+  }
+
+  /* Lists: the reset zeroes margins, so markers need their indent back.
+     <ul><li>… · <ol><li>… (nesting indents further, tighter rhythm) */
+  :where(ul, ol) {
+    padding-left: 1.5em;
+    margin-block: var(--lui-space-2);
+  }
+  :where(ol ol, ul ul, ol ul, ul ol) {
+    margin-block: var(--lui-space-1);
+  }
+  :where(li) {
+    margin-block: var(--lui-space-1);
+  }
+  :where(li)::marker {
+    color: var(--lui-muted);
+    font-weight: 600;
   }
 
   /* Buttons + inputs share heights → consistent */
@@ -114,6 +150,7 @@
     flex: none;
     padding: 0;
     margin: 0;
+    position: relative;
     background: var(--lui-field);
     border: 2px solid var(--lui-text);
     /* Same radius as all other controls (buttons, inputs) —
@@ -126,29 +163,68 @@
   :where(input[type="checkbox"]:not([role="switch"]):hover, input[type="radio"]:hover) {
     border-color: var(--lui-primary);
   }
+  /* Checkbox follows the control radius only for small values, then caps:
+     damping so the box stays box-like (pill shape would turn it circular). */
+  :where(input[type="checkbox"]:not([role="switch"])) {
+    border-radius: min(var(--lui-radius-control), 8px);
+  }
   :where(input[type="radio"]) {
     border-radius: 50%;
   }
   :where(input[type="checkbox"]:not([role="switch"]):checked) {
     background-color: var(--lui-primary);
     border-color: var(--lui-primary);
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
-    background-size: 72%;
-    background-position: center;
-    background-repeat: no-repeat;
+  }
+  :where(input[type="checkbox"]:not([role="switch"])[data-variant="secondary"]:checked) {
+    background-color: var(--lui-secondary);
+    border-color: var(--lui-secondary);
+  }
+  :where(input[type="checkbox"]:not([role="switch"])[data-variant="accent"]:checked) {
+    background-color: var(--lui-accent);
+    border-color: var(--lui-accent);
+  }
+  /* Check as border technique (no image, so it can invert): two borders of
+     a rotated box, painted in on-primary — legible on any primary,
+     including white. Pseudos work here like on the switch track below. */
+  :where(input[type="checkbox"]:not([role="switch"]):checked)::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 46%;
+    width: 26%;
+    height: 52%;
+    border: solid var(--lui-on-primary);
+    border-width: 0 calc(var(--lui-check) * 0.11) calc(var(--lui-check) * 0.11) 0;
+    transform: translate(-50%, -50%) rotate(45deg);
+    box-sizing: border-box;
   }
   /* Radio dot as border technique: the "dot" is the box itself with a thick
      border — it automatically follows border-radius AND corner-shape
-     (superellipse). Relative units so density scaling carries it along. */
-  :where(input[type="radio"]:checked, input[type="radio"]:hover) {
+     (superellipse). Relative units so density scaling carries it along.
+     Dot inverts with primary (on-primary) — checked, pressed, and hover
+     preview alike: the primary ring defines it on field backgrounds,
+     the dot itself on primary-matching ones. */
+  :where(input[type="radio"]:checked, input[type="radio"]:not(:checked):hover) {
     border-color: var(--lui-primary);
     border-width: calc(var(--lui-check) * 0.25);
-    background-color: var(--lui-text);
+    background-color: var(--lui-on-primary);
+  }
+  :where(input[type="radio"][data-variant="secondary"]:checked, input[type="radio"][data-variant="secondary"]:not(:checked):hover) {
+    border-color: var(--lui-secondary);
+  }
+  :where(input[type="radio"][data-variant="accent"]:checked, input[type="radio"][data-variant="accent"]:not(:checked):hover) {
+    border-color: var(--lui-accent);
   }
   :where(input[type="radio"]:active) {
     border-color: var(--lui-primary);
     border-width: calc(var(--lui-check) * 0.18);
-    background-color: var(--lui-text);
+    background-color: var(--lui-on-primary);
+  }
+  :where(input[type="radio"][data-variant="secondary"]:active) {
+    border-color: var(--lui-secondary);
+  }
+  :where(input[type="radio"][data-variant="accent"]:active) {
+    border-color: var(--lui-accent);
   }
 
   :where(input[type="color"]) {
@@ -165,6 +241,29 @@
   :where(input[type="color"]::-webkit-color-swatch-wrapper) { padding: 0; }
   :where(input[type="color"]::-webkit-color-swatch) { border: 0; border-radius: var(--lui-radius-sm); }
   :where(input[type="color"]::-moz-color-swatch) { border: 0; border-radius: var(--lui-radius-sm); }
+
+  /* Picker indicator as a big docked button (like the input-group action):
+     fills the input height with only a 0.25rem inset, rounded + tinted.
+     (The calendar/color popup panels themselves are browser UI and cannot
+     be styled — color-scheme keeps them in the right mode.) */
+  :where(input[type="date"], input[type="time"], input[type="datetime-local"], input[type="month"], input[type="week"]) {
+    padding-block: 0.25rem;
+  }
+  :where(input[type="date"], input[type="time"], input[type="datetime-local"], input[type="month"], input[type="week"])::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    /* Intrinsic sizing, same reason as the file button: explicit height is
+       ignored by some engines. min-height is honored where height is not —
+       screenshot-verified to nearly fill the content height. */
+    height: auto;
+    min-height: 2.375rem;
+    padding-block: 0.25rem;
+    padding-inline: var(--lui-control-px);
+    border: var(--lui-border-width) solid var(--lui-border);
+    border-radius: var(--lui-radius-control);
+    corner-shape: var(--lui-corner-shape);
+    background-color: var(--lui-surface);
+    background-color: color-mix(in oklch, var(--lui-primary) 12%, var(--lui-surface));
+  }
   /* Range: the input IS the track (pill + overflow hidden), fill = huge
      primary shadow left of the thumb — structurally exact, zero JS.
      Thumb color = text (like the switch knob). */
@@ -197,11 +296,16 @@
     /* full instead of 50%: square = circle, wider = real pill (no ellipse) */
     border-radius: var(--lui-radius-full);
     corner-shape: var(--lui-corner-shape);
-    background: var(--lui-text);
+    background: var(--lui-on-primary);
+    /* Inverted fill, primary ring: the ring defines the knob on the field
+       track, the fill on the primary fill — legible with any primary,
+       including white. */
     border: var(--lui-primary) calc(var(--lui-thumb) / 5) solid;
 
-    /* Fill ends at thumb center (half thumb width as joint), rounded by the track pill */
-    box-shadow: calc(-400px - var(--lui-thumbw) * 0.5) 0 0 400px var(--lui-primary);
+    /* Fill ends at thumb center (half thumb width as joint), rounded by the track pill.
+       Reach is viewport-wide (not a fixed px length) so the fill always
+       starts at 0, no matter how wide the track gets. */
+    box-shadow: calc(-100vw - var(--lui-thumbw) * 0.5) 0 0 100vw var(--lui-primary);
     transition: all 0.1s ease-in-out;
   }
   :where(input[type="range"]:hover)::-webkit-slider-thumb {
@@ -220,9 +324,9 @@
     height: var(--lui-thumb);
     border-radius: var(--lui-radius-full);
     corner-shape: var(--lui-corner-shape);
-    background: var(--lui-text);
-    border: 0;
-    box-shadow: calc(-400px - var(--lui-thumbw) / 2) 0 0 400px var(--lui-primary);
+    background: var(--lui-on-primary);
+    border: var(--lui-primary) calc(var(--lui-thumb) / 5) solid;
+    box-shadow: calc(-100vw - var(--lui-thumbw) / 2) 0 0 100vw var(--lui-primary);
     transition: filter 0.1s ease-in-out;
   }
   :where(input[type="range"]:hover)::-moz-range-thumb {
@@ -234,6 +338,163 @@
   :where(input[type="range"]:disabled) {
     opacity: 0.5;
     cursor: not-allowed;
+  }
+  /* Secondary variant: thumb ring + fill follow --lui-secondary.
+     <input type="range" data-variant="secondary" … /> */
+  :where(input[type="range"][data-variant="secondary"])::-webkit-slider-thumb {
+    border-color: var(--lui-secondary);
+    box-shadow: calc(-100vw - var(--lui-thumbw) * 0.5) 0 0 100vw var(--lui-secondary);
+  }
+  :where(input[type="range"][data-variant="secondary"])::-moz-range-thumb {
+    border-color: var(--lui-secondary);
+    box-shadow: calc(-100vw - var(--lui-thumbw) / 2) 0 0 100vw var(--lui-secondary);
+  }
+  :where(input[type="range"][data-variant="accent"])::-webkit-slider-thumb {
+    border-color: var(--lui-accent);
+    box-shadow: calc(-100vw - var(--lui-thumbw) * 0.5) 0 0 100vw var(--lui-accent);
+  }
+  :where(input[type="range"][data-variant="accent"])::-moz-range-thumb {
+    border-color: var(--lui-accent);
+    box-shadow: calc(-100vw - var(--lui-thumbw) / 2) 0 0 100vw var(--lui-accent);
+  }
+
+  /* Progress: native <progress>, track = element, fill = vendor pseudos.
+     <progress value="60" max="100">60%</progress> (determinate) or
+     <progress> (indeterminate: sweeping fill, pure CSS).
+     Date/time/month/week inputs need nothing extra — they inherit the
+     text-input rule above and their picker follows color-scheme. */
+  :where(progress) {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    max-width: 28rem;
+    height: calc(var(--lui-check) * 0.5);
+    border-radius: var(--lui-radius-full);
+    corner-shape: var(--lui-corner-shape);
+    background: var(--lui-field);
+    border: var(--lui-border-width) solid var(--lui-border);
+    overflow: hidden;
+    vertical-align: middle;
+  }
+  :where(progress)::-webkit-progress-bar {
+    background: transparent;
+  }
+  :where(progress)::-webkit-progress-value {
+    background: var(--lui-primary);
+    border-radius: var(--lui-radius-full);
+    corner-shape: var(--lui-corner-shape);
+  }
+  :where(progress)::-moz-progress-bar {
+    background: var(--lui-primary);
+    border-radius: var(--lui-radius-full);
+    corner-shape: var(--lui-corner-shape);
+  }
+  :where(progress[data-variant="secondary"])::-webkit-progress-value {
+    background: var(--lui-secondary);
+  }
+  :where(progress[data-variant="secondary"])::-moz-progress-bar {
+    background: var(--lui-secondary);
+  }
+  :where(progress[data-variant="accent"])::-webkit-progress-value {
+    background: var(--lui-accent);
+  }
+  :where(progress[data-variant="accent"])::-moz-progress-bar {
+    background: var(--lui-accent);
+  }
+  :where(progress:not([value])) {
+    background-image: linear-gradient(100deg, transparent 30%, var(--lui-primary) 50%, transparent 70%);
+    background-size: 200% 100%;
+    animation: lui-progress-slide 1.2s linear infinite;
+  }
+  @keyframes lui-progress-slide {
+    from { background-position: 100% 0; }
+    to { background-position: -100% 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :where(progress:not([value])) { animation: none; }
+  }
+
+  /* Meter: known-quantity gauge (<meter value="0.6" min="0" max="1">) —
+     unlike progress it has optimum zones, hence tone per zone per engine.
+     <meter value="0.8" min="0" max="1" low="0.3" high="0.75" optimum="0.9">80%</meter> */
+  :where(meter) {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    max-width: 28rem;
+    /* Inset around the fill: tighter vertically (0.25rem, budgeted in the
+       fixed height above), roomier horizontally — in a wide pill equal rem
+       values look starved at the ends because of the end-cap curvature. */
+    height: calc(var(--lui-check) * 0.5 + 0.5rem + (2 * var(--lui-border-width)));
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--lui-radius-full);
+    corner-shape: var(--lui-corner-shape);
+    background: var(--lui-field);
+    border: var(--lui-border-width) solid var(--lui-border);
+    overflow: hidden;
+    vertical-align: middle;
+  }
+  :where(meter)::-webkit-meter-bar {
+    background: transparent;
+    border: 0;
+    height: 100%;
+  }
+  :where(meter)::-webkit-meter-optimum-value {
+    background: var(--lui-success);
+    border-radius: var(--lui-radius-full);
+    corner-shape: var(--lui-corner-shape);
+  }
+  :where(meter)::-webkit-meter-suboptimum-value {
+    background: var(--lui-warning);
+    border-radius: var(--lui-radius-full);
+    corner-shape: var(--lui-corner-shape);
+  }
+  :where(meter)::-webkit-meter-even-less-good-value {
+    background: var(--lui-danger);
+    border-radius: var(--lui-radius-full);
+    corner-shape: var(--lui-corner-shape);
+  }
+  :where(meter)::-moz-meter-bar {
+    background: var(--lui-primary);
+    border-radius: var(--lui-radius-full);
+    corner-shape: var(--lui-corner-shape);
+  }
+  :where(meter:-moz-meter-optimum)::-moz-meter-bar { background: var(--lui-success); }
+  :where(meter:-moz-meter-sub-optimum)::-moz-meter-bar { background: var(--lui-warning); }
+  :where(meter:-moz-meter-sub-sub-optimum)::-moz-meter-bar { background: var(--lui-danger); }
+
+  /* File: the button + filename are UA-internal boxes. Some engines ignore
+     height, margins and vertical-align on them and top-position the line,
+     so the button is sized INTRINSICALLY to exactly the content height —
+     then it fills edge to edge and position stops mattering. Fixed 1rem
+     font metrics keep it immune to surrounding font size; the padding
+     formula stays exact under density scaling and zoom. */
+  :where(input[type="file"]) {
+    padding: 0 var(--lui-control-px) 0 0.25rem;
+    line-height: calc(var(--lui-control-h-md) - (2 * var(--lui-border-width)));
+  }
+  :where(input[type="file"])::file-selector-button,
+  :where(input[type="file"])::-webkit-file-upload-button {
+    height: auto;
+    margin: 0;
+    padding: calc((var(--lui-control-h-md) - (2 * var(--lui-border-width)) - 1.2rem - (2 * var(--lui-border-width))) / 2) var(--lui-control-px);
+    vertical-align: middle;
+    vertical-align: middle;
+    border: var(--lui-border-width) solid var(--lui-border);
+    border-radius: var(--lui-radius-control);
+    corner-shape: var(--lui-corner-shape);
+    background: var(--lui-surface);
+    background: color-mix(in oklch, var(--lui-primary) 12%, var(--lui-surface));
+    color: var(--lui-text);
+    font: inherit;
+    /* Decouple from the input's tall centering line-height (inherited into
+       the button in some engines, inflating it past the track) */
+    line-height: 1.2;
+    /* Decouple from surrounding font size too (e.g. 13px inside label.field
+       shrinks the button intrinsically) — fixed metrics, fills every time */
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
   }
 
   /* Switch: label wrapper + native checkbox input (CSS-only, no JS).
@@ -319,10 +580,38 @@
     border-width: 2px;
     width: calc(var(--lui-knobw) + 4px);
   }
-  /* On: right-anchored (pure lengths → animatable) */
+  /* On: right-anchored (pure lengths → animatable).
+     Knob inverts with primary (on-primary): on a white primary the
+     text-colored knob would disappear into the track. */
   :where(input[type="checkbox"][role="switch"]:checked)::after {
     margin-left: calc(100% - var(--lui-knobw));
     border-color: var(--lui-primary);
+    background-color: var(--lui-on-primary);
+  }
+  /* Secondary variant: fill + track follow --lui-secondary, knob inverts
+     with it just like the primary knob does.
+     <label class="switch"><input type="checkbox" role="switch" data-variant="secondary" /></label> */
+  :where(input[type="checkbox"][role="switch"][data-variant="secondary"])::before {
+    background-color: var(--lui-secondary);
+  }
+  :where(input[type="checkbox"][role="switch"][data-variant="secondary"]:checked) {
+    border-color: var(--lui-secondary);
+    background-color: var(--lui-secondary);
+  }
+  :where(input[type="checkbox"][role="switch"][data-variant="secondary"]:checked)::after {
+    border-color: var(--lui-secondary);
+    background-color: var(--lui-on-secondary);
+  }
+  :where(input[type="checkbox"][role="switch"][data-variant="accent"])::before {
+    background-color: var(--lui-accent);
+  }
+  :where(input[type="checkbox"][role="switch"][data-variant="accent"]:checked) {
+    border-color: var(--lui-accent);
+    background-color: var(--lui-accent);
+  }
+  :where(input[type="checkbox"][role="switch"][data-variant="accent"]:checked)::after {
+    border-color: var(--lui-accent);
+    background-color: var(--lui-on-accent);
   }
   :where(input[type="checkbox"][role="switch"]:checked:hover)::after {
     border-width: 2px;
@@ -349,6 +638,18 @@
     padding: var(--lui-space-3);
   }
   :where(legend) { padding-inline: 0.5em; font-weight: 700; }
+
+  /* Description list: term/definition grid (margin reset is global).
+     <dl><dt>Plan</dt><dd>Pro, monthly</dd></dl> */
+  :where(dl) {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--lui-space-1) var(--lui-space-3);
+  }
+  :where(dt) {
+    font-size: var(--lui-font-sm);
+    font-weight: 600;
+  }
 
   /* Card default without class */
   :where(article) {
@@ -408,6 +709,13 @@
     max-height: min(40rem, calc(100dvh - 2rem));
     box-shadow: var(--lui-shadow-md);
   }
+  /* Sizes: sm for confirms, lg for wide content (default sits between). */
+  :where(dialog[data-size="sm"]) {
+    max-width: min(24rem, calc(100vw - 2rem));
+  }
+  :where(dialog[data-size="lg"]) {
+    max-width: min(48rem, calc(100vw - 2rem));
+  }
   /* NOTE: :where() wraps only `dialog` — ::backdrop itself must stay
      outside (:where(dialog::backdrop) never matches in Chrome). */
   :where(dialog)::backdrop {
@@ -442,4 +750,58 @@
   }
 
   :where(hr) { border: 0; border-top: var(--lui-border-width) solid var(--lui-border); margin-block: var(--lui-space-3); }
+
+  /* Divider with a label ("or" separators), still classless via data-text.
+     The label straddles the rule on a page-colored patch (self-centering
+     via its own height, so font metrics can't break it).
+     <hr data-text="or" /> */
+  :where(hr[data-text]) {
+    border: 0;
+    border-top: var(--lui-border-width) solid var(--lui-border);
+    overflow: visible;
+    text-align: center;
+    color: var(--lui-muted);
+    font-size: var(--lui-font-sm);
+    font-weight: 600;
+  }
+  :where(hr[data-text])::after {
+    content: attr(data-text);
+    display: inline-block;
+    transform: translateY(-55%);
+    padding-inline: 0.75em;
+    background: var(--lui-bg);
+  }
+
+  /* Quote + figure: docs/content essentials, classless.
+     <blockquote><p>…</p><cite>— …</cite></blockquote>
+     <figure><img src="…" alt="…" /><figcaption>…</figcaption></figure> */
+  :where(blockquote) {
+    margin-block: var(--lui-space-3);
+    padding: var(--lui-space-2) var(--lui-space-3);
+    border-left: 4px solid var(--lui-primary);
+    border-top-right-radius: var(--lui-radius-sm);
+    border-bottom-right-radius: var(--lui-radius-sm);
+    background: var(--lui-surface);
+  }
+  :where(blockquote cite) {
+    display: block;
+    margin-top: var(--lui-space-1);
+    font-style: normal;
+    font-size: var(--lui-font-sm);
+    color: var(--lui-muted);
+  }
+  :where(figure) {
+    display: grid;
+    gap: var(--lui-space-2);
+    margin-block: var(--lui-space-3);
+  }
+  :where(figure) > :where(img) {
+    border-radius: var(--lui-radius-lg);
+    corner-shape: var(--lui-corner-shape);
+    border: var(--lui-border-width) solid var(--lui-border);
+  }
+  :where(figcaption) {
+    font-size: var(--lui-font-sm);
+    color: var(--lui-muted);
+  }
 }

@@ -5,11 +5,13 @@
  * ADDING YOUR OWN THEME (pattern, light + dark):
  *   [data-theme="my-theme"] {
  *     color-scheme: light;
- *     --lui-primary: oklch(0.6 0.16 255);
- *     --lui-on-primary: oklch(0.99 0 0);
- *     --lui-bg: oklch(0.99 0.005 95);
- *     --lui-surface: #edf1f7; /* fallback */
- *     --lui-surface: color-mix(in oklch, var(--lui-primary) 7%, var(--lui-bg));
+  *     --lui-primary: oklch(0.6 0.16 255);
+  *     --lui-on-primary: oklch(0.99 0 0);
+  *     --lui-accent: oklch(0.6 0.16 255);
+  *     --lui-on-accent: oklch(0.99 0 0);
+  *     --lui-bg: oklch(0.99 0.005 95);
+  *     --lui-surface: #edf1f7; (fallback if no color-mix)
+ *     --lui-surface: color-mix(in oklch, var(--lui-accent) 7%, var(--lui-bg));
  *     --lui-text: oklch(0.27 0.03 260);
  *     --lui-radius: 12px;            (boxes)
  *     --lui-radius-control: 12px;    (buttons/inputs; 999px = pill)
@@ -32,7 +34,7 @@
     color-scheme: light;
     --lui-bg: oklch(0.99 0.005 95);
     --lui-surface: #edf1f7;
-    --lui-surface: color-mix(in oklch, var(--lui-primary) 7%, var(--lui-bg));
+    --lui-surface: color-mix(in oklch, var(--lui-accent) 7%, var(--lui-bg));
     --lui-text: oklch(0.27 0.03 260);
     --lui-muted: oklch(0.55 0.03 260);
     --lui-border: #e2e5ea;
@@ -45,6 +47,12 @@
     --lui-on-primary: oklch(0.99 0 0);
     --lui-secondary: oklch(0.55 0.06 260);
     --lui-on-secondary: oklch(0.99 0 0);
+    --lui-accent: oklch(0.6 0.16 255);
+    --lui-accent-hover: #3f6fd8;
+    --lui-accent-hover: color-mix(in oklch, var(--lui-accent) 88%, black);
+    --lui-accent-active: #355cb8;
+    --lui-accent-active: color-mix(in oklch, var(--lui-accent) 78%, black);
+    --lui-on-accent: oklch(0.99 0 0);
     --lui-radius: 12px;
     --lui-density: 1;
     --lui-corner-shape: normal;
@@ -55,7 +63,7 @@
     color-scheme: light;
     --lui-bg: oklch(0.985 0.01 210);
     --lui-surface: #e8f1f5;
-    --lui-surface: color-mix(in oklch, var(--lui-primary) 7%, var(--lui-bg));
+    --lui-surface: color-mix(in oklch, var(--lui-accent) 7%, var(--lui-bg));
     --lui-text: oklch(0.26 0.04 230);
     --lui-muted: oklch(0.53 0.04 220);
     --lui-primary: oklch(0.65 0.14 200);
@@ -66,6 +74,12 @@
     --lui-on-primary: oklch(0.99 0 0);
     --lui-secondary: oklch(0.52 0.07 210);
     --lui-on-secondary: oklch(0.99 0 0);
+    --lui-accent: oklch(0.65 0.14 200);
+    --lui-accent-hover: #1f7a9e;
+    --lui-accent-hover: color-mix(in oklch, var(--lui-accent) 88%, black);
+    --lui-accent-active: #1a6887;
+    --lui-accent-active: color-mix(in oklch, var(--lui-accent) 78%, black);
+    --lui-on-accent: oklch(0.99 0 0);
     --lui-radius: 10px;
     --lui-density: 1;
     --lui-corner-shape: normal;
@@ -76,7 +90,7 @@
     color-scheme: light;
     --lui-bg: oklch(0.99 0.01 350);
     --lui-surface: #f9edf1;
-    --lui-surface: color-mix(in oklch, var(--lui-primary) 7%, var(--lui-bg));
+    --lui-surface: color-mix(in oklch, var(--lui-accent) 7%, var(--lui-bg));
     --lui-text: oklch(0.28 0.05 350);
     --lui-muted: oklch(0.56 0.05 350);
     --lui-primary: oklch(0.65 0.2 10);
@@ -87,6 +101,12 @@
     --lui-on-primary: oklch(0.99 0 0);
     --lui-secondary: oklch(0.58 0.12 10);
     --lui-on-secondary: oklch(0.99 0 0);
+    --lui-accent: oklch(0.65 0.2 10);
+    --lui-accent-hover: #d14a7a;
+    --lui-accent-hover: color-mix(in oklch, var(--lui-accent) 88%, black);
+    --lui-accent-active: #b23e68;
+    --lui-accent-active: color-mix(in oklch, var(--lui-accent) 78%, black);
+    --lui-on-accent: oklch(0.99 0 0);
     --lui-radius: 18px;
     --lui-density: 1.15;
     --lui-corner-shape: superellipse(1.3);
@@ -97,7 +117,7 @@
     color-scheme: dark;
     --lui-bg: oklch(0.22 0.02 260);
     --lui-surface: #232c40;
-    --lui-surface: color-mix(in oklch, var(--lui-primary) 7%, var(--lui-bg));
+    --lui-surface: color-mix(in oklch, var(--lui-accent) 7%, var(--lui-bg));
     --lui-text: oklch(0.95 0.01 95);
     --lui-muted: oklch(0.7 0.03 260);
     --lui-border: #3a4152;
@@ -109,7 +129,7 @@
     color-scheme: dark;
     --lui-bg: oklch(0.22 0.03 220);
     --lui-surface: #213040;
-    --lui-surface: color-mix(in oklch, var(--lui-primary) 7%, var(--lui-bg));
+    --lui-surface: color-mix(in oklch, var(--lui-accent) 7%, var(--lui-bg));
     --lui-text: oklch(0.95 0.01 210);
     --lui-muted: oklch(0.7 0.04 220);
     --lui-primary: oklch(0.75 0.13 200);
@@ -119,7 +139,7 @@
     color-scheme: dark;
     --lui-bg: oklch(0.23 0.03 350);
     --lui-surface: #2c2633;
-    --lui-surface: color-mix(in oklch, var(--lui-primary) 7%, var(--lui-bg));
+    --lui-surface: color-mix(in oklch, var(--lui-accent) 7%, var(--lui-bg));
     --lui-text: oklch(0.95 0.015 350);
     --lui-muted: oklch(0.72 0.04 350);
     --lui-primary: oklch(0.72 0.18 10);
@@ -132,7 +152,7 @@
       color-scheme: dark;
       --lui-bg: oklch(0.22 0.02 260);
       --lui-surface: #232c40;
-    --lui-surface: color-mix(in oklch, var(--lui-primary) 7%, var(--lui-bg));
+    --lui-surface: color-mix(in oklch, var(--lui-accent) 7%, var(--lui-bg));
       --lui-text: oklch(0.95 0.01 95);
       --lui-muted: oklch(0.7 0.03 260);
       --lui-border: #3a4152;
@@ -144,7 +164,7 @@
       color-scheme: dark;
       --lui-bg: oklch(0.22 0.03 220);
       --lui-surface: #213040;
-    --lui-surface: color-mix(in oklch, var(--lui-primary) 7%, var(--lui-bg));
+    --lui-surface: color-mix(in oklch, var(--lui-accent) 7%, var(--lui-bg));
       --lui-text: oklch(0.95 0.01 210);
       --lui-muted: oklch(0.7 0.04 220);
       --lui-primary: oklch(0.75 0.13 200);
@@ -154,7 +174,7 @@
       color-scheme: dark;
       --lui-bg: oklch(0.23 0.03 350);
       --lui-surface: #2c2633;
-    --lui-surface: color-mix(in oklch, var(--lui-primary) 7%, var(--lui-bg));
+    --lui-surface: color-mix(in oklch, var(--lui-accent) 7%, var(--lui-bg));
       --lui-text: oklch(0.95 0.015 350);
       --lui-muted: oklch(0.72 0.04 350);
       --lui-primary: oklch(0.72 0.18 10);

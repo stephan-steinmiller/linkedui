@@ -3,6 +3,9 @@ node_modules/
 dist/
 *.log
 
+# Agent workspace (local-only state, loops, skills cache)
+.opencode/
+
 # OS
 .DS_Store
 Thumbs.db

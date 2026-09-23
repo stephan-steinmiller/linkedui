@@ -1,0 +1,118 @@
+/* linkedui — components/popover.css — popover menu (details-first).
+   Trigger + floating panel. Without JS: native <details> toggle (click,
+   Enter/Space, Tab reach the items). With JS (enhance.js bindPopovers):
+   ESC closes, outside pointer closes.
+   <details class="popover" data-placement="bottom">
+     <summary>Trigger</summary>
+     <div role="menu">
+       <a href="…" role="menuitem">Entry</a>
+       <button type="button" role="menuitem">Action</button>
+       <hr />
+       <a href="…" role="menuitem">More</a>
+     </div>
+   </details>
+   Placements: top | bottom (default) | left | right — same vocabulary as
+   toasts (corners don't apply to anchored panels). No px anywhere. */
+@layer components {
+  .popover {
+    position: relative;
+    display: inline-block;
+    /* Undo the base <details> card look (like details.dropdown) */
+    padding: 0;
+    border: 0;
+    background: none;
+  }
+  .popover > summary {
+    list-style: none;
+    cursor: pointer;
+  }
+  .popover > summary::-webkit-details-marker {
+    display: none;
+  }
+  .popover > summary:focus-visible {
+    outline: 2px solid var(--lui-ring);
+    outline-offset: 2px;
+    border-radius: var(--lui-radius-sm);
+  }
+  /* Panel: surface card, hidden until [open] (pure CSS, no JS) */
+  .popover > div {
+    display: none;
+    position: absolute;
+    z-index: 20;
+    min-width: 12rem;
+    max-width: min(20rem, calc(100vw - 2rem));
+    background: var(--lui-surface);
+    border: var(--lui-border-width) solid var(--lui-border);
+    border-radius: var(--lui-radius-lg);
+    corner-shape: var(--lui-corner-shape);
+    box-shadow: var(--lui-shadow-md);
+    padding: var(--lui-space-1);
+  }
+  .popover[open] > div {
+    display: block;
+  }
+  /* Placement (bottom default — only the set axis overrides) */
+  .popover[data-placement="bottom"] > div,
+  .popover:not([data-placement]) > div {
+    top: calc(100% + 6px);
+    left: 0;
+  }
+  .popover[data-placement="top"] > div {
+    bottom: calc(100% + 6px);
+    left: 0;
+  }
+  .popover[data-placement="left"] > div {
+    top: 0;
+    right: calc(100% + 6px);
+  }
+  .popover[data-placement="right"] > div {
+    top: 0;
+    left: calc(100% + 6px);
+  }
+  /* Items: links + buttons share one look, control height for targets */
+  .popover [role="menuitem"] {
+    display: flex;
+    align-items: center;
+    /* Reset base button centering (links never had it, buttons do) */
+    justify-content: flex-start;
+    gap: var(--lui-space-2);
+    width: 100%;
+    /* Override the fixed base-button height — links and buttons share
+       min-height so every row measures the same. */
+    height: auto;
+    min-height: var(--lui-control-h-sm);
+    padding: var(--lui-space-1) var(--lui-space-2);
+    border: 0;
+    border-radius: var(--lui-radius-sm);
+    corner-shape: var(--lui-corner-shape);
+    background: none;
+    color: var(--lui-text);
+    font: inherit;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .popover [role="menuitem"]:hover {
+    background: rgb(128 128 128 / 0.12);
+    background: color-mix(in oklch, var(--lui-primary) 12%, transparent);
+  }
+  .popover [role="menuitem"]:focus-visible {
+    outline: 2px solid var(--lui-ring);
+    outline-offset: -2px;
+  }
+  /* First/last item follow the panel's inner curve (radius − padding),
+     otherwise their smaller hover radius gets cut off by the panel edge. */
+  .popover [role="menu"] > [role="menuitem"]:first-child {
+    border-top-left-radius: calc(var(--lui-radius-lg) - var(--lui-space-1));
+    border-top-right-radius: calc(var(--lui-radius-lg) - var(--lui-space-1));
+  }
+  .popover [role="menu"] > [role="menuitem"]:last-child {
+    border-bottom-left-radius: calc(var(--lui-radius-lg) - var(--lui-space-1));
+    border-bottom-right-radius: calc(var(--lui-radius-lg) - var(--lui-space-1));
+  }
+  .popover [role="menu"] hr {
+    border: 0;
+    border-top: var(--lui-border-width) solid var(--lui-border);
+    margin: var(--lui-space-1) 0;
+  }
+}

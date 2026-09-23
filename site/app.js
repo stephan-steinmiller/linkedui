@@ -7,9 +7,9 @@
  *
  * Core ideas:
  * - Number fields are the source of truth (wider value range), sliders follow.
- * - Derived values (surface, hover, border …) are computed from 3 base colors +
- *   contrast, so nothing falls apart (e.g. light bg + dark surface from
- *   the system dark mode).
+  * - Derived values (surface, text, on-colors, hover, border …) are computed
+  *   from 3 base colors (primary, secondary, bg) + contrast, so nothing
+  *   falls apart (e.g. light bg + dark surface from the system dark mode).
  * - `dirty` flag: page-wide overrides only after the first change —
  *   otherwise builder defaults would override theme choice and dark mode.
  * - Builder state lives in the URL (query params) → reload-safe + shareable.
@@ -22,7 +22,7 @@
   if (!controls || !preview || !out) return;
 
   const els = {
-    name: $("in-name"), primary: $("in-primary"), secondary: $("in-secondary"), bg: $("in-bg"), text: $("in-text"),
+    name: $("in-name"), primary: $("in-primary"), secondary: $("in-secondary"), accent: $("in-accent"), bg: $("in-bg"),
     contrast: $("in-contrast"), contrastNum: $("in-contrast-num"),
     radius: $("in-radius"), radiusNum: $("in-radius-num"),
     densX: $("in-density-x"), densXNum: $("in-density-x-num"),
@@ -155,8 +155,8 @@
   /** @returns {number} contrast 0..1 from the number field (default 0.5) */
   const contrastVal = () => clamp(num(els.contrastNum, 50), 0, 100) / 100;
   /**
-   * Surface primary share from contrast — surface is tinted with primary
-   * (never colorless, even on #000).
+   * Surface ink share from contrast — surface is a neutral lift (text ink
+   * over bg), never brand-tinted, so surfaces stay neutral in every theme.
    * @param {number} ct contrast 0..1
    * @returns {number} percent 3..11
    */
@@ -170,12 +170,12 @@
   /**
    * Surface with lightness floor (second declaration in the export = modern
    * enhancement, old browsers ignore the line and take the plain mix).
-   * @param {string} primary primary hex (tint source)
+   * @param {string} accent accent hex (tint source)
    * @param {string} bg background hex
    * @param {number} ct contrast 0..1
    * @returns {string} `oklch(from … max(l, …) …)` expression
    */
-  const surfaceHi = (primary, bg, ct) => `oklch(from ${mix(primary, bg, mixShare(ct))} max(l, ${floorVal(ct).toFixed(2)}) c h)`;
+  const surfaceHi = (accent, bg, ct) => `oklch(from ${mix(accent, bg, mixShare(ct))} max(l, ${floorVal(ct).toFixed(2)}) c h)`;
 
   // Build chevron matching the text color (hex → %23-encoded for data URI)
   /**
@@ -198,6 +198,54 @@
       return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
     });
     return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+  }
+
+  /**
+   * WCAG contrast ratio between two hex colors.
+   * @param {string} a first color as hex
+   * @param {string} b second color as hex
+   * @returns {number} ratio 1..21
+   */
+  function contrastRatio(a, b) {
+    const hi = Math.max(luminance(a), luminance(b));
+    const lo = Math.min(luminance(a), luminance(b));
+    return (hi + 0.05) / (lo + 0.05);
+  }
+  /**
+   * Linearly mix two hex colors in sRGB.
+   * @param {string} a first color as hex
+   * @param {string} b second color as hex
+   * @param {number} t weight toward b (0 = all a, 1 = all b)
+   * @returns {string} mixed color as hex
+   */
+  function mixHex(a, b, t) {
+    const pa = parseInt(a.slice(1), 16), pb = parseInt(b.slice(1), 16);
+    const ch = (s) => Math.round(((pa >> s) & 255) * (1 - t) + ((pb >> s) & 255) * t);
+    const to = (n) => clamp(n, 0, 255).toString(16).padStart(2, "0");
+    return `#${to(ch(16))}${to(ch(8))}${to(ch(0))}`;
+  }
+  /**
+   * Guarantee a color stays visible on a background: if contrast is below
+   * `min`, move brightness away from the background (toward black for light
+   * colors, toward white for dark ones) with the smallest effective shift.
+   * Colors that already pass come back byte-identical — brand colors that
+   * work in both modes are never touched.
+   * @param {string} color picked color as hex
+   * @param {string} bg background color as hex
+   * @param {number} [min=3] minimum WCAG ratio (fills, charts, large text)
+   * @returns {string} original or adjusted color as hex
+   */
+  function ensureVisible(color, bg, min = 3) {
+    if (!/^#[0-9a-f]{6}$/i.test(color || "") || !/^#[0-9a-f]{6}$/i.test(bg || "")) return color;
+    if (contrastRatio(color, bg) >= min) return color.toLowerCase();
+    const toward = luminance(color) > luminance(bg) ? "#000000" : "#ffffff";
+    let lo = 0, hi = 1;
+    for (let i = 0; i < 12; i++) {
+      const mid = (lo + hi) / 2;
+      if (contrastRatio(mixHex(color, toward, mid), bg) >= min) hi = mid;
+      else lo = mid;
+    }
+    return mixHex(color, toward, hi);
   }
 
   // CSS color (oklch(), …) → #hex via canvas normalization
@@ -231,7 +279,11 @@
   function derived() {
     const sv = shapeVars();
     const { box, control, corner } = sv;
-    const primary = els.primary.value, secondary = els.secondary.value, bg = els.bg.value, text = els.text.value;
+    const primary = els.primary.value, secondary = els.secondary.value, bg = els.bg.value;
+    const accent = els.accent ? els.accent.value : primary;
+    // Text derives from the background (no selector): dark on light bg,
+    // light on dark bg — same 0.45 luminance threshold as the on-colors.
+    const text = luminance(bg) > 0.45 ? "#333a48" : "#f2f3f5";
     const ct = contrastVal();
     const share = mixShare(ct);
     return {
@@ -246,14 +298,18 @@
       densityX: densXVal().toFixed(2),
       densityY: densYVal().toFixed(2),
       primary, secondary, bg, text,
+      accent,
+      accentHover: mix(accent, "black", 88),
+      accentActive: mix(accent, "black", 78),
+      onAccent: luminance(accent) > 0.45 ? "#1c2333" : "#ffffff",
       hover: mix(primary, "black", 88),
       active: mix(primary, "black", 78),
       onPrimary: luminance(primary) > 0.45 ? "#1c2333" : "#ffffff",
       secondaryHover: mix(secondary, "black", 88),
       secondaryActive: mix(secondary, "black", 78),
       onSecondary: luminance(secondary) > 0.45 ? "#1c2333" : "#ffffff",
-      surface: mix(primary, bg, share),
-      surfaceHi: surfaceHi(primary, bg, ct),
+      surface: mix(accent, bg, share),
+      surfaceHi: surfaceHi(accent, bg, ct),
       muted: mix(text, bg, 62),
       border: mix(text, bg, borderShare(ct)),
       chevron: chev(text),
@@ -261,9 +317,10 @@
   }
 
   /** @constant {string[]} All inline-managed custom properties (for clearVars). */
-  const MANAGED = ["--lui-primary", "--lui-primary-hover", "--lui-primary-active",
+  const MANAGED = ["color-scheme", "--lui-primary", "--lui-primary-hover", "--lui-primary-active",
     "--lui-on-primary", "--lui-secondary", "--lui-secondary-hover", "--lui-secondary-active",
-    "--lui-on-secondary", "--lui-bg", "--lui-surface", "--lui-text", "--lui-muted",
+    "--lui-on-secondary", "--lui-accent", "--lui-accent-hover", "--lui-accent-active",
+    "--lui-on-accent", "--lui-bg", "--lui-surface", "--lui-text", "--lui-muted",
     "--lui-border", "--lui-chevron", "--lui-contrast", "--lui-radius", "--lui-radius-control",
     "--lui-density-x", "--lui-density-y", "--lui-corner-shape"];
 
@@ -278,6 +335,9 @@
     // Set color explicitly: custom properties alone don't change inherited `color`
     // (body sets color via var() with :root values — descendants without their own var() would keep the old color)
     el.style.color = d.text;
+    // color-scheme follows bg luminance (dark bg → dark) so light-dark()
+    // in status fills and native controls resolve to the right side.
+    el.style.setProperty("color-scheme", luminance(d.bg) > 0.45 ? "light" : "dark");
     el.style.setProperty("--lui-primary", d.primary);
     el.style.setProperty("--lui-primary-hover", d.hover);
     el.style.setProperty("--lui-primary-active", d.active);
@@ -286,6 +346,10 @@
     el.style.setProperty("--lui-secondary-hover", d.secondaryHover);
     el.style.setProperty("--lui-secondary-active", d.secondaryActive);
     el.style.setProperty("--lui-on-secondary", d.onSecondary);
+    el.style.setProperty("--lui-accent", d.accent);
+    el.style.setProperty("--lui-accent-hover", d.accentHover);
+    el.style.setProperty("--lui-accent-active", d.accentActive);
+    el.style.setProperty("--lui-on-accent", d.onAccent);
     el.style.setProperty("--lui-bg", d.bg);
     el.style.setProperty("--lui-surface", d.surface);
     // Browsers silently ignore invalid values → fallback stays in place
@@ -332,6 +396,8 @@
       `  --lui-on-primary: ${d.onPrimary};\n` +
       `  --lui-secondary: ${d.secondary};\n` +
       `  --lui-on-secondary: ${d.onSecondary};\n` +
+      `  --lui-accent: ${d.accent};\n` +
+      `  --lui-on-accent: ${d.onAccent};\n` +
       `  --lui-bg: ${d.bg};\n` +
       `  --lui-surface: ${d.surface};\n` +
       `  --lui-surface: ${d.surfaceHi};\n` +
@@ -366,7 +432,7 @@
     const name = slug(els.name.value);
     const d = derived();
     const light = snippet();
-    const dark = `[data-mode="dark"][data-theme="${name}"] {\n  color-scheme: dark;\n  --lui-primary: ${d.primary};\n  --lui-on-primary: ${d.onPrimary};\n  --lui-secondary: ${d.secondary};\n  --lui-on-secondary: ${d.onSecondary};\n  --lui-bg: #161b28;\n  --lui-surface: #222839;\n  --lui-text: #f2f3f5;\n  --lui-muted: #9aa3b5;\n  --lui-border: color-mix(in oklch, #f2f3f5 22%, #161b28);\n  --lui-chevron: ${chev("#e8eaf0")};\n}\n@media (prefers-color-scheme: dark) {\n  [data-mode="auto"][data-theme="${name}"] {\n    color-scheme: dark;\n    --lui-primary: ${d.primary};\n    --lui-on-primary: ${d.onPrimary};\n    --lui-secondary: ${d.secondary};\n    --lui-on-secondary: ${d.onSecondary};\n    --lui-bg: #161b28;\n    --lui-surface: #222839;\n    --lui-text: #f2f3f5;\n    --lui-muted: #9aa3b5;\n    --lui-border: color-mix(in oklch, #f2f3f5 22%, #161b28);\n    --lui-chevron: ${chev("#e8eaf0")};\n  }\n}`;
+    const dark = `[data-mode="dark"][data-theme="${name}"] {\n  color-scheme: dark;\n  --lui-primary: ${d.primary};\n  --lui-on-primary: ${d.onPrimary};\n  --lui-secondary: ${d.secondary};\n  --lui-on-secondary: ${d.onSecondary};\n  --lui-accent: ${d.accent};\n  --lui-on-accent: ${d.onAccent};\n  --lui-bg: #161b28;\n  --lui-surface: #252a36;\n  --lui-text: #f2f3f5;\n  --lui-muted: #9aa3b5;\n  --lui-border: color-mix(in oklch, #f2f3f5 22%, #161b28);\n  --lui-chevron: ${chev("#e8eaf0")};\n}\n@media (prefers-color-scheme: dark) {\n  [data-mode="auto"][data-theme="${name}"] {\n    color-scheme: dark;\n    --lui-primary: ${d.primary};\n    --lui-on-primary: ${d.onPrimary};\n    --lui-secondary: ${d.secondary};\n    --lui-on-secondary: ${d.onSecondary};\n    --lui-bg: #161b28;\n    --lui-surface: #252a36;\n    --lui-text: #f2f3f5;\n    --lui-muted: #9aa3b5;\n    --lui-border: color-mix(in oklch, #f2f3f5 22%, #161b28);\n    --lui-chevron: ${chev("#e8eaf0")};\n  }\n}`;
     return `/* linkedui theme: ${name} — paste into themes.css */\n${light}\n${dark}\n`;
   }
 
@@ -429,8 +495,8 @@
     const set = (el, v) => { if (el && v !== null && v !== undefined && v !== "") el.value = v; };
     set(els.primary, cssToHex(get("--lui-primary")));
     set(els.secondary, cssToHex(get("--lui-secondary")));
+    set(els.accent, cssToHex(get("--lui-accent")));
     set(els.bg, cssToHex(get("--lui-bg")));
-    set(els.text, cssToHex(get("--lui-text")));
     const corner = get("--lui-corner-shape");
     const sm = /superellipse\(\s*([0-9.]+)\s*\)/.exec(corner || "");
     const control = get("--lui-radius-control");
@@ -466,12 +532,12 @@
   const HEX6 = /^#[0-9a-f]{6}$/i;
   /**
    * Read the current builder state as an object (for URL + debugging).
-   * @returns {{n: string, p: string, s: string, bg: string, tx: string, ct: string, r: string, dx: string, dy: string, sh: string, cu: string}} builder values
-   */
+   * @returns {{n: string, p: string, s: string, a: string, bg: string, ct: string, r: string, dx: string, dy: string, sh: string, cu: string}} builder values
+    */
   function builderState() {
     return {
-      n: els.name.value, p: els.primary.value, s: els.secondary.value,
-      bg: els.bg.value, tx: els.text.value, ct: els.contrastNum.value,
+      n: els.name.value, p: els.primary.value, s: els.secondary.value, a: els.accent.value,
+      bg: els.bg.value, ct: els.contrastNum.value,
       r: els.radiusNum.value, dx: els.densXNum.value, dy: els.densYNum.value,
       sh: els.shape.value, cu: els.curveNum.value,
     };
@@ -492,7 +558,8 @@
     const nm = q.get("n");
     if (nm && els.name) { els.name.value = nm.slice(0, 40); hit = true; }
     setHex(els.primary, q.get("p")); setHex(els.secondary, q.get("s"));
-    setHex(els.bg, q.get("bg")); setHex(els.text, q.get("tx"));
+    setHex(els.accent, q.get("a"));
+    setHex(els.bg, q.get("bg"));
     setNum(els.contrastNum, q.get("ct"), 0, 100);
     setNum(els.radiusNum, q.get("r"), 0, 64);
     setNum(els.densXNum, q.get("dx"), 0.5, 2);
@@ -511,7 +578,7 @@
     try {
       const q = new URLSearchParams(location.search);
       const s = builderState();
-      [["n", s.n], ["p", s.p], ["s", s.s], ["bg", s.bg], ["tx", s.tx], ["ct", s.ct],
+      [["n", s.n], ["p", s.p], ["s", s.s], ["a", s.a], ["bg", s.bg], ["ct", s.ct],
        ["r", s.r], ["dx", s.dx], ["dy", s.dy], ["sh", s.sh], ["cu", s.cu]]
         .forEach(([k, v]) => q.set(k, v));
       history.replaceState(null, "", `${location.pathname}?${q}`);

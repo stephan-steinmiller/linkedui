@@ -23,15 +23,19 @@
 
     /* Base colors (light) */
     --lui-bg: oklch(0.99 0.005 95);
-    /* Surface is tinted with primary (never colorless, even on #000) */
+    /* Surface carries the accent (brand-neutral surfaces would read dead);
+       the accent lives in its own token so brand hue never leaks from
+       primary/secondary choices. Never colorless, even on #000. */
     --lui-surface: #edf1f7;
-    --lui-surface: color-mix(in oklch, var(--lui-primary) 7%, var(--lui-bg));
+    --lui-surface: color-mix(in oklch, var(--lui-accent) 7%, var(--lui-bg));
     /* Field (inputs, slider/segment tracks, checkbox/radio, otp boxes):
-       same primary+bg family as surface, but stronger — so fields stand out
-       both on the page (--lui-bg) AND on cards (--lui-surface).
+       same accent+bg family as surface, but stronger — so fields stand out
+       both on the page (--lui-bg) AND on cards (--lui-surface). The accent
+       share follows --lui-contrast like border and surface (6→22%,
+       14% at the 0.5 default).
        Fallback first: old browsers fall back to surface (previous behavior). */
     --lui-field: var(--lui-surface);
-    --lui-field: color-mix(in oklch, var(--lui-primary) 14%, var(--lui-bg));
+    --lui-field: color-mix(in oklch, var(--lui-accent) calc(6% + var(--lui-contrast, 0.5) * 16%), var(--lui-bg));
     --lui-text: oklch(0.27 0.03 260);
     --lui-muted: oklch(0.55 0.03 260);
 
@@ -55,10 +59,21 @@
     --lui-secondary-active: color-mix(in oklch, var(--lui-secondary) 78%, black);
     --lui-on-secondary: oklch(0.99 0 0);
 
+    /* Accent (own hue, own hover/active) — feeds surfaces/fields and every
+       data-variant="accent" control. Defaults to the primary hue. */
+    --lui-accent: oklch(0.6 0.16 255);
+    --lui-accent-hover: #3f6fd8;
+    --lui-accent-hover: color-mix(in oklch, var(--lui-accent) 88%, black);
+    --lui-accent-active: #355cb8;
+    --lui-accent-active: color-mix(in oklch, var(--lui-accent) 78%, black);
+    --lui-on-accent: oklch(0.99 0 0);
+
     /* Status */
     --lui-success: oklch(0.65 0.15 150);
     --lui-warning: oklch(0.75 0.15 80);
     --lui-danger: oklch(0.62 0.2 25);
+    /* Info is always blue — never primary, so it reads as info in any theme */
+    --lui-info: oklch(0.65 0.16 250);
     --lui-ring: #9db8f0;
     --lui-ring: color-mix(in oklch, var(--lui-primary) 45%, white);
 
@@ -69,7 +84,10 @@
     --lui-radius: 12px;
     --lui-radius-sm: calc(var(--lui-radius) * 0.5);
     --lui-radius-md: var(--lui-radius);
-    --lui-radius-lg: calc(var(--lui-radius) * 1.5);
+    /* Boxes stay a touch rounder than controls (1.25×, not 1.5×) so large
+       surfaces — cards, toasts, dialogs — don't go blobby next to inputs
+       when the radius slider climbs. */
+    --lui-radius-lg: calc(var(--lui-radius) * 1.25);
     --lui-radius-full: 999px;
 
     /* Control radius (buttons, inputs, selects): follows shape choice.
@@ -84,12 +102,21 @@
     --lui-control-py: calc(0.55rem * var(--lui-density-y));
     --lui-control-px: calc(0.9rem * var(--lui-density-x));
     --lui-control-h-sm: calc(2rem * var(--lui-density-y));
-    --lui-control-h-md: calc(2.5rem * var(--lui-density-y));
+    /* md clears the 44pt touch guideline for real (3rem = 48px): buttons,
+       inputs, selects and every control-height component follow together,
+       so text controls and buttons always align. */
+    --lui-control-h-md: calc(3rem * var(--lui-density-y));
     --lui-control-h-lg: calc(3rem * var(--lui-density-y));
 
     /* Compact form controls (checkbox, radio, switch track, slider):
-       text-sized (1.5rem, like running text) and density-scaled. */
-    --lui-check: calc(1.5rem * var(--lui-density-y));
+       text-sized (1.5rem, like running text) and deliberately NOT
+       density-scaled — vertical padding must never stretch them. */
+    --lui-check: 1.5rem;
+
+    /* App nav (sidebar ↔ bottom bar): expanded sidebar width vs. collapsed
+       icon rail. The bottom-bar layout needs no token (full-width row). */
+    --lui-app-nav-w: 14rem;
+    --lui-app-nav-w-rail: 3.5rem;
 
     /* Contrast 0..1: drives separation everywhere (borders, segmented,
        toasts). The builder exports it per theme; components use calc()

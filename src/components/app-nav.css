@@ -1,0 +1,195 @@
+/* linkedui — components/app-nav.css — adaptive app navigation.
+   Sidebar on desktop, bottom tab bar on mobile. No JS needed: the layout
+   switch is a width-only media query, collapse is a native <details>
+   toggle read via :has() (links stay direct <nav> children, so the
+   closed-details shadow hiding can never swallow them).
+   <nav class="app-nav" aria-label="Primary">
+     <a href="/" aria-current="page"><span aria-hidden="true">⌂</span><span>Home</span></a>
+     <a href="/search"><span aria-hidden="true">⌕</span><span>Search</span></a>
+     <details class="app-nav-toggle">
+       <summary aria-label="Toggle navigation"></summary>
+     </details>
+   </nav>
+   Rules: per link exactly one icon span (aria-hidden) + one label span.
+   In rail mode labels hide via the visually-hidden pattern, so the text
+   stays the link's accessible name (no per-link aria-label needed).
+   The toggle glyph (»/«) comes from CSS; its aria-label stays a neutral
+   "Toggle navigation" (CSS can't sync Expand/Collapse — future enhance.js
+   could). Ship `open` on the details to default to the wide sidebar.
+   First width breakpoint in the lib: 48rem (= 768px at default root, rem
+   so it follows user zoom). Width alone switches layout — (pointer:
+   coarse) only sizes targets, never layout. No px anywhere. */
+@layer components {
+  .app-nav {
+    position: fixed;
+    inset-block: 0;
+    left: 0;
+    width: var(--lui-app-nav-w-rail);
+    z-index: 40;
+    display: flex;
+    flex-direction: column;
+    gap: var(--lui-space-1);
+    padding: var(--lui-space-2);
+    background: var(--lui-surface);
+    border-right: var(--lui-border-width) solid var(--lui-border);
+    transition: width 0.2s ease;
+  }
+  /* Links: icon + label rows; active follows the .nav convention
+     (aria-current="page" → primary). */
+  .app-nav > a {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--lui-space-2);
+    min-height: var(--lui-control-h-md);
+    padding: var(--lui-control-py) var(--lui-control-px);
+    border-radius: var(--lui-radius-control);
+    corner-shape: var(--lui-corner-shape);
+    color: var(--lui-muted);
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .app-nav > a > [aria-hidden="true"] {
+    flex: none;
+    width: 1.5em;
+    font-size: 1.25em;
+    line-height: 1;
+    text-align: center;
+  }
+  .app-nav > a:hover {
+    color: var(--lui-text);
+    background: rgb(128 128 128 / 0.12);
+    background: color-mix(in oklch, var(--lui-primary) 12%, transparent);
+  }
+  .app-nav > a[aria-current="page"] {
+    color: var(--lui-primary);
+    background: rgb(128 128 128 / 0.12);
+    background: color-mix(in oklch, var(--lui-primary) 12%, transparent);
+  }
+  .app-nav > a:focus-visible {
+    outline: 2px solid var(--lui-ring);
+    outline-offset: 2px;
+  }
+  /* Collapse toggle: a stateless <details> (undo the base card look like
+     details.dropdown/popover). Pinned to the rail bottom on desktop. */
+  .app-nav > .app-nav-toggle {
+    margin-top: auto;
+    padding: 0;
+    border: 0;
+    background: none;
+  }
+  .app-nav-toggle > summary {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--lui-control-h-md);
+    padding: 0;
+    border-radius: var(--lui-radius-control);
+    corner-shape: var(--lui-corner-shape);
+    color: var(--lui-muted);
+    cursor: pointer;
+  }
+  .app-nav-toggle > summary::-webkit-details-marker {
+    display: none;
+  }
+  .app-nav-toggle > summary::after {
+    content: "»";
+    line-height: 1;
+  }
+  .app-nav-toggle[open] > summary::after {
+    content: "«";
+  }
+  .app-nav-toggle > summary:hover {
+    color: var(--lui-text);
+    background: rgb(128 128 128 / 0.12);
+    background: color-mix(in oklch, var(--lui-primary) 12%, transparent);
+  }
+  .app-nav-toggle > summary:focus-visible {
+    outline: 2px solid var(--lui-ring);
+    outline-offset: 2px;
+  }
+
+  /* Desktop-only states (scoped to min-width so the mobile bar below never
+     fights the :has() rules — media queries add no specificity). */
+  @media (min-width: 48.01rem) {
+    .app-nav:has(> .app-nav-toggle[open]) {
+      width: var(--lui-app-nav-w);
+    }
+    /* Rail: center icons, hide labels accessibly (text stays the name). */
+    .app-nav:not(:has(> .app-nav-toggle[open])) > a {
+      justify-content: center;
+      padding-inline: 0;
+    }
+    .app-nav:not(:has(> .app-nav-toggle[open])) > a > span:not([aria-hidden="true"]) {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      clip-path: inset(50%);
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    /* App shell spacing, following rail/open live (no JS). Applies only
+       when the nav is a direct body child (real app shell, not demos). */
+    body:has(> .app-nav) {
+      padding-left: var(--lui-app-nav-w-rail);
+    }
+    body:has(> .app-nav:has(> .app-nav-toggle[open])) {
+      padding-left: var(--lui-app-nav-w);
+    }
+  }
+
+  /* Mobile: bottom tab bar. Toggle hidden, labels always shown. */
+  @media (max-width: 48rem) {
+    .app-nav {
+      top: auto;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      width: auto;
+      flex-direction: row;
+      align-items: stretch;
+      gap: var(--lui-space-1);
+      border-right: 0;
+      border-top: var(--lui-border-width) solid var(--lui-border);
+      padding: var(--lui-space-1) var(--lui-space-2);
+      padding-bottom: calc(var(--lui-space-1) + env(safe-area-inset-bottom, 0rem));
+      transition: none;
+    }
+    .app-nav > .app-nav-toggle {
+      display: none;
+    }
+    .app-nav > a {
+      flex: 1 1 0;
+      min-width: 0;
+      min-height: 3rem;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0.125rem;
+      padding: var(--lui-space-1) 0.25rem;
+      font-size: var(--lui-font-sm);
+    }
+    .app-nav > a > span:not([aria-hidden="true"]) {
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: center;
+    }
+    body:has(> .app-nav) {
+      padding-bottom: calc(3.5rem + env(safe-area-inset-bottom, 0rem));
+    }
+  }
+
+  /* Touch targets grow; layout never changes on pointer alone. */
+  @media (pointer: coarse) {
+    .app-nav > a {
+      min-height: 3rem;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .app-nav {
+      transition: none;
+    }
+  }
+}

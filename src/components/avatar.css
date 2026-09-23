@@ -1,0 +1,80 @@
+/* linkedui — components/avatar.css — avatar (photo or initials).
+   <span class="avatar" data-status="online">AL</span>
+   <span class="avatar"><img src="ada.jpg" alt="Ada" /></span>
+   Sizes: sm | (md) | lg. Status dot: online | away | busy | off.
+   Initials inherit the element font (set font-size on .avatar to scale).
+   Overlap group (latest on top) + headless overflow count:
+   <span class="avatar-stack"><span class="avatar">AL</span><span class="avatar">BO</span><span class="avatar" data-more="+3"></span></span> */
+@layer components {
+  .avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: var(--lui-control-h-md);
+    height: var(--lui-control-h-md);
+    border-radius: 50%;
+    corner-shape: var(--lui-corner-shape);
+    background: var(--lui-primary);
+    color: var(--lui-on-primary);
+    font-weight: 700;
+    font-size: 1rem;
+    text-transform: uppercase;
+    /* No overflow:hidden here — it would clip the status dot. The photo
+       below clips itself instead. */
+    position: relative;
+    vertical-align: middle;
+  }
+  .avatar > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: inherit;
+    corner-shape: var(--lui-corner-shape);
+  }
+  .avatar[data-size="sm"] {
+    width: var(--lui-check);
+    height: var(--lui-check);
+    font-size: var(--lui-font-sm);
+  }
+  .avatar[data-size="lg"] {
+    width: var(--lui-control-h-lg);
+    height: var(--lui-control-h-lg);
+    font-size: var(--lui-font-lg);
+  }
+  /* Status dot (bottom-right, page-colored joint ring) */
+  .avatar[data-status]::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 28%;
+    height: 28%;
+    border-radius: 50%;
+    background: var(--lui-muted);
+    border: 2px solid var(--lui-bg);
+    box-sizing: border-box;
+  }
+  .avatar[data-status="online"]::after { background: var(--lui-success); }
+  .avatar[data-status="away"]::after { background: var(--lui-warning); }
+  .avatar[data-status="busy"]::after { background: var(--lui-danger); }
+  .avatar[data-status="off"]::after { background: var(--lui-muted); }
+
+  /* Overlap stack: later avatars sit on top; page-colored ring separates.
+     A headless avatar with data-more shows the overflow count instead. */
+  .avatar-stack {
+    display: inline-flex;
+    align-items: center;
+  }
+  .avatar-stack > .avatar {
+    border: 2px solid var(--lui-bg);
+    box-sizing: border-box;
+  }
+  .avatar-stack > .avatar + .avatar {
+    margin-left: calc(-1 * var(--lui-space-2));
+  }
+  .avatar-stack > .avatar[data-more]::before {
+    content: attr(data-more);
+    font-size: var(--lui-font-sm);
+  }
+}
