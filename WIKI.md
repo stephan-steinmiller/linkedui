@@ -3,7 +3,13 @@
 CSS-first UI library: classless base, variants via classes, theming via CSS variables.
 Usable without JS, better with JS (progressive enhancement). No build, no dependencies.
 
-- **Live docs (built with the lib itself):** `site/wiki.html` (English), `site/wiki-de.html` (Deutsch)
+- **Live docs (built with the lib itself):** `site/wiki.html` (English home),
+  `site/wiki-de.html` (Deutsch home), one page per component under
+  `site/wiki/` (`buttons.html` … + `-de.html` twins, sidebar included on every
+  page). Bodies are generated from `site/wiki-src.html` /
+  `site/wiki-src-de.html` — edit those (or the chrome in
+  `site/split-wiki.py`), then re-run `python3 site/split-wiki.py`.
+  Never hand-edit `site/wiki/*` bodies.
 - **Theme builder:** `site/index.html` (English), `site/index-de.html` (Deutsch)
 - **Entry point:** `src/linkedui.css`
 
@@ -45,7 +51,8 @@ try {
 ## 3. Components (markup reference)
 
 Buttons · Forms & input (+hints, OTP, check-chips, rating, dropzone) · Layout (card,
-stat, toolbar, footer) · Navigation (nav, app-nav, breadcrumb, steps,
+stat, toolbar, footer) · Page structure (stack, cluster, split, sidebar, stage,
+hero) · Navigation (nav, app-nav, breadcrumb, steps,
 pagination, tabs, segmented) · Overlays (popover, tooltip, dropdown,
 toasts, dialog, drawer, sheet) · Content (tables, lists, quotes, figures,
 timeline, carousel, avatar, chat) · Feedback (alert, badge, chip,
@@ -152,6 +159,24 @@ Without JS: type one digit per box, Tab advances.
     <article class="card"><h3>Title</h3><p>Text</p></article>
   </div>
 </main>
+```
+
+### Page structure — `src/components/layout.css`
+
+Vertical rhythm (`.stack`, gap not margins — `data-gap: sm | (md) | lg`),
+wrapping rows (`.cluster`), halves stacking under 48rem (`.split`), docs
+shell (`.with-sidebar` + `.menu`: sticky sidebar on desktop, stacked on
+mobile), demo frames (`.stage`), page titles (`.hero`). One breakpoint
+(48rem, width only). The wiki pages themselves use `.with-sidebar`.
+
+```html
+<div class="stack" data-gap="sm">…</div>
+<div class="cluster"><button class="btn">…</button>…</div>
+<div class="split"><article>…</article><article>…</article></div>
+<div class="with-sidebar"><aside><nav class="menu">…</nav></aside>
+  <main>…</main></div>
+<div class="stage">live demo…</div>
+<header class="hero"><h1>Title</h1><p>Lead.</p></header>
 ```
 
 Bare `<article>` without class already looks like `.card`.
@@ -524,6 +549,7 @@ src/reset.css                 mini reset
 src/base.css                  classless base (buttons, forms, switch, slider, dialog …)
 src/components/button.css     .btn + variants/states/sizes
 src/components/card.css       container, grid, card, field, hints, empty state
+src/components/layout.css     page structure: stack, cluster, split, sidebar shell, stage, hero
 src/components/steps.css      stepper (CSS counters)
 src/components/feedback.css   alert, badge, skeleton
 src/components/chat.css       chat bubbles (static, no JS)
@@ -543,7 +569,10 @@ src/enhance.js                progressive enhancement (JSDoc)
 site/index.html               theme builder, English (dogfoods the lib)
 site/index-de.html            theme builder, German
 site/app.js                   builder logic (JSDoc)
-site/wiki.html                these docs as a page, English
-site/wiki-de.html             these docs as a page, German
+site/site.css                 site-only chrome (builder panels, NOT lib)
+site/split-wiki.py            one-shot wiki splitter (see docstring)
+site/wiki.html                docs home, English
+site/wiki-de.html             docs home, German
+site/wiki/*.html              one page per component, EN + -de twins
 WIKI.md                       this file
 ```

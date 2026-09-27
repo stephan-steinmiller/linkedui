@@ -16,6 +16,7 @@
 @import "./base.css" layer(base-classless);
 @import "./components/button.css" layer(components);
 @import "./components/card.css" layer(components);
+@import "./components/layout.css" layer(components);
 @import "./components/feedback.css" layer(components);
 @import "./components/chat.css" layer(components);
 @import "./components/nav-overlays.css" layer(components);

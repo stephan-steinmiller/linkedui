@@ -1,0 +1,109 @@
+/* linkedui — components/layout.css — page-structure primitives.
+ *
+ * Classes: .stack (vertical rhythm via gap, not margins), .cluster
+ * (wrapping horizontal row), .split (halves that stack on mobile),
+ * .with-sidebar (sticky side nav on desktop, stacked on mobile),
+ * .stage (framed demo box), .hero (page title + lead).
+ *
+ * Markup:
+ *   <div class="stack"><section>…</section><section>…</section></div>
+ *   <div class="cluster"><button class="btn">…</button><a …>…</a></div>
+ *   <div class="split"><article>…</article><article>…</article></div>
+ *   <div class="with-sidebar">
+ *     <aside><nav class="menu" aria-label="Docs">…</nav></aside>
+ *     <main>…</main>
+ *   </div>
+ *   <div class="stage">live demo…</div>
+ *   <header class="hero"><h1>Title</h1><p>Lead paragraph.</p></header>
+ *
+ * Notes: gap scales come from --lui-space-* (density-aware). The only
+ * breakpoint is the lib-wide 48rem, width-only. .stack zeroes child
+ * margins (rhythm comes from gap alone); .with-sidebar needs
+ * minmax(0, 1fr) so wide <pre> content can't push the sidebar off.
+ */
+@layer components {
+  /* Vertical rhythm: gap instead of stacked margins (no collapsing,
+     no first/last-child margin hacks). data-gap: sm | (md) | lg. */
+  .stack {
+    display: grid;
+    gap: var(--lui-space-3);
+    align-content: start;
+  }
+  .stack > * {
+    margin-block: 0;
+  }
+  .stack[data-gap="sm"] { gap: var(--lui-space-2); }
+  .stack[data-gap="lg"] { gap: var(--lui-space-4); }
+
+  /* Wrapping row: buttons, badges, chips, toolbar actions.
+     data-gap: sm | (md) | lg. */
+  .cluster {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--lui-space-2);
+    align-items: center;
+  }
+  .cluster[data-gap="sm"] { gap: var(--lui-space-1); }
+  .cluster[data-gap="lg"] { gap: var(--lui-space-3); }
+
+  /* Halves: two columns on desktop, one column under 48rem. */
+  .split {
+    display: grid;
+    gap: var(--lui-space-3);
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+  @media (max-width: 48rem) {
+    .split { grid-template-columns: 1fr; }
+  }
+
+  /* Docs/app shell: fixed side nav + fluid content. Sidebar is sticky
+     with its own scroll on desktop, plain stacked block on mobile. */
+  .with-sidebar {
+    display: grid;
+    gap: var(--lui-space-3);
+    grid-template-columns: 15rem minmax(0, 1fr);
+    align-items: start;
+  }
+  @media (max-width: 48rem) {
+    .with-sidebar { grid-template-columns: 1fr; }
+  }
+  @media (min-width: 48.01rem) {
+    .with-sidebar > aside {
+      position: sticky;
+      top: var(--lui-space-3);
+      max-height: calc(100dvh - var(--lui-space-3) * 2);
+      overflow-y: auto;
+    }
+  }
+
+  /* Demo frame: surface box around live examples (replaces ad-hoc
+     inline borders on doc pages). */
+  .stage {
+    background: var(--lui-surface);
+    border: var(--lui-border-width) solid var(--lui-border);
+    border-radius: var(--lui-radius-lg);
+    corner-shape: var(--lui-corner-shape);
+    padding: var(--lui-space-3);
+    display: grid;
+    gap: var(--lui-space-2);
+    align-content: start;
+  }
+
+  /* Page title: fluid display type + muted lead, centered container
+     provides the measure (no max-width here — hero spans full width). */
+  .hero {
+    padding-block: var(--lui-space-4) var(--lui-space-2);
+  }
+  .hero h1 {
+    font-size: clamp(2rem, 1.2rem + 3vw, 3rem);
+    letter-spacing: -0.02em;
+    margin-block: 0 var(--lui-space-2);
+  }
+  .hero > p {
+    font-size: var(--lui-font-lg);
+    color: var(--lui-muted);
+    max-width: 44rem;
+    margin-block: 0 var(--lui-space-3);
+  }
+}

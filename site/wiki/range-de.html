@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="de" data-theme="default" data-mode="auto">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Range — linkedui Wiki</title>
+  <meta name="description" content="linkedui-Doku: jede Komponente auf eigener Seite, mit Live-Demos." />
+  <link rel="stylesheet" href="../../src/linkedui.css?v=78" />
+  <script>
+    try {
+      const t = localStorage.getItem("lui-theme"), m = localStorage.getItem("lui-mode");
+      if (t) document.documentElement.dataset.theme = t;
+      if (m) document.documentElement.dataset.mode = m;
+    } catch (e) {}
+  </script>
+</head>
+<body>
+  <a href="#main">Zum Inhalt springen</a>
+  <nav class="nav" aria-label="Hauptnavigation">
+    <strong>linkedui</strong>
+    <a href="../index-de.html">Builder</a>
+    <a href="../wiki-de.html" aria-current="page">Wiki</a>
+    <a href="./range.html" hreflang="en">English</a>
+    <span style="flex:1"></span>
+    <label class="visually-hidden" for="wiki-theme">Theme</label>
+    <select id="wiki-theme" data-lui-theme>
+        <option value="default">default</option>
+        <option value="ocean">ocean</option>
+        <option value="squishy">squishy + squircle</option>
+    </select>
+    <label class="visually-hidden" for="wiki-mode">Modus</label>
+    <select id="wiki-mode" data-lui-mode>
+      <option value="auto">auto (System)</option>
+      <option value="light">hell</option>
+      <option value="dark">dunkel</option>
+    </select>
+  </nav>
+
+  <div class="lui-container">
+    <div class="with-sidebar">
+      <aside>
+          <nav class="menu" aria-label="Dokumentation">
+            <span>Schnellstart</span>
+            <a href="./start-de.html">Schnellstart</a>
+            <span>Buttons</span>
+            <a href="./buttons-de.html">Buttons</a>
+            <span>Formulare &amp; Eingaben</span>
+            <a href="./fields-de.html">Felder</a>
+            <a href="./hints-de.html">Hinweise &amp; Fehler</a>
+            <a href="./input-group-de.html">Input-Gruppen</a>
+            <a href="./form-grid-de.html">Formular-Grid</a>
+            <a href="./checks-de.html">Checkbox, Radio, Switch</a>
+            <a href="./check-chips-de.html">Toggle-Chips</a>
+            <a href="./rating-de.html">Sterne-Bewertung</a>
+            <a href="./range-de.html" aria-current="page">Range</a>
+            <a href="./meters-de.html">Progress &amp; Meter</a>
+            <a href="./pickers-de.html">File- &amp; Date-Inputs</a>
+            <a href="./otp-de.html">Einmal-Codes</a>
+            <span>Layout</span>
+            <a href="./page-structure-de.html">Seitenstruktur</a>
+            <a href="./container-de.html">Container, Grid, Card</a>
+            <a href="./stat-de.html">Stats</a>
+            <a href="./toolbar-de.html">Toolbar</a>
+            <a href="./footer-de.html">Footer</a>
+            <span>Navigation</span>
+            <a href="./nav-de.html">Top-Bar</a>
+            <a href="./app-nav-de.html">App-Nav</a>
+            <a href="./menu-de.html">Bereichs-Menü</a>
+            <a href="./breadcrumb-de.html">Breadcrumb</a>
+            <a href="./pagination-de.html">Pagination</a>
+            <a href="./steps-de.html">Steps</a>
+            <a href="./tabs-de.html">Tabs</a>
+            <a href="./segmented-de.html">Segmented Control</a>
+            <span>Overlays &amp; Details</span>
+            <a href="./tooltip-de.html">Tooltip</a>
+            <a href="./dropdown-de.html">Dropdown</a>
+            <a href="./popover-de.html">Popover</a>
+            <a href="./dialog-de.html">Dialog</a>
+            <a href="./drawer-de.html">Drawer</a>
+            <a href="./accordion-de.html">Accordion</a>
+            <a href="./toasts-de.html">Toasts</a>
+            <span>Inhalte &amp; Daten</span>
+            <a href="./table-de.html">Tabellen</a>
+            <a href="./lists-de.html">Listen</a>
+            <a href="./blockquote-de.html">Zitate</a>
+            <a href="./divider-de.html">Trennlinie</a>
+            <a href="./timeline-de.html">Timeline</a>
+            <a href="./carousel-de.html">Carousel</a>
+            <a href="./figure-de.html">Figures</a>
+            <a href="./code-de.html">Code &amp; Tasten</a>
+            <a href="./dl-de.html">Definitionslisten</a>
+            <a href="./avatar-de.html">Avatare</a>
+            <a href="./chat-de.html">Chat-Bubbles</a>
+            <span>Feedback</span>
+            <a href="./alert-de.html">Alerts</a>
+            <a href="./badge-de.html">Badges</a>
+            <a href="./chip-de.html">Chips</a>
+            <a href="./skeleton-de.html">Skeleton</a>
+            <a href="./empty-de.html">Empty States</a>
+            <span>Theming</span>
+            <a href="./theming-de.html">Theming</a>
+            <span>Token-Referenz</span>
+            <a href="./tokens-de.html">Token-Referenz</a>
+            <span>JS-API</span>
+            <a href="./js-de.html">JS-API</a>
+            <span>Ohne-JS-Matrix</span>
+            <a href="./nojs-de.html">Ohne-JS-Matrix</a>
+          </nav>
+      </aside>
+      <main id="main">
+        <div class="stack">
+          <div>
+            <h1>Range</h1>
+          </div>
+    <div class="field"><span>Lautstärke</span><input type="range" min="0" max="100" value="60" aria-label="Lautstärke" /></div>
+    <div class="field"><span>Bass (sekundär)</span><input type="range" min="0" max="100" value="30" aria-label="Bass" data-variant="secondary" /></div>
+    <div class="field"><span>Qualität (gerastert)</span><input type="range" min="0" max="100" step="25" value="50" aria-label="Qualität" /><div class="ticks" style="--lui-ticks: 5" aria-hidden="true"></div></div>
+    <pre><code>&lt;input type="range" min="0" max="100" step="25" value="50" aria-label="Qualität" /&gt;
+&lt;div class="ticks" style="--lui-ticks: 5" aria-hidden="true"&gt;&lt;/div&gt;
+&lt;!-- --lui-ticks = Anzahl Stops, passend zu min/max/step; Ticks sind Deko --&gt;</code></pre>          <hr />
+          <div class="cluster">
+            <a class="btn" data-variant="ghost" href="./rating-de.html">← Sterne-Bewertung</a>
+            <a class="btn" data-variant="ghost" href="./meters-de.html">Progress &amp; Meter →</a>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <footer class="footer"><div>
+      <span>linkedui</span><span style="flex:1"></span><span><a href="../index-de.html">Builder</a></span><span>Volltext: <code>WIKI.md</code> (Englisch)</span>
+    </div></footer>
+  </div>
+
+<dialog id="wiki-dialog" aria-label="Wiki-Dialog">
+    <h3>Dialog</h3>
+    <p>Nativ, ESC + Backdrop-Klick inklusive.</p>
+    <button class="btn" type="button" data-lui-close>Schließen</button>
+  </dialog>
+
+  <dialog class="drawer" data-side="left" id="wiki-drawer" aria-label="Wiki-Drawer">
+    <h3>Drawer</h3>
+    <p>Side-Sheet, gleiche Mechanik wie Dialog.</p>
+    <button class="btn" type="button" data-lui-close>Schließen</button>
+  </dialog>
+
+  <dialog class="sheet" id="wiki-sheet" aria-label="Wiki-Sheet">
+    <h3>Sheet</h3>
+    <p>Bottom-Sheet mobil, zentriertes Modal ab 48rem.</p>
+    <button class="btn" type="button" data-lui-close>Fertig</button>
+  </dialog>
+  <script src="../../src/enhance.js?v=12" defer></script>
+</body>
+</html>

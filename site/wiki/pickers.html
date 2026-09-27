@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en" data-theme="default" data-mode="auto">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>File &amp;amp; date inputs — linkedui Wiki</title>
+  <meta name="description" content="linkedui docs: every component on its own page, with live demos." />
+  <link rel="stylesheet" href="../../src/linkedui.css?v=78" />
+  <script>
+    try {
+      const t = localStorage.getItem("lui-theme"), m = localStorage.getItem("lui-mode");
+      if (t) document.documentElement.dataset.theme = t;
+      if (m) document.documentElement.dataset.mode = m;
+    } catch (e) {}
+  </script>
+</head>
+<body>
+  <a href="#main">Skip to content</a>
+  <nav class="nav" aria-label="Main navigation">
+    <strong>linkedui</strong>
+    <a href="../index.html">Builder</a>
+    <a href="../wiki.html" aria-current="page">Wiki</a>
+    <a href="./pickers-de.html" hreflang="de">Deutsch</a>
+    <span style="flex:1"></span>
+    <label class="visually-hidden" for="wiki-theme">Theme</label>
+    <select id="wiki-theme" data-lui-theme>
+        <option value="default">default</option>
+        <option value="ocean">ocean</option>
+        <option value="squishy">squishy + squircle</option>
+    </select>
+    <label class="visually-hidden" for="wiki-mode">Mode</label>
+    <select id="wiki-mode" data-lui-mode>
+      <option value="auto">auto (system)</option>
+      <option value="light">light</option>
+      <option value="dark">dark</option>
+    </select>
+  </nav>
+
+  <div class="lui-container">
+    <div class="with-sidebar">
+      <aside>
+          <nav class="menu" aria-label="Documentation">
+            <span>Quick start</span>
+            <a href="./start.html">Quick start</a>
+            <span>Buttons</span>
+            <a href="./buttons.html">Buttons</a>
+            <span>Forms &amp; input</span>
+            <a href="./fields.html">Fields</a>
+            <a href="./hints.html">Hints &amp; errors</a>
+            <a href="./input-group.html">Input groups</a>
+            <a href="./form-grid.html">Form grid</a>
+            <a href="./checks.html">Checkbox, radio, switch</a>
+            <a href="./check-chips.html">Toggle chips</a>
+            <a href="./rating.html">Star rating</a>
+            <a href="./range.html">Range</a>
+            <a href="./meters.html">Progress &amp; meter</a>
+            <a href="./pickers.html" aria-current="page">File &amp; date inputs</a>
+            <a href="./otp.html">One-time codes</a>
+            <span>Layout</span>
+            <a href="./page-structure.html">Page structure</a>
+            <a href="./container.html">Container, grid, card</a>
+            <a href="./stat.html">Stats</a>
+            <a href="./toolbar.html">Toolbar</a>
+            <a href="./footer.html">Footer</a>
+            <span>Navigation</span>
+            <a href="./nav.html">Top bar</a>
+            <a href="./app-nav.html">App nav</a>
+            <a href="./menu.html">Section menu</a>
+            <a href="./breadcrumb.html">Breadcrumb</a>
+            <a href="./pagination.html">Pagination</a>
+            <a href="./steps.html">Steps</a>
+            <a href="./tabs.html">Tabs</a>
+            <a href="./segmented.html">Segmented control</a>
+            <span>Overlays &amp; disclosure</span>
+            <a href="./tooltip.html">Tooltip</a>
+            <a href="./dropdown.html">Dropdown</a>
+            <a href="./popover.html">Popover</a>
+            <a href="./dialog.html">Dialog</a>
+            <a href="./drawer.html">Drawer</a>
+            <a href="./accordion.html">Accordion</a>
+            <a href="./toasts.html">Toasts</a>
+            <span>Content &amp; data</span>
+            <a href="./table.html">Tables</a>
+            <a href="./lists.html">Lists</a>
+            <a href="./blockquote.html">Quotes</a>
+            <a href="./divider.html">Divider</a>
+            <a href="./timeline.html">Timeline</a>
+            <a href="./carousel.html">Carousel</a>
+            <a href="./figure.html">Figures</a>
+            <a href="./code.html">Code &amp; keys</a>
+            <a href="./dl.html">Definition lists</a>
+            <a href="./avatar.html">Avatars</a>
+            <a href="./chat.html">Chat bubbles</a>
+            <span>Feedback</span>
+            <a href="./alert.html">Alerts</a>
+            <a href="./badge.html">Badges</a>
+            <a href="./chip.html">Chips</a>
+            <a href="./skeleton.html">Skeleton</a>
+            <a href="./empty.html">Empty states</a>
+            <span>Theming</span>
+            <a href="./theming.html">Theming</a>
+            <span>Token reference</span>
+            <a href="./tokens.html">Token reference</a>
+            <span>JS API</span>
+            <a href="./js.html">JS API</a>
+            <span>No-JS matrix</span>
+            <a href="./nojs.html">No-JS matrix</a>
+          </nav>
+      </aside>
+      <main id="main">
+        <div class="stack">
+          <div>
+            <h1>File &amp; date inputs</h1>
+          </div>
+    <div class="lui-grid">
+      <label class="field"><span>Attachment</span><input type="file" /></label>
+      <label class="field"><span>Due</span><input type="date" /></label>
+    </div>
+    <label class="dropzone" style="margin-block:var(--lui-space-2)"><input type="file" aria-label="Upload files" />
+      <span aria-hidden="true">⇪</span>
+      <span><strong>Drop files here</strong><small>or click to browse</small></span>
+    </label>
+    <pre><code>&lt;label class="dropzone"&gt;&lt;input type="file" /&gt;&lt;span aria-hidden="true"&gt;⇪&lt;/span&gt;
+  &lt;span&gt;&lt;strong&gt;Drop files here&lt;/strong&gt;&lt;small&gt;or click to browse&lt;/small&gt;&lt;/span&gt;&lt;/label&gt;</code></pre>          <hr />
+          <div class="cluster">
+            <a class="btn" data-variant="ghost" href="./meters.html">← Progress &amp; meter</a>
+            <a class="btn" data-variant="ghost" href="./otp.html">One-time codes →</a>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <footer class="footer"><div>
+      <span>linkedui</span><span style="flex:1"></span><span><a href="../index.html">Builder</a></span><span>Full text: <code>WIKI.md</code></span>
+    </div></footer>
+  </div>
+
+<dialog id="wiki-dialog" aria-label="Wiki dialog">
+    <h3>Dialog</h3>
+    <p>Native, ESC + backdrop click included.</p>
+    <button class="btn" type="button" data-lui-close>Close</button>
+  </dialog>
+
+  <dialog class="drawer" data-side="left" id="wiki-drawer" aria-label="Wiki drawer">
+    <h3>Drawer</h3>
+    <p>Side sheet, same plumbing as dialog.</p>
+    <button class="btn" type="button" data-lui-close>Close</button>
+  </dialog>
+
+  <dialog class="sheet" id="wiki-sheet" aria-label="Wiki sheet">
+    <h3>Sheet</h3>
+    <p>Bottom sheet on mobile, centered modal from 48rem up.</p>
+    <button class="btn" type="button" data-lui-close>Done</button>
+  </dialog>
+  <script src="../../src/enhance.js?v=12" defer></script>
+</body>
+</html>
