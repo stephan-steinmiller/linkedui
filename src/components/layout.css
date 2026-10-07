@@ -23,7 +23,9 @@
  */
 @layer components {
   /* Vertical rhythm: gap instead of stacked margins (no collapsing,
-     no first/last-child margin hacks). data-gap: sm | (md) | lg. */
+     no first/last-child margin hacks). data-gap: sm | (md) | lg.
+     min-width: 0 keeps wide descendants (pre, tables) from blowing out
+     the single auto track — scroll containers handle themselves. */
   .stack {
     display: grid;
     gap: var(--lui-space-3);
@@ -31,6 +33,7 @@
   }
   .stack > * {
     margin-block: 0;
+    min-width: 0;
   }
   .stack[data-gap="sm"] { gap: var(--lui-space-2); }
   .stack[data-gap="lg"] { gap: var(--lui-space-4); }
@@ -46,11 +49,12 @@
   .cluster[data-gap="sm"] { gap: var(--lui-space-1); }
   .cluster[data-gap="lg"] { gap: var(--lui-space-3); }
 
-  /* Halves: two columns on desktop, one column under 48rem. */
+  /* Halves: two columns on desktop, one column under 48rem.
+     minmax(0, …) so content can never force the tracks wider. */
   .split {
     display: grid;
     gap: var(--lui-space-3);
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     align-items: start;
   }
   @media (max-width: 48rem) {
@@ -75,6 +79,11 @@
       max-height: calc(100dvh - var(--lui-space-3) * 2);
       overflow-y: auto;
     }
+  }
+  /* Sidebar links may wrap (long labels, narrow rail) — the 48px
+     min-height from .menu keeps touch targets intact. */
+  .with-sidebar .menu > a {
+    white-space: normal;
   }
 
   /* Demo frame: surface box around live examples (replaces ad-hoc

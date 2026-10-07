@@ -4,11 +4,15 @@
 .builder {
   display: grid;
   gap: 1rem;
-  grid-template-columns: 20rem 1fr;
+  grid-template-columns: 20rem minmax(0, 1fr);
   align-items: start;
 }
+/* min-width: 0 — same grid-blowout guard as the lib .stack */
+.builder > * {
+  min-width: 0;
+}
 @media (max-width: 56.25rem) {
-  .builder { grid-template-columns: 1fr; }
+  .builder { grid-template-columns: minmax(0, 1fr); }
 }
 /* Left panel scrolls independently from the preview on the right */
 @media (min-width: 56.26rem) {
@@ -34,6 +38,11 @@
   padding: 1rem;
   display: grid;
   gap: 1rem;
+}
+/* same grid-blowout guard as .builder above */
+.panel > *,
+.preview > * {
+  min-width: 0;
 }
 .controls label { display: grid; gap: .25rem; }
 .controls input[type="range"] { max-width: none; }

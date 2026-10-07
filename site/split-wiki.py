@@ -28,8 +28,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SITE = ROOT / "site"
 WIKI = SITE / "wiki"
-CSS_V = "78"  # bump when src/* changes
-SITE_CSS_V = "1"  # bump when site/site.css changes
+CSS_V = "79"  # bump when src/* changes
+SITE_CSS_V = "2"  # bump when site/site.css changes
 ENHANCE_V = "12"
 DIR_START = "<!--WIKI-DIR-START-->"
 DIR_END = "<!--WIKI-DIR-END-->"
@@ -42,8 +42,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SITE = ROOT / "site"
 WIKI = SITE / "wiki"
-CSS_V = "78"  # bump when src/* changes
-SITE_CSS_V = "1"  # bump when site/site.css changes
+CSS_V = "79"  # bump when src/* changes
+SITE_CSS_V = "2"  # bump when site/site.css changes
 ENHANCE_V = "12"
 
 FOUC = """  <script>
@@ -189,6 +189,31 @@ def split_source(path):
     return dialogs, groups, pages_flat
 
 
+def wrap_tables(body):
+    """Wrap bare <table> blocks in .table-wrap (scroll frame) so wide
+    tables scroll internally instead of blowing out the page. Tables
+    already inside a .table-wrap (table.html source) are left alone."""
+    lines = body.split("\n")
+    out = []
+    i = 0
+    while i < len(lines):
+        m = re.match(r"^(\s*)<table[ >]", lines[i])
+        prev = out[-1] if out else ""
+        if m and "table-wrap" not in prev:
+            ind = m.group(1)
+            out.append(f"{ind}<div class=\"table-wrap\">")
+            while i < len(lines):
+                out.append(lines[i])
+                if "</table>" in lines[i]:
+                    break
+                i += 1
+            out.append(f"{ind}</div>")
+        else:
+            out.append(lines[i])
+        i += 1
+    return "\n".join(out)
+
+
 def sidebar(groups, lang, current, prefix="./"):
     L = LANG[lang]
     out = [f'          <nav class="menu" aria-label="{L["side_label"]}">']
@@ -329,7 +354,7 @@ def main():
                 body = p["body"]
                 subtitle = p["subtitle"]
             shell = page_shell(lang, groups, flat, p["slug"], p["title"],
-                               subtitle, body)
+                               subtitle, wrap_tables(body))
             shell = shell.replace("{DIALOGS}", dialogs.rstrip("\n"))
             (WIKI / f'{p["slug"]}{L["sfx"]}').write_text(shell)
     # cross-check EN/DE page order matches (same slugs, same order)
