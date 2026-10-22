@@ -73,6 +73,14 @@
     outline-offset: 2px;
   }
 
+  /* Grouped menu (e.g. rendered by a loop): the wrapper dissolves so its
+     span/a children behave like direct .menu children.
+     <nav class="menu"><div class="menu-group"><span>Group</span>
+       <a href="…">Entry</a></div></nav> */
+  .menu > .menu-group {
+    display: contents;
+  }
+
   /* Pure-CSS tooltip */
   [data-tooltip] { position: relative; }
   [data-tooltip]:hover::after, [data-tooltip]:focus-visible::after {
