@@ -126,7 +126,7 @@ SMALL_RE = re.compile(r"\s*<small>(.*)</small>\s*$", re.DOTALL)
 def split_source(path):
     """Return (dialogs_html, groups). groups = [(h2_id, label, pages)] where
     pages = [(slug, title, subtitle_or_None, body_html)]."""
-    text = path.read_text()
+    text = path.read_text(encoding='utf-8')
     assert '<div class="with-sidebar">' not in text, \
         f"{path.name} is a generated file, not a source — edit wiki-src*.html instead"
     main = text.split("  </main>")[0]
@@ -341,7 +341,7 @@ def main():
         n_h3 = sum(len(g["pages"]) for g in groups)
         print(f"{lang}: {len(groups)} groups, {len(flat)} pages")
         assert len(groups) == 12, f"{lang}: expected 12 groups"
-        assert len(flat) == 53, f"{lang}: expected 53 pages, got {len(flat)}"
+        assert len(flat) == 55, f"{lang}: expected 55 pages, got {len(flat)}"
         # per-component pages
         for p in flat:
             if p.get("keep_heading"):
@@ -356,7 +356,7 @@ def main():
             shell = page_shell(lang, groups, flat, p["slug"], p["title"],
                                subtitle, wrap_tables(body))
             shell = shell.replace("{DIALOGS}", dialogs.rstrip("\n"))
-            (WIKI / f'{p["slug"]}{L["sfx"]}').write_text(shell)
+            (WIKI / f'{p["slug"]}{L["sfx"]}').write_text(shell, encoding='utf-8')
     # cross-check EN/DE page order matches (same slugs, same order)
     en_slugs = [p["slug"] for p in data["en"][2]]
     de_slugs = [p["slug"] for p in data["de"][2]]
@@ -381,19 +381,19 @@ def main():
         # fix nav/footer paths (home lives one level up from pages)
         shell = shell.replace("../wiki" + L["sfx"], "./wiki" + L["sfx"])
         shell = shell.replace('href="../index', 'href="./index')
-        L["home"].write_text(shell)
+        L["home"].write_text(shell, encoding='utf-8')
         print(f"{lang}: home rewritten ({L['home'].name})")
     # index directory markers (idempotent block replace)
     for lang, index in (("en", SITE / "index.html"), ("de", SITE / "index-de.html")):
         _, groups, _ = data[lang]
-        text = index.read_text()
+        text = index.read_text(encoding='utf-8')
         assert DIR_START in text and DIR_END in text, \
             f"markers missing in {index.name}"
         start = text.index(DIR_START) + len(DIR_START)
         end = text.index(DIR_END)
         text = (text[:start] + "\n" + directory(groups, lang, "./wiki/")
                 + "\n      " + text[end:])
-        index.write_text(text)
+        index.write_text(text, encoding='utf-8')
         print(f"{lang}: directory inserted into {index.name}")
 
 

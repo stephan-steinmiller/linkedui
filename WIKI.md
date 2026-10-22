@@ -55,8 +55,9 @@ stat, toolbar, footer) · Page structure (stack, cluster, split, sidebar, stage,
 hero) · Navigation (nav, app-nav, breadcrumb, steps,
 pagination, tabs, segmented) · Overlays (popover, tooltip, dropdown,
 toasts, dialog, drawer, sheet) · Content (tables, lists, quotes, figures,
-timeline, carousel, avatar, chat) · Feedback (alert, badge, chip,
-skeleton, spinner) · Empty states.
+timeline, carousel, avatar, chat, code copy button) · Feedback (alert, badge, chip,
+skeleton, spinner) · Empty states · Quiz (single-choice cards with
+ok/wrong states + feedback).
 
 ### Buttons — `src/components/button.css`
 
@@ -403,6 +404,43 @@ Bottom sheet with grab handle on mobile, centered modal card from
 </div>
 ```
 
+### Quiz — `src/components/quiz.css`
+
+Radio-based single-choice cards. Options are plain labels + radios
+(keyboard + no-JS friendly); the app sets `data-state` after answering and
+unhides `.quiz-feedback`. Score line via `.quiz-stand`.
+
+```html
+<fieldset class="quiz">
+  <legend>Welche Anweisung liest ein Feld?</legend>
+  <label class="quiz-option" data-state="ok">
+    <input type="radio" name="q1" disabled />
+    <span>Me!Feld</span>
+  </label>
+  <label class="quiz-option" data-state="falsch">
+    <input type="radio" name="q1" checked disabled />
+    <span>Me(Feld)</span>
+  </label>
+  <div class="quiz-feedback">Richtig: Me! greift auf Steuerelement/Feld zu.</div>
+</fieldset>
+<p class="quiz-stand"><progress value="3" max="5"></progress> 3 / 5 richtig</p>
+```
+
+`data-state` on `.quiz-option`: `ok` (success tint) | `falsch` (danger
+tint). Without it the option is neutral; `:checked` shows the primary ring.
+Disable the radios once answered.
+
+### Code copy button — `src/enhance.js` (`bindCopyButtons`)
+
+```html
+<pre><code id="snippet">Me!KundenNr</code></pre>
+<button class="btn" data-variant="secondary" data-size="sm" data-lui-copy="snippet">Kopieren</button>
+```
+
+`data-lui-copy="<target-id>"` copies the target's text to the clipboard and
+shows a success toast. Without clipboard API the target text is selected
+instead (toast explains Ctrl+C).
+
 ### Avatar — `src/components/avatar.css`
 
 ```html
@@ -520,6 +558,7 @@ segmented and toasts), `--lui-density` (master) or `--lui-density-x`/`-y`,
 | `enhanceTabs()` | `.tabs` → tablist (ARIA, roving tabindex, keys) |
 | `enhanceOtp()` | `.otp` → advance, backspace, paste-split |
 | `bindToasts()` / `showToast()` | toasts via `data-lui-toast` or `luiToast({tone,title,message,ms})` |
+| `bindCopyButtons()` | `data-lui-copy="<id>"` copies target text + toast |
 
 Builder (`site/app.js`, JSDoc everywhere): `derived()` (derive theme),
 `snippet()` / `fullFile()` (export), `render()` (live; density applies on release),
@@ -551,6 +590,7 @@ src/components/button.css     .btn + variants/states/sizes
 src/components/card.css       container, grid, card, field, hints, empty state
 src/components/layout.css     page structure: stack, cluster, split, sidebar shell, stage, hero
 src/components/steps.css      stepper (CSS counters)
+src/components/quiz.css       single-choice quiz cards
 src/components/feedback.css   alert, badge, skeleton
 src/components/chat.css       chat bubbles (static, no JS)
 src/components/avatar.css     avatar (initials/photo, status)

@@ -31,4 +31,5 @@
 @import "./components/drawer.css" layer(components);
 @import "./components/avatar.css" layer(components);
 @import "./components/steps.css" layer(components);
+@import "./components/quiz.css" layer(components);
 @import "./themes.css" layer(themes);

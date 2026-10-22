@@ -14,6 +14,7 @@
  * 4. {@link enhanceTabs} — `.tabs` as a real `tablist` (roles, roving tabindex)
  * 5. {@link enhanceOtp} — `.otp` boxes (advance, backspace, paste-split)
  * 6. {@link bindToasts} + {@link showToast} — toasts (also as `window.luiToast`)
+ * 7. {@link bindCopyButtons} — `[data-lui-copy]` copies target text + toast
  *
  * @example Include (deferred!) before `</body>`:
  * ```html
@@ -391,6 +392,36 @@
     window.luiToast = showToast;
   }
 
+  /**
+   * Copy buttons: `[data-lui-copy="<target-id>"]` copies the text of the
+   * target element (e.g. a code block) to the clipboard and confirms with
+   * a success toast. Without clipboard API it selects the target instead.
+   * @returns {void}
+   */
+  function bindCopyButtons() {
+    document.addEventListener("click", (e) => {
+      const btn = e.target.closest?.("[data-lui-copy]");
+      if (!btn) return;
+      const target = document.getElementById(btn.dataset.luiCopy);
+      if (!target) return;
+      const text = target.textContent || "";
+      const done = () => showToast({ tone: "success", title: "Kopiert", ms: 2000 });
+      if (navigator.clipboard?.writeText) {
+        navigator.clipboard.writeText(text).then(done, () => fallbackSelect(target));
+      } else {
+        fallbackSelect(target);
+      }
+    });
+    function fallbackSelect(target) {
+      const range = document.createRange();
+      range.selectNodeContents(target);
+      const sel = getSelection();
+      sel?.removeAllRanges();
+      sel?.addRange(range);
+      showToast({ tone: "info", title: "Text markiert", message: "Mit Strg+C kopieren.", ms: 4000 });
+    }
+  }
+
   restoreTheme();
   bindThemeSwitchers();
   bindDialogs();
@@ -398,4 +429,5 @@
   enhanceTabs();
   enhanceOtp();
   bindToasts();
+  bindCopyButtons();
 })();

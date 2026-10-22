@@ -1,0 +1,92 @@
+/* linkedui — components/quiz.css — single-choice quiz cards.
+ *
+ * Radio-based (keyboard + no-JS friendly: options are plain radios).
+ * The app sets `data-state` after answering; the explanation block
+ * (`.quiz-feedback`) is shown by the app (remove `hidden`).
+ *
+ * Markup:
+ *   <fieldset class="quiz">
+ *     <legend>Welche Anweisung …?</legend>
+ *     <label class="quiz-option" data-state="ok">
+ *       <input type="radio" name="q1" disabled />
+ *       <span>Me!Feld</span>
+ *     </label>
+ *     <label class="quiz-option" data-state="falsch">
+ *       <input type="radio" name="q1" checked disabled />
+ *       <span>Me(Feld)</span>
+ *     </label>
+ *     <div class="quiz-feedback">Richtig! …</div>
+ *   </fieldset>
+ *
+ * data-state on .quiz-option: ok (success tint) | falsch (danger tint).
+ * Without data-state the option is neutral; :checked shows the primary ring.
+ */
+
+@layer components {
+  .quiz {
+    border: var(--lui-border-width) solid var(--lui-border);
+    border-radius: var(--lui-radius-lg);
+    background: var(--lui-surface);
+    padding: var(--lui-space-3);
+    display: grid;
+    gap: var(--lui-space-2);
+    margin: 0;
+  }
+  .quiz > legend {
+    font-weight: 700;
+    padding-inline: var(--lui-space-2);
+  }
+  .quiz-option {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--lui-space-2);
+    padding: var(--lui-space-2) var(--lui-space-3);
+    border: var(--lui-border-width) solid var(--lui-border);
+    border-radius: var(--lui-radius-md);
+    background: var(--lui-field);
+    cursor: pointer;
+  }
+  .quiz-option:hover {
+    border-color: var(--lui-primary);
+  }
+  .quiz-option:has(input:focus-visible) {
+    outline: 2px solid var(--lui-ring);
+    outline-offset: 2px;
+  }
+  .quiz-option:has(input:checked):not([data-state]) {
+    border-color: var(--lui-primary);
+    box-shadow: 0 0 0 1px var(--lui-primary);
+  }
+  .quiz-option:has(input:disabled) {
+    cursor: default;
+  }
+  .quiz-option:has(input:disabled):hover {
+    border-color: var(--lui-border);
+  }
+  .quiz-option[data-state="ok"],
+  .quiz-option[data-state="ok"]:hover {
+    border-color: var(--lui-success);
+    background: var(--lui-surface);
+    background: color-mix(in oklch, var(--lui-success) calc(50% + var(--lui-contrast, 0.5) * 30%), var(--lui-bg));
+    background: color-mix(in oklch, var(--lui-success) calc(50% + var(--lui-contrast, 0.5) * 30%), light-dark(#ffffff, #000000));
+  }
+  .quiz-option[data-state="falsch"],
+  .quiz-option[data-state="falsch"]:hover {
+    border-color: var(--lui-danger);
+    background: var(--lui-surface);
+    background: color-mix(in oklch, var(--lui-danger) calc(50% + var(--lui-contrast, 0.5) * 30%), var(--lui-bg));
+    background: color-mix(in oklch, var(--lui-danger) calc(50% + var(--lui-contrast, 0.5) * 30%), light-dark(#ffffff, #000000));
+  }
+  .quiz-feedback {
+    font-size: var(--lui-font-sm);
+    border-top: var(--lui-border-width) solid var(--lui-border);
+    padding-top: var(--lui-space-2);
+  }
+  .quiz-stand {
+    display: flex;
+    align-items: center;
+    gap: var(--lui-space-2);
+    font-size: var(--lui-font-sm);
+    color: var(--lui-muted);
+  }
+}
