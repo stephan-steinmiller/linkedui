@@ -588,7 +588,31 @@ Builder (`site/app.js`, JSDoc everywhere): `derived()` (derive theme),
 `loadThemeIntoBuilder()` (theme → inputs), `applyUrlState()` / `pushUrlState()`
 (shareable links), `cssToHex()`, `squirFactor()`.
 
-## 7. No-JS matrix
+## 7. Build (`tools/minify.py`, stdlib only, no dependencies)
+
+Source of truth stays human-readable (`src/`, documented). `dist/` is
+generated and checked in so `<link>`/CDN users get minified files:
+
+```sh
+python3 tools/minify.py                    # full build -> dist/
+python3 tools/minify.py --check            # CI/manual check: dist aktuell?
+python3 tools/minify.py --entry slim.css   # nur gelistete @imports (Pruning)
+python3 tools/minify.py --theme default    # nur dieses Theme (+ generics)
+```
+
+- Full minified: CSS ~11 KB gzip, JS ~2.4 KB gzip (Stand: gemessen am Repo).
+- Custom-Entry: eigene `@import`-Liste (vgl. `src/linkedui.css`), z. B. nur
+  genutzte Komponenten — Beispiel: tokens+reset+base+button+card, default-Theme
+  ≈ 6 KB CSS gzip + 2.4 KB JS.
+- `--theme` filtert `[data-theme="…"]`-Blöcke; theme-lose Regeln (Fallbacks,
+  dark-generics, `@supports`) bleiben immer drin — lieber korrekt als maximal klein.
+- Nach `src/`-Änderungen: Skript laufen lassen, `git diff --stat dist/` prüfen
+  (unerwartete Sprünge = Hinweis auf versehentlichen Ballast), committen.
+- Kein Mangling, kein Bundler: absichtlich konservativ (Kommentare raus,
+  Whitespace kollabiert, Strings/`url()`/`calc()` unangetastet). Wer echtes
+  Tree-Shaking braucht, nimmt lightningcss & Co. — bewusst *nicht* Teil der Lib.
+
+## 8. No-JS matrix
 
 Works without JS: system theme, all content, accordion/dropdown (`details`),
 popover toggle (`details`), dialog via `open`, drawer via `open`, tabs
@@ -596,13 +620,13 @@ popover toggle (`details`), dialog via `open`, drawer via `open`, tabs
 Needs JS: persistent theme choice, `showModal()`, tablist ARIA,
 copy/download/share buttons (manual copy from `<pre>` works).
 
-## 8. Browser support
+## 9. Browser support
 
 Modern evergreen. With fallbacks: HEX before `color-mix`, gray ghost wash,
 `@supports` for `corner-shape` and the surface floor. Test checklist in the
 builder: light/dark/auto, keyboard-only, `prefers-reduced-motion`, no-JS.
 
-## 9. Files
+## 10. Files
 
 ```
 src/linkedui.css              entry point (layers + imports)
@@ -629,6 +653,9 @@ src/components/carousel.css   scroll-snap slider (CSS-only)
 src/components/otp.css        OTP (separate boxes + paste-split)
 src/themes.css                all themes (default, ocean, squishy)
 src/enhance.js                progressive enhancement (JSDoc)
+tools/minify.py               stdlib-only minifier (-> dist/, --entry/--theme/--check)
+dist/linkedui.min.css         generated (checked in, vgl. ## 7)
+dist/enhance.min.js           generated (checked in, vgl. ## 7)
 site/index.html               theme builder, English (dogfoods the lib)
 site/index-de.html            theme builder, German
 site/app.js                   builder logic (JSDoc)

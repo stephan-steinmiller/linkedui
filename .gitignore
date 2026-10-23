@@ -1,7 +1,7 @@
 # Deps / Build
 node_modules/
-dist/
 *.log
+# Hinweis: dist/ ist bewusst NICHT ignoriert (eingecheckte Build-Artefakte, siehe WIKI.md ## 7)
 
 # Agent workspace (local-only state, loops, skills cache)
 .opencode/
