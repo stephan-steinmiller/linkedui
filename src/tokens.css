@@ -135,9 +135,12 @@
     --lui-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.06);
     --lui-shadow-md: 0 4px 16px rgb(0 0 0 / 0.08);
     --lui-maxw: 72rem;
-    --lui-space-1: calc(0.25rem * var(--lui-density-y));
-    --lui-space-2: calc(0.5rem * var(--lui-density-y));
-    --lui-space-3: calc(1rem * var(--lui-density-y));
-    --lui-space-4: calc(1.5rem * var(--lui-density-y));
+    /* Layout-Rhythmus (stack/cluster/grid/card/field-Gaps): bewusst NICHT
+       density-skaliert. Dichte macht Controls kompakt, das Layout bleibt
+       luftig — sonst klebt bei niedriger Density alles aneinander. */
+    --lui-space-1: 0.25rem;
+    --lui-space-2: 0.5rem;
+    --lui-space-3: 1rem;
+    --lui-space-4: 1.5rem;
   }
 }

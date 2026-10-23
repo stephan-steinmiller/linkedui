@@ -16,7 +16,8 @@
  *   <div class="stage">live demo…</div>
  *   <header class="hero"><h1>Title</h1><p>Lead paragraph.</p></header>
  *
- * Notes: gap scales come from --lui-space-* (density-aware). The only
+ * Notes: gap scales come from --lui-space-* (density-independent on
+ * purpose — density sizes controls, never the layout rhythm). The only
  * breakpoint is the lib-wide 48rem, width-only. .stack zeroes child
  * margins (rhythm comes from gap alone); .with-sidebar needs
  * minmax(0, 1fr) so wide <pre> content can't push the sidebar off.
