@@ -185,17 +185,17 @@
 
     <h2 id="layout">4. Layout <small>src/components/card.css</small></h2>
     <h3 id="page-structure">Page structure <small>src/components/layout.css — this page uses it (sidebar + menu)</small></h3>
-    <p>Vertical rhythm (<code>.stack</code>), wrapping rows (<code>.cluster</code>),
-      halves that stack on mobile (<code>.split</code>), docs shell
+    <p>Vertical rhythm (<code>.stack</code>), wrapping rows (<code>.cluster</code>,
+      <code>data-justify</code> / <code>data-align</code>), halves that stack on
+      mobile (<code>.split</code>, thirds via <code>data-columns="3"</code>), docs shell
       (<code>.with-sidebar</code> + <code>.menu</code>), demo frames
       (<code>.stage</code>), page titles (<code>.hero</code>). One breakpoint: 48rem, width only.</p>
     <div class="stack" data-gap="sm">
       <div class="stage">stack item one — gap, not margins</div>
       <div class="stage">stack item two</div>
     </div>
-    <div class="cluster" style="margin-block:var(--lui-space-3)">
-      <button class="btn" type="button">Save</button>
-      <button class="btn" data-variant="secondary" type="button">Cancel</button>
+    <div class="cluster" data-justify="between" style="margin-block:var(--lui-space-3)">
+      <span class="cluster"><button class="btn" type="button">Save</button><button class="btn" data-variant="secondary" type="button">Cancel</button></span>
       <span class="badge">Draft</span>
     </div>
     <div class="split">
@@ -209,6 +209,11 @@
   &lt;main&gt;…&lt;/main&gt;&lt;/div&gt;
 &lt;div class="stage"&gt;live demo…&lt;/div&gt;
 &lt;header class="hero"&gt;&lt;h1&gt;Title&lt;/h1&gt;&lt;p&gt;Lead.&lt;/p&gt;&lt;/header&gt;</code></pre>
+    <h3 id="spacing">Spacing helpers <small>same file — pad boxes, flex filler</small></h3>
+    <div class="pad" data-pad="lg"><span class="badge">padded box, no card chrome</span></div>
+    <div class="cluster"><button class="btn" type="button">Left</button><span class="spacer"></span><button class="btn" type="button">Right</button></div>
+    <pre><code>&lt;div class="pad" data-pad="lg"&gt;…&lt;/div&gt; &lt;!-- sm | (md) | lg --&gt;
+&lt;span class="spacer"&gt;&lt;/span&gt; &lt;!-- flex filler inside .cluster/.toolbar/.footer --&gt;</code></pre>
     <h3 id="container">Container, grid, card</h3>
     <p>Bare <code>&lt;article&gt;</code> without class already looks like <code>.card</code>:</p>
     <div class="lui-grid">

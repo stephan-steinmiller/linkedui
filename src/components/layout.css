@@ -38,6 +38,7 @@
   }
   .stack[data-gap="sm"] { gap: var(--lui-space-2); }
   .stack[data-gap="lg"] { gap: var(--lui-space-4); }
+  .stack[data-gap="none"] { gap: 0; }
 
   /* Wrapping row: buttons, badges, chips, toolbar actions.
      data-gap: sm | (md) | lg. */
@@ -49,6 +50,18 @@
   }
   .cluster[data-gap="sm"] { gap: var(--lui-space-1); }
   .cluster[data-gap="lg"] { gap: var(--lui-space-3); }
+  .cluster[data-gap="none"] { gap: 0; }
+  /* Main-axis distribution: start (default) | center | end | between
+     (e.g. actions left, paging right). Cross-axis via data-align. */
+  .cluster[data-justify="center"] { justify-content: center; }
+  .cluster[data-justify="end"] { justify-content: flex-end; }
+  .cluster[data-justify="between"] { justify-content: space-between; }
+  /* Cross-axis alignment for row containers (cluster) and grids (split). */
+  .cluster[data-align="start"] { align-items: flex-start; }
+  .cluster[data-align="end"] { align-items: flex-end; }
+  .cluster[data-align="stretch"] { align-items: stretch; }
+  .split[data-align="center"] { align-items: center; }
+  .split[data-align="end"] { align-items: end; }
 
   /* Halves: two columns on desktop, one column under 48rem.
      minmax(0, …) so content can never force the tracks wider. */
@@ -61,6 +74,21 @@
   @media (max-width: 48rem) {
     .split { grid-template-columns: 1fr; }
   }
+  /* Thirds: three columns on desktop, one column under 48rem. */
+  .split[data-columns="3"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  @media (max-width: 48rem) {
+    .split[data-columns="3"] { grid-template-columns: 1fr; }
+  }
+
+  /* Padded box: same spacing scale as .card, but without border,
+     background or title styling — for plain padded sections. */
+  .pad { padding: var(--lui-space-3); }
+  .pad[data-pad="sm"] { padding: var(--lui-space-2); }
+  .pad[data-pad="lg"] { padding: var(--lui-space-4); }
+
+  /* Flex spacer: pushes siblings apart inside .cluster/.toolbar/.footer.
+     Replaces ad-hoc <span style="flex:1"> shims. */
+  .spacer { flex: 1 1 auto; min-width: 0; }
 
   /* Docs/app shell: fixed side nav + fluid content. Sidebar is sticky
      with its own scroll on desktop, plain stacked block on mobile. */

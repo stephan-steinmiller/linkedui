@@ -341,7 +341,7 @@ def main():
         n_h3 = sum(len(g["pages"]) for g in groups)
         print(f"{lang}: {len(groups)} groups, {len(flat)} pages")
         assert len(groups) == 12, f"{lang}: expected 12 groups"
-        assert len(flat) == 56, f"{lang}: expected 56 pages, got {len(flat)}"
+        assert len(flat) == 57, f"{lang}: expected 57 pages, got {len(flat)}"
         # per-component pages
         for p in flat:
             if p.get("keep_heading"):

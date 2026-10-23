@@ -58,6 +58,7 @@
             <a href="./otp-de.html">Einmal-Codes</a>
             <span>Layout</span>
             <a href="./page-structure-de.html" aria-current="page">Seitenstruktur</a>
+            <a href="./spacing-de.html">Abstände</a>
             <a href="./container-de.html">Container, Grid, Card</a>
             <a href="./stat-de.html">Stats</a>
             <a href="./toolbar-de.html">Toolbar</a>
@@ -116,17 +117,18 @@
             <h1>Seitenstruktur</h1>
           <p><small>src/components/layout.css — diese Seite nutzt sie (Sidebar + Menü)</small></p>
           </div>
-    <p>Vertikaler Rhythmus (<code>.stack</code>), umbrechende Zeilen (<code>.cluster</code>),
-      Hälften, die mobil stapeln (<code>.split</code>), Doku-Hülle
-      (<code>.with-sidebar</code> + <code>.menu</code>), Demo-Rahmen
-      (<code>.stage</code>), Seitentitel (<code>.hero</code>). Ein Breakpoint: 48rem, nur Breite.</p>
+    <p>Vertikaler Rhythmus (<code>.stack</code>), umbrechende Zeilen
+      (<code>.cluster</code>, <code>data-justify</code> / <code>data-align</code>),
+      Hälften, die mobil stapeln (<code>.split</code>, Drittel via
+      <code>data-columns="3"</code>), Doku-Hülle (<code>.with-sidebar</code> +
+      <code>.menu</code>), Demo-Rahmen (<code>.stage</code>), Seitentitel
+      (<code>.hero</code>). Ein Breakpoint: 48rem, nur Breite.</p>
     <div class="stack" data-gap="sm">
       <div class="stage">Stack-Eintrag eins — Abstände statt Margins</div>
       <div class="stage">Stack-Eintrag zwei</div>
     </div>
-    <div class="cluster" style="margin-block:var(--lui-space-3)">
-      <button class="btn" type="button">Speichern</button>
-      <button class="btn" data-variant="secondary" type="button">Abbrechen</button>
+    <div class="cluster" data-justify="between" style="margin-block:var(--lui-space-3)">
+      <span class="cluster"><button class="btn" type="button">Speichern</button><button class="btn" data-variant="secondary" type="button">Abbrechen</button></span>
       <span class="badge">Entwurf</span>
     </div>
     <div class="split">
@@ -142,7 +144,7 @@
 &lt;header class="hero"&gt;&lt;h1&gt;Titel&lt;/h1&gt;&lt;p&gt;Lead.&lt;/p&gt;&lt;/header&gt;</code></pre>          <hr />
           <div class="cluster">
             <a class="btn" data-variant="ghost" href="./otp-de.html">← Einmal-Codes</a>
-            <a class="btn" data-variant="ghost" href="./container-de.html">Container, Grid, Card →</a>
+            <a class="btn" data-variant="ghost" href="./spacing-de.html">Abstände →</a>
           </div>
         </div>
       </main>

@@ -164,20 +164,34 @@ Without JS: type one digit per box, Tab advances.
 
 ### Page structure — `src/components/layout.css`
 
-Vertical rhythm (`.stack`, gap not margins — `data-gap: sm | (md) | lg`),
-wrapping rows (`.cluster`), halves stacking under 48rem (`.split`), docs
-shell (`.with-sidebar` + `.menu`: sticky sidebar on desktop, stacked on
-mobile), demo frames (`.stage`), page titles (`.hero`). One breakpoint
-(48rem, width only). The wiki pages themselves use `.with-sidebar`.
+Vertical rhythm (`.stack`, gap not margins — `data-gap: sm | (md) | lg | none`),
+wrapping rows (`.cluster`, `data-justify: start | center | end | between`,
+`data-align: start | center | end | stretch`), halves stacking under 48rem
+(`.split`, plus `.split[data-columns="3"]` for thirds), docs shell
+(`.with-sidebar` + `.menu`: sticky sidebar on desktop, stacked on mobile),
+demo frames (`.stage`), page titles (`.hero`). One breakpoint (48rem,
+width only). The wiki pages themselves use `.with-sidebar`.
 
 ```html
 <div class="stack" data-gap="sm">…</div>
-<div class="cluster"><button class="btn">…</button>…</div>
-<div class="split"><article>…</article><article>…</article></div>
+<div class="cluster" data-justify="between"><button class="btn">…</button><button class="btn">…</button></div>
+<div class="split" data-columns="3"><article>…</article><article>…</article><article>…</article></div>
 <div class="with-sidebar"><aside><nav class="menu">…</nav></aside>
   <main>…</main></div>
 <div class="stage">live demo…</div>
 <header class="hero"><h1>Title</h1><p>Lead.</p></header>
+```
+
+### Spacing helpers — `src/components/layout.css`
+
+`.pad` (padded box without card chrome, `data-pad: sm | (md) | lg`) and
+`.spacer` (flex filler: pushes siblings apart inside `.cluster`/`.toolbar`/`.footer`,
+replaces ad-hoc `<span style="flex:1">` shims). Inline `style` remains the
+documented escape hatch for genuine one-offs (e.g. a single fixed width).
+
+```html
+<div class="pad" data-pad="lg">…</div>
+<div class="cluster"><button class="btn">…</button><span class="spacer"></span><button class="btn">…</button></div>
 ```
 
 Bare `<article>` without class already looks like `.card`.
@@ -189,7 +203,7 @@ Bare `<article>` without class already looks like `.card`.
   <button class="btn" type="button">Invite</button>
 </div>
 <footer class="footer"><div>
-  <span>© 2026 Acme</span><span style="flex:1"></span><a href="/imprint">Imprint</a>
+  <span>© 2026 Acme</span><span class="spacer"></span><a href="/imprint">Imprint</a>
 </div></footer>
 ```
 <div class="stat"><span>ARR</span><strong>$1.2M</strong><small data-trend="up">+12%</small></div>

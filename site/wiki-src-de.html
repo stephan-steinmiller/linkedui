@@ -185,17 +185,18 @@
 
     <h2 id="layout">4. Layout <small>src/components/card.css</small></h2>
     <h3 id="page-structure">Seitenstruktur <small>src/components/layout.css — diese Seite nutzt sie (Sidebar + Menü)</small></h3>
-    <p>Vertikaler Rhythmus (<code>.stack</code>), umbrechende Zeilen (<code>.cluster</code>),
-      Hälften, die mobil stapeln (<code>.split</code>), Doku-Hülle
-      (<code>.with-sidebar</code> + <code>.menu</code>), Demo-Rahmen
-      (<code>.stage</code>), Seitentitel (<code>.hero</code>). Ein Breakpoint: 48rem, nur Breite.</p>
+    <p>Vertikaler Rhythmus (<code>.stack</code>), umbrechende Zeilen
+      (<code>.cluster</code>, <code>data-justify</code> / <code>data-align</code>),
+      Hälften, die mobil stapeln (<code>.split</code>, Drittel via
+      <code>data-columns="3"</code>), Doku-Hülle (<code>.with-sidebar</code> +
+      <code>.menu</code>), Demo-Rahmen (<code>.stage</code>), Seitentitel
+      (<code>.hero</code>). Ein Breakpoint: 48rem, nur Breite.</p>
     <div class="stack" data-gap="sm">
       <div class="stage">Stack-Eintrag eins — Abstände statt Margins</div>
       <div class="stage">Stack-Eintrag zwei</div>
     </div>
-    <div class="cluster" style="margin-block:var(--lui-space-3)">
-      <button class="btn" type="button">Speichern</button>
-      <button class="btn" data-variant="secondary" type="button">Abbrechen</button>
+    <div class="cluster" data-justify="between" style="margin-block:var(--lui-space-3)">
+      <span class="cluster"><button class="btn" type="button">Speichern</button><button class="btn" data-variant="secondary" type="button">Abbrechen</button></span>
       <span class="badge">Entwurf</span>
     </div>
     <div class="split">
@@ -209,6 +210,11 @@
   &lt;main&gt;…&lt;/main&gt;&lt;/div&gt;
 &lt;div class="stage"&gt;Live-Demo…&lt;/div&gt;
 &lt;header class="hero"&gt;&lt;h1&gt;Titel&lt;/h1&gt;&lt;p&gt;Lead.&lt;/p&gt;&lt;/header&gt;</code></pre>
+    <h3 id="spacing">Abstände <small>gleiche Datei — Boxen mit Padding, Flex-Lückenfüller</small></h3>
+    <div class="pad" data-pad="lg"><span class="badge">Box mit Padding, ohne Card-Chrome</span></div>
+    <div class="cluster"><button class="btn" type="button">Links</button><span class="spacer"></span><button class="btn" type="button">Rechts</button></div>
+    <pre><code>&lt;div class="pad" data-pad="lg"&gt;…&lt;/div&gt; &lt;!-- sm | (md) | lg --&gt;
+&lt;span class="spacer"&gt;&lt;/span&gt; &lt;!-- Flex-Lückenfüller in .cluster/.toolbar/.footer --&gt;</code></pre>
     <h3 id="container">Container, Grid, Card</h3>
     <p>Reines <code>&lt;article&gt;</code> ohne Klasse sieht aus wie <code>.card</code>:</p>
     <div class="lui-grid">
