@@ -51,6 +51,7 @@
   .menu > .menu-group > a {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: var(--lui-space-2);
     min-height: var(--lui-control-h-md);
     padding: var(--lui-control-py) var(--lui-control-px);
@@ -59,9 +60,13 @@
     color: var(--lui-text);
     text-decoration: none;
     /* kein nowrap: lange Einträge brechen in der Sidebar um statt
-       abgeschnitten zu werden (min-width: 0 gegen Flex-Overflow) */
+       abgeschnitten zu werden (wrap + min-width: 0 gegen Flex-Overflow) */
     min-width: 0;
     overflow-wrap: break-word;
+  }
+  .menu > a > span,
+  .menu > .menu-group > a > span {
+    min-width: 0;
   }
   .menu > a:hover,
   .menu > .menu-group > a:hover {
