@@ -75,8 +75,8 @@
   function syncRanges() {
     if (els.radius) els.radius.value = clamp(radiusVal(), 0, 24);
     if (els.curve) els.curve.value = clamp(curveVal(), 0.8, 2);
-    if (els.densX) els.densX.value = clamp(densXVal(), 0.85, 1.3);
-    if (els.densY) els.densY.value = clamp(densYVal(), 0.85, 1.3);
+    if (els.densX) els.densX.value = clamp(densXVal(), 0.5, 2);
+    if (els.densY) els.densY.value = clamp(densYVal(), 0.5, 2);
     if (els.contrast) els.contrast.value = clamp(num(els.contrastNum, 50), 0, 100);
   }
 

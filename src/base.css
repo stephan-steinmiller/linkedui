@@ -422,11 +422,10 @@
     appearance: none;
     width: 100%;
     max-width: 28rem;
-    /* Inset around the fill: tighter vertically (0.25rem, budgeted in the
-       fixed height above), roomier horizontally — in a wide pill equal rem
-       values look starved at the ends because of the end-cap curvature. */
-    height: calc(var(--lui-check) * 0.5 + 0.5rem + (2 * var(--lui-border-width)));
-    padding: 0.25rem 0.5rem;
+    /* Uniform inset around the fill: same padding on all sides, so the
+       track ring reads evenly (height budgets 2 × inset + fill + borders). */
+    height: calc(var(--lui-check) * 0.5 + 0.75rem + (2 * var(--lui-border-width)));
+    padding: 0.375rem;
     border-radius: var(--lui-radius-full);
     corner-shape: var(--lui-corner-shape);
     background: var(--lui-field);

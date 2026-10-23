@@ -78,20 +78,20 @@
           </label>
           <label>Radius (boxes): <output id="out-radius" for="in-radius">12px</output>
             <span class="pair">
-              <input type="range" id="in-radius" min="0" max="24" step="1" value="12" />
-              <input type="number" id="in-radius-num" min="0" max="64" step="1" value="12" aria-label="Exact radius in pixels" />
+              <input type="range" id="in-radius" min="0" max="24" step="0.5" value="12" />
+              <input type="number" id="in-radius-num" min="0" max="64" step="0.5" value="12" aria-label="Exact radius in pixels" />
             </span>
           </label>
-          <label>Padding/density vertical: <output id="out-density-y" for="in-density-y">1.00</output>
+          <label>Padding/density vertical: <output id="out-density-y" for="in-density-y">0.50</output>
             <span class="pair">
-              <input type="range" id="in-density-y" min="0.85" max="1.3" step="0.05" value="1" />
-              <input type="number" id="in-density-y-num" min="0.5" max="2" step="0.05" value="1" aria-label="Exact vertical density" />
+              <input type="range" id="in-density-y" min="0.5" max="2" step="0.01" value="0.5" />
+              <input type="number" id="in-density-y-num" min="0.5" max="2" step="0.01" value="0.5" aria-label="Exact vertical density" />
             </span>
           </label>
           <label>Padding/density horizontal: <output id="out-density-x" for="in-density-x">1.00</output>
             <span class="pair">
-              <input type="range" id="in-density-x" min="0.85" max="1.3" step="0.05" value="1" />
-              <input type="number" id="in-density-x-num" min="0.5" max="2" step="0.05" value="1" aria-label="Exact horizontal density" />
+              <input type="range" id="in-density-x" min="0.5" max="2" step="0.01" value="1" />
+              <input type="number" id="in-density-x-num" min="0.5" max="2" step="0.01" value="1" aria-label="Exact horizontal density" />
             </span>
           </label>
           <label>Shape
@@ -233,7 +233,7 @@
   --lui-radius: 12px;
   --lui-radius-control: 12px;
   --lui-density-x: 1.00;
-  --lui-density-y: 1.00;
+  --lui-density-y: 0.50;
   --lui-corner-shape: round;
 }</code></pre>
       <p><small>Paste into <code>src/themes.css</code> → use via <code>&lt;html data-theme="my-theme" data-mode="auto"&gt;</code>. The builder generates the dark variant too (see full export after download).</small></p>

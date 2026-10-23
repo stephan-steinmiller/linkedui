@@ -55,6 +55,7 @@
     --lui-on-accent: oklch(0.99 0 0);
     --lui-radius: 12px;
     --lui-density: 1;
+    --lui-density-y: 0.5;
     --lui-corner-shape: normal;
   }
 
@@ -115,6 +116,7 @@
   /* ---------- Dark: explicit override ---------- */
   [data-mode="dark"], [data-mode="dark"][data-theme="default"] {
     color-scheme: dark;
+    --lui-density-y: 0.5;
     --lui-bg: oklch(0.22 0.02 260);
     --lui-surface: #232c40;
     --lui-surface: color-mix(in oklch, var(--lui-accent) 7%, var(--lui-bg));
