@@ -441,6 +441,15 @@ Disable the radios once answered.
 shows a success toast. Without clipboard API the target text is selected
 instead (toast explains Ctrl+C).
 
+### No-wrap utility — `src/base.css`
+
+```html
+<code class="nowrap">Me!Feld</code>
+```
+
+Keeps short code/identifiers on one line instead of breaking mid-token.
+Use sparingly (short snippets only — long code belongs in `pre`, which scrolls).
+
 ### Avatar — `src/components/avatar.css`
 
 ```html
