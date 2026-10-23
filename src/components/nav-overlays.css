@@ -40,13 +40,15 @@
     border-radius: var(--lui-radius-lg);
     corner-shape: var(--lui-corner-shape);
   }
-  .menu > span {
+  .menu > span,
+  .menu > .menu-group > span {
     padding: var(--lui-space-1) var(--lui-space-2);
     color: var(--lui-muted);
     font-size: var(--lui-font-sm);
     font-weight: 600;
   }
-  .menu > a {
+  .menu > a,
+  .menu > .menu-group > a {
     display: flex;
     align-items: center;
     gap: var(--lui-space-2);
@@ -58,17 +60,20 @@
     text-decoration: none;
     white-space: nowrap;
   }
-  .menu > a:hover {
+  .menu > a:hover,
+  .menu > .menu-group > a:hover {
     background: rgb(128 128 128 / 0.12);
     background: color-mix(in oklch, var(--lui-primary) 12%, transparent);
   }
-  .menu > a[aria-current="page"] {
+  .menu > a[aria-current="page"],
+  .menu > .menu-group > a[aria-current="page"] {
     color: var(--lui-primary);
     font-weight: 600;
     background: rgb(128 128 128 / 0.12);
     background: color-mix(in oklch, var(--lui-primary) 12%, transparent);
   }
-  .menu > a:focus-visible {
+  .menu > a:focus-visible,
+  .menu > .menu-group > a:focus-visible {
     outline: 2px solid var(--lui-ring);
     outline-offset: 2px;
   }
