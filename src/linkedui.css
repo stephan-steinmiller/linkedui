@@ -19,6 +19,7 @@
 @import "./components/layout.css" layer(components);
 @import "./components/feedback.css" layer(components);
 @import "./components/chat.css" layer(components);
+@import "./components/code.css" layer(components);
 @import "./components/nav-overlays.css" layer(components);
 @import "./components/app-nav.css" layer(components);
 @import "./components/tabs.css" layer(components);

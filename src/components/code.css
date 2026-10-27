@@ -1,0 +1,49 @@
+/* linkedui — components/code.css — code blocks (static, no JS).
+ *
+ * Markup:
+ *   <figure class="code-block">
+ *     <figcaption><span>VBA</span><button class="btn" data-variant="ghost" data-size="sm" type="button" data-lui-copy="snippet-id">Kopieren</button></figcaption>
+ *     <pre><code id="snippet-id">…</code></pre>
+ *   </figure>
+ * Caption is optional; without it the block is just the framed <pre>.
+ * Copy uses the global [data-lui-copy] behavior (enhance.js + toast).
+ */
+@layer components {
+  .code-block {
+    margin: 0;
+    background: var(--lui-surface);
+    border: var(--lui-border-width) solid var(--lui-border);
+    border-radius: var(--lui-radius-lg);
+    corner-shape: var(--lui-corner-shape);
+    overflow: hidden;
+  }
+  .code-block > figcaption {
+    display: flex;
+    align-items: center;
+    gap: var(--lui-space-2);
+    padding: var(--lui-space-1) var(--lui-space-2);
+    padding-left: var(--lui-space-3);
+    border-bottom: var(--lui-border-width) solid var(--lui-border);
+    font-size: var(--lui-font-sm);
+    color: var(--lui-muted);
+    font-weight: 600;
+  }
+  .code-block > figcaption > [data-lui-copy] {
+    margin-left: auto;
+  }
+  .code-block > pre {
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    padding: var(--lui-space-3);
+    overflow-x: auto;
+  }
+  /* Block code is plain text: undo the inline-code pill. */
+  .code-block > pre > code {
+    background: none;
+    border: 0;
+    padding: 0;
+    font-size: 1em;
+  }
+}
