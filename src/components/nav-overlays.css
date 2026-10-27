@@ -94,6 +94,53 @@
     display: contents;
   }
 
+  /* ZWEISTUFIGE-SIDEBAR (Ueberkategorie > Unterkategorie > Lektion):
+     .menu-sub-Wrapper loesen sich ebenfalls auf, damit Buttons und
+     Links im .menu-Fluss bleiben; Sichtbarkeit steuert :hidden auf
+     den Elementen selbst. Link-Styling wie Top-Level-Links,
+     zusaetzlich eingerueckt.
+     <nav class="menu"><div class="menu-group"><button>Kat</button>
+       <div class="menu-sub"><button>Sub</button><a href="...">Lektion</a>
+       </div></div></nav> */
+  .menu .menu-sub {
+    display: contents;
+  }
+  .menu .menu-sub > a {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--lui-space-2);
+    min-height: var(--lui-control-h-md);
+    padding: var(--lui-control-py) var(--lui-control-px);
+    padding-left: calc(var(--lui-control-px) + 1rem);
+    border-radius: var(--lui-radius-control);
+    corner-shape: var(--lui-corner-shape);
+    color: var(--lui-text);
+    text-decoration: none;
+    min-width: 0;
+    overflow-wrap: break-word;
+  }
+  .menu .menu-sub > a > span {
+    min-width: 0;
+  }
+  .menu .menu-sub > a:hover {
+    background: rgb(128 128 128 / 0.12);
+    background: color-mix(in oklch, var(--lui-primary) 12%, transparent);
+  }
+  .menu .menu-sub > a[aria-current="page"] {
+    color: var(--lui-primary);
+    font-weight: 600;
+    background: rgb(128 128 128 / 0.12);
+    background: color-mix(in oklch, var(--lui-primary) 12%, transparent);
+  }
+  .menu .menu-sub > a:focus-visible {
+    outline: 2px solid var(--lui-ring);
+    outline-offset: 2px;
+  }
+  .menu .menu-sub > button {
+    padding-left: calc(var(--lui-control-px) + 1rem);
+  }
+
   /* Pure-CSS tooltip */
   [data-tooltip] { position: relative; }
   [data-tooltip]:hover::after, [data-tooltip]:focus-visible::after {

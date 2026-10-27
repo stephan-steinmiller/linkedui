@@ -109,9 +109,39 @@
       overflow-y: auto;
     }
   }
-  /* Sidebar links may wrap (long labels, narrow rail) — the 48px
+
+  /* App shell: volle linke Randleiste statt zentrierter Sidebar.
+     Aside klebt oben (sticky) mit eigenem Scroll, darunter bricht
+     das Layout einspaltig um.
+     <div class="shell"><aside>...</aside><main class="lui-container">...
+     ZWEISTUFIGE-SIDEBAR: passt zu .menu-sub in nav-overlays.css. */
+  .shell {
+    display: grid;
+    grid-template-columns: 19rem minmax(0, 1fr);
+    align-items: start;
+  }
+  .shell > aside {
+    position: sticky;
+    top: 0;
+    max-height: 100dvh;
+    overflow-y: auto;
+    padding: var(--lui-space-3);
+    border-right: var(--lui-border-width) solid var(--lui-border);
+  }
+  @media (max-width: 48rem) {
+    .shell { grid-template-columns: 1fr; }
+    .shell > aside {
+      position: static;
+      max-height: none;
+      overflow: visible;
+      border-right: 0;
+      border-bottom: var(--lui-border-width) solid var(--lui-border);
+    }
+  }
+  /* Sidebar links may wrap (long labels, narrow rail), gilt fuer
+     alle Ebenen (auch verschachtelte .menu-sub-Links); die 48px
      min-height from .menu keeps touch targets intact. */
-  .with-sidebar .menu > a {
+  .with-sidebar .menu a {
     white-space: normal;
   }
 
