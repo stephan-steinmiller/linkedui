@@ -1,20 +1,21 @@
 /**
- * linkedui — enhance.js
+ * linkedui - enhance.js
  * =====================
  * Progressive enhancement for the linkedui CSS library (<3 KB, no build tools,
  * no dependencies). Everything works WITHOUT this script (system theme via CSS,
- * `dialog[open]`, `<details>` dropdowns/accordion, radio tabs) — with it things
+ * `dialog[open]`, `<details>` dropdowns/accordion, radio tabs) - with it things
  * become persistent, convenient, and more accessible.
  *
  * Modules (initialized in order):
- * 1. {@link restoreTheme} — apply the stored theme before first paint
- * 2. {@link bindThemeSwitchers} — `data-lui-theme` / `data-lui-mode` selects
-  * 3. {@link bindDialogs} — `data-lui-open` / `data-lui-close` + backdrop click
-  * 3b. {@link bindPopovers} — `.popover` ESC + outside-click to close
- * 4. {@link enhanceTabs} — `.tabs` as a real `tablist` (roles, roving tabindex)
- * 5. {@link enhanceOtp} — `.otp` boxes (advance, backspace, paste-split)
- * 6. {@link bindToasts} + {@link showToast} — toasts (also as `window.luiToast`)
- * 7. {@link bindCopyButtons} — `[data-lui-copy]` copies target text + toast
+ * 1. {@link restoreTheme} - apply the stored theme before first paint
+ * 2. {@link bindThemeSwitchers} - `data-lui-theme` / `data-lui-mode` selects
+  * 3. {@link bindDialogs} - `data-lui-open` / `data-lui-close` + backdrop click
+  * 3b. {@link bindPopovers} - `.popover` ESC + outside-click to close
+ * 4. {@link enhanceTabs} - `.tabs` as a real `tablist` (roles, roving tabindex)
+ * 5. {@link enhanceOtp} - `.otp` boxes (advance, backspace, paste-split)
+ * 6. {@link bindToasts} + {@link showToast} - toasts (also as `window.luiToast`)
+ * 7. {@link bindCopyButtons} - `[data-lui-copy]` copies target text + toast
+ * 8. {@link highlightCodeBlocks} - VBA highlighting for `.code-block` (line numbers, token colors)
  *
  * @example Include (deferred!) before `</body>`:
  * ```html
@@ -22,7 +23,7 @@
  * <script src="linkedui/src/enhance.js" defer></script>
  * ```
  *
- * @example Avoid FOUC — additionally, early in `<head>` (enhance.js does the same,
+ * @example Avoid FOUC - additionally, early in `<head>` (enhance.js does the same,
  * but only after parsing):
  * ```html
  * <script>
@@ -38,7 +39,7 @@
  */
 
 (() => {
-  /** @type {HTMLElement} Root element — carries `data-theme` + `data-mode`. */
+  /** @type {HTMLElement} Root element - carries `data-theme` + `data-mode`. */
   const root = document.documentElement;
   /** @constant {string} localStorage key for the theme (`default|ocean|squishy|…`). */
   const LS_THEME = "lui-theme";
@@ -47,7 +48,7 @@
 
   /**
    * Apply the stored theme choice early.
-   * Fails silently in private mode — then `data-mode="auto"` (system) applies.
+   * Fails silently in private mode - then `data-mode="auto"` (system) applies.
    * @returns {void}
    */
   function restoreTheme() {
@@ -56,7 +57,7 @@
       const m = localStorage.getItem(LS_MODE);
       if (t) root.dataset.theme = t;
       if (m) root.dataset.mode = m;
-    } catch { /* private mode — doesn't matter, system auto applies */ }
+    } catch { /* private mode - doesn't matter, system auto applies */ }
   }
 
   /**
@@ -235,8 +236,8 @@
    * arrow/Home/End navigation and paste-split across boxes starting
    * at the focused box.
    * Overflow typed/pasted/autofilled into one box (e.g. SMS autofill dumping
-   * the whole code) is distributed forward — pasting never lands on one digit.
-   * Without JS: type one digit per box, Tab advances — fully usable.
+   * the whole code) is distributed forward - pasting never lands on one digit.
+   * Without JS: type one digit per box, Tab advances - fully usable.
    *
    * Expected markup: `.otp` wrapping plain `<input>`s (no maxlength on purpose,
    * see otp.css), optional `<span aria-hidden>` dash between groups.
@@ -422,6 +423,37 @@
     }
   }
 
+  /**
+   * Code highlighting: `.code-block pre > code` gets line spans (.ln)
+   * plus VBA token spans (.tok-kw/.tok-str/.tok-com/.tok-num).
+   * Language via closest [data-lang] (default "vba"). Line numbers are
+   * CSS counters, never part of textContent, so copy stays clean.
+   * No-JS fallback: raw text stays readable.
+   * @returns {void}
+   */
+  const VBA_KEYWORDS = ["attribute", "dim", "as", "redim", "preserve", "const", "public", "private", "friend", "static", "sub", "function", "property", "end", "if", "then", "else", "elseif", "select", "case", "for", "each", "next", "do", "loop", "while", "wend", "with", "on", "error", "goto", "resume", "call", "set", "new", "let", "get", "option", "explicit", "compare", "exit", "stop", "debug", "print", "true", "false", "nothing", "null", "empty", "to", "step", "until", "is", "not", "and", "or", "xor", "eqv", "imp", "mod", "byval", "byref", "optional", "paramarray", "declare", "lib", "alias", "like"];
+  const VBA_TOKEN_RE = new RegExp(
+    '("(?:[^"]|"")*")' + "|('.*$)" + "|(\\b\\d+(?:\\.\\d+)?\\b)" +
+    "|\\b(" + VBA_KEYWORDS.join("|") + ")\\b",
+    "gi"
+  );
+  function highlightVBA(line) {
+    return line.replace(VBA_TOKEN_RE, (m, str, com, num, kw) => {
+      const cls = str ? "tok-str" : com ? "tok-com" : num ? "tok-num" : kw ? "tok-kw" : null;
+      const t = m.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      return cls ? `<span class="${cls}">${t}</span>` : t;
+    });
+  }
+  function highlightCodeBlocks() {
+    document.querySelectorAll(".code-block pre > code:not([data-lui-hl])").forEach((code) => {
+      const lang = (code.closest("[data-lang]")?.dataset.lang || "vba").toLowerCase();
+      if (lang !== "vba" && lang !== "vb") return;
+      const lines = code.textContent.replace(/\n$/, "").split("\n");
+      code.innerHTML = lines.map((l) => `<span class="ln">${l ? highlightVBA(l) : ""}</span>`).join("");
+      code.setAttribute("data-lui-hl", "vba");
+    });
+  }
+
   restoreTheme();
   bindThemeSwitchers();
   bindDialogs();
@@ -430,4 +462,5 @@
   enhanceOtp();
   bindToasts();
   bindCopyButtons();
+  highlightCodeBlocks();
 })();

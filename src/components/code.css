@@ -46,4 +46,44 @@
     padding: 0;
     font-size: 1em;
   }
+
+  /* Highlighting: JS wraps each line in .ln and tokens in .tok-*
+     (enhance.js highlightCodeBlocks). Line numbers are CSS counters,
+     never part of textContent, so copy stays clean. No-JS fallback:
+     raw text stays readable, just without numbers and colors. */
+  .code-block pre {
+    counter-reset: code-line;
+  }
+  .code-block .ln {
+    display: block;
+    counter-increment: code-line;
+    padding-left: 3.25rem;
+  }
+  .code-block .ln::before {
+    content: counter(code-line);
+    display: inline-block;
+    width: 2.25rem;
+    margin-left: -3.25rem;
+    margin-right: 1rem;
+    text-align: right;
+    color: var(--lui-muted);
+    user-select: none;
+  }
+  .code-block .ln:empty::after {
+    content: "\00a0";
+  }
+  .code-block .tok-kw {
+    color: var(--lui-primary);
+    font-weight: 600;
+  }
+  .code-block .tok-str {
+    color: var(--lui-success);
+  }
+  .code-block .tok-com {
+    color: var(--lui-muted);
+    font-style: italic;
+  }
+  .code-block .tok-num {
+    color: var(--lui-warning);
+  }
 }
