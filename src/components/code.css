@@ -109,6 +109,7 @@
   }
   .code-block[data-variant="bare"] > pre {
     padding-top: var(--lui-space-2);
+    padding-bottom: var(--lui-space-2);
     padding-right: calc(var(--lui-space-2) * 2 + var(--lui-control-h-sm));
   }
 }
