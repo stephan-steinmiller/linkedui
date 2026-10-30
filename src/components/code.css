@@ -57,14 +57,14 @@
   .code-block .ln {
     display: block;
     counter-increment: code-line;
-    padding-left: 3.25rem;
+    padding-left: 2.25rem;
   }
   .code-block .ln::before {
     content: counter(code-line);
     display: inline-block;
-    width: 2.25rem;
-    margin-left: -3.25rem;
-    margin-right: 1rem;
+    width: 1.5rem;
+    margin-left: -2.25rem;
+    margin-right: 0.5rem;
     text-align: right;
     color: var(--lui-muted);
     user-select: none;
@@ -87,8 +87,9 @@
     color: var(--lui-warning);
   }
 
-  /* Bare variant without title bar: copy button floats top-right over the
-     code. Extra top padding in <pre> keeps the button off the first line.
+  /* Bare variant without title bar: copy button floats top-right over a
+     reserved strip, so no code ever slides underneath. Tight top padding
+     like plain text; the strip keeps the first line clear.
      <figure class="code-block" data-variant="bare">
        <button class="btn" data-variant="ghost" data-size="sm" type="button" data-lui-copy="snippet-id" aria-label="Kopieren"><i class="hgi-stroke hgi-copy-01" aria-hidden="true"></i></button>
        <pre><code id="snippet-id">...</code></pre>
@@ -100,8 +101,14 @@
     position: absolute;
     top: var(--lui-space-2);
     right: var(--lui-space-2);
+    background: var(--lui-surface);
+  }
+  .code-block[data-variant="bare"] > [data-lui-copy]:hover {
+    background: rgb(128 128 128 / 0.12);
+    background: color-mix(in oklch, var(--lui-primary) 12%, transparent);
   }
   .code-block[data-variant="bare"] > pre {
-    padding-top: calc(var(--lui-space-3) + var(--lui-control-h-sm));
+    padding-top: var(--lui-space-2);
+    padding-right: calc(var(--lui-space-2) * 2 + var(--lui-control-h-sm));
   }
 }
