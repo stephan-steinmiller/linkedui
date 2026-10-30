@@ -86,4 +86,22 @@
   .code-block .tok-num {
     color: var(--lui-warning);
   }
+
+  /* Bare variant without title bar: copy button floats top-right over the
+     code. Extra top padding in <pre> keeps the button off the first line.
+     <figure class="code-block" data-variant="bare">
+       <button class="btn" data-variant="ghost" data-size="sm" type="button" data-lui-copy="snippet-id" aria-label="Kopieren"><i class="hgi-stroke hgi-copy-01" aria-hidden="true"></i></button>
+       <pre><code id="snippet-id">...</code></pre>
+     </figure> */
+  .code-block[data-variant="bare"] {
+    position: relative;
+  }
+  .code-block[data-variant="bare"] > [data-lui-copy] {
+    position: absolute;
+    top: var(--lui-space-2);
+    right: var(--lui-space-2);
+  }
+  .code-block[data-variant="bare"] > pre {
+    padding-top: calc(var(--lui-space-3) + var(--lui-control-h-sm));
+  }
 }
