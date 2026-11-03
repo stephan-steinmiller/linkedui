@@ -278,7 +278,11 @@
   }
   .toast[data-tone="info"]::before { content: "ⓘ"; }
   .toast[data-tone="success"] { --lui-toast-tone: var(--lui-success); }
-  .toast[data-tone="success"]::before { content: "✓"; }
+  .toast[data-tone="success"]::before {
+    content: "\f1971";
+    font-family: "hugeicons-stroke-rounded";
+    font-weight: 400;
+  }
   .toast[data-tone="warning"] { --lui-toast-tone: var(--lui-warning); }
   .toast[data-tone="warning"]::before { content: "⚠"; }
   .toast[data-tone="danger"] { --lui-toast-tone: var(--lui-danger); }
