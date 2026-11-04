@@ -34,7 +34,7 @@
   .timeline > li::before {
     content: "";
     position: absolute;
-    top: 0.25rem;
+    top: var(--lui-space-1);
     left: calc(-1 * var(--lui-space-4) + var(--lui-space-4) / 2 - 0.375rem);
     width: 0.75rem;
     height: 0.75rem;

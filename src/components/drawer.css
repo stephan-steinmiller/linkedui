@@ -32,6 +32,7 @@
     width: min(24rem, calc(100vw - 4rem));
     max-width: none;
     max-height: none;
+    height: 100vh;
     height: 100dvh;
     border-left: var(--lui-border-width) solid var(--lui-border);
   }
@@ -43,6 +44,7 @@
     width: min(24rem, calc(100vw - 4rem));
     max-width: none;
     max-height: none;
+    height: 100vh;
     height: 100dvh;
     border-right: var(--lui-border-width) solid var(--lui-border);
   }
@@ -53,6 +55,7 @@
     left: 0;
     width: 100%;
     max-width: none;
+    max-height: 80vh;
     max-height: 80dvh;
     border-top: var(--lui-border-width) solid var(--lui-border);
     border-top-left-radius: var(--lui-radius-lg);
@@ -89,6 +92,7 @@
     padding: var(--lui-space-4);
     width: 100%;
     max-width: none;
+    max-height: min(92vh, 40rem);
     max-height: min(92dvh, 40rem);
     border: 0;
     border-top: var(--lui-border-width) solid var(--lui-border);
@@ -104,7 +108,7 @@
     content: "";
     display: block;
     width: 2.5rem;
-    height: 0.25rem;
+    height: var(--lui-space-1);
     margin: 0 auto var(--lui-space-3);
     border-radius: var(--lui-radius-full);
     background: var(--lui-border);
@@ -120,6 +124,7 @@
       margin: auto;
       width: auto;
       max-width: min(32rem, calc(100vw - 2rem));
+      max-height: min(40rem, calc(100vh - 2rem));
       max-height: min(40rem, calc(100dvh - 2rem));
       border: var(--lui-border-width) solid var(--lui-border);
       border-radius: var(--lui-radius-lg);

@@ -16,6 +16,11 @@
  * 6. {@link bindToasts} + {@link showToast} - toasts (also as `window.luiToast`)
  * 7. {@link bindCopyButtons} - `[data-lui-copy]` copies target text + toast
  * 8. {@link highlightCodeBlocks} - VBA highlighting for `.code-block` (line numbers, token colors)
+ * 9. {@link bindActivationGuards} - `aria-disabled` widgets never activate
+ * 10. {@link bindChipClose} - `data-lui-chip-close` removes its `.chip`
+ *
+ * Static DOM only (binds once at load): controls injected later are not
+ * enhanced, except toasts/copy/activation-guards which use delegation.
  *
  * @example Include (deferred!) before `</body>`:
  * ```html
@@ -39,6 +44,9 @@
  */
 
 (() => {
+  // Single-init guard: a second <script> include must not double-bind.
+  if (window.__luiEnhanced) return;
+  window.__luiEnhanced = true;
   /** @type {HTMLElement} Root element - carries `data-theme` + `data-mode`. */
   const root = document.documentElement;
   /** @constant {string} localStorage key for the theme (`default|ocean|squishy|…`). */
@@ -46,6 +54,9 @@
   /** @constant {string} localStorage key for the mode (`auto|light|dark`). */
   const LS_MODE = "lui-mode";
 
+  /** Known themes/modes - anything else in storage is ignored. */
+  const KNOWN_THEMES = ["default", "ocean", "squishy"];
+  const KNOWN_MODES = ["auto", "light", "dark"];
   /**
    * Apply the stored theme choice early.
    * Fails silently in private mode - then `data-mode="auto"` (system) applies.
@@ -53,18 +64,20 @@
    */
   function restoreTheme() {
     try {
-      const t = localStorage.getItem(LS_THEME);
-      const m = localStorage.getItem(LS_MODE);
-      if (t) root.dataset.theme = t;
-      if (m) root.dataset.mode = m;
+      const q = new URLSearchParams(location.search);
+      const t = localStorage.getItem(LS_THEME) || q.get("theme");
+      const m = localStorage.getItem(LS_MODE) || q.get("mode");
+      if (t && KNOWN_THEMES.includes(t)) root.dataset.theme = t;
+      if (m && KNOWN_MODES.includes(m)) root.dataset.mode = m;
     } catch { /* private mode - doesn't matter, system auto applies */ }
   }
 
   /**
    * Bind theme/mode switchers.
-   * Without JS these are plain `<select>`s in a form (with reload);
-   * with JS they set `data-*` + localStorage without reload and keep
-   * multiple switchers on the page in sync.
+   * Without JS the selects are decorative (the form submits `theme`/`mode`
+   * params that nothing reads — system `auto` applies); with JS they set
+   * `data-*` + localStorage without reload and keep multiple switchers
+   * on the page in sync.
    *
    * @example
    * ```html
@@ -120,8 +133,12 @@
     document.querySelectorAll("[data-lui-open]").forEach((btn) => {
       btn.addEventListener("click", () => {
         const dlg = document.getElementById(btn.dataset.luiOpen);
-        if (dlg && typeof dlg.showModal === "function") dlg.showModal();
-        else if (dlg) dlg.setAttribute("open", "");
+        if (!dlg) return;
+        if (dlg.hasAttribute("open")) return; // already open - showModal() would throw
+        try {
+          if (typeof dlg.showModal === "function") dlg.showModal();
+          else dlg.setAttribute("open", "");
+        } catch { dlg.setAttribute("open", ""); }
       });
     });
     document.querySelectorAll("dialog [data-lui-close]").forEach((btn) => {
@@ -138,6 +155,7 @@
    * Popover niceties for `details.popover` (the toggle itself is native):
    * - ESC closes the open popover
    * - pointerdown outside closes it (native `<details>` has no light-dismiss)
+   * - ArrowUp/Down/Home/End move focus between `menuitem`s (APG menu pattern)
    *
    * @example
    * ```html
@@ -152,7 +170,21 @@
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
         document.querySelectorAll("details.popover[open]").forEach((d) => d.removeAttribute("open"));
+        return;
       }
+      if (e.key !== "ArrowDown" && e.key !== "ArrowUp" && e.key !== "Home" && e.key !== "End") return;
+      const pop = e.target.closest?.("details.popover[open]");
+      if (!pop) return;
+      const items = [...pop.querySelectorAll('[role="menuitem"]')].filter((el) => !el.disabled);
+      const i = items.indexOf(e.target.closest?.('[role="menuitem"]'));
+      if (i < 0) return;
+      e.preventDefault();
+      let j = i;
+      if (e.key === "ArrowDown") j = (i + 1) % items.length;
+      else if (e.key === "ArrowUp") j = (i - 1 + items.length) % items.length;
+      else if (e.key === "Home") j = 0;
+      else if (e.key === "End") j = items.length - 1;
+      items[j]?.focus();
     });
     document.addEventListener("pointerdown", (e) => {
       document.querySelectorAll("details.popover[open]").forEach((d) => {
@@ -167,7 +199,7 @@
    * panels switch via the CSS `:checked` selector). With JS on top:
    * `tablist`/`tab`/`tabpanel` roles, `aria-selected` sync, roving tabindex
    * (only the active tab is reachable via Tab) plus arrow/Home/End navigation.
-   * Radios are removed from tab order and the accessibility tree.
+   * Radios leave the tab order but stay in the accessibility tree.
    *
    * Expected markup per tab: `input → label → section` as direct children of
    * `.tabs`, label linked via `for`/`id` (`CSS.escape` must exist,
@@ -188,6 +220,10 @@
    */
   function enhanceTabs() {
     if (!window.CSS?.escape) return;
+    /** @returns {void} Sync every enhanced group from radio state. */
+    const syncAll = () => document.querySelectorAll('.tabs[data-lui-tabs]').forEach((group) => {
+      group._luiSync?.();
+    });
     document.querySelectorAll(".tabs").forEach((group) => {
       const items = [...group.querySelectorAll(":scope > input[type='radio']")]
         .map((radio) => ({
@@ -198,20 +234,24 @@
         .filter((x) => x.label && x.panel && x.panel.tagName === "SECTION");
       if (!items.length) return;
       group.setAttribute("role", "tablist");
+      if (group.dataset.orientation === "vertical") group.setAttribute("aria-orientation", "vertical");
+      group.dataset.luiTabs = "";
       /** @returns {void} Sync `aria-selected` + tabindex from radio state. */
-      const sync = () => items.forEach(({ radio, label }) => {
+      const sync = () => items.forEach(({ radio, label, panel }) => {
         const on = radio.checked;
         label.setAttribute("role", "tab");
         label.setAttribute("aria-selected", String(on));
+        label.setAttribute("aria-controls", panel.id);
         label.tabIndex = on ? 0 : -1;
+        panel.tabIndex = on ? 0 : -1;
       });
+      group._luiSync = sync;
       items.forEach(({ radio, label, panel }, i) => {
         if (!label.id) label.id = `${radio.id}-tab`;
+        if (!panel.id) panel.id = `${radio.id}-panel`;
         panel.setAttribute("role", "tabpanel");
         panel.setAttribute("aria-labelledby", label.id);
-        panel.tabIndex = 0;
         radio.tabIndex = -1;
-        radio.setAttribute("aria-hidden", "true");
         label.addEventListener("keydown", (e) => {
           let j = null;
           if (e.key === "ArrowRight" || e.key === "ArrowDown") j = (i + 1) % items.length;
@@ -225,8 +265,11 @@
           items[j].label.focus();
         });
       });
-      group.addEventListener("change", sync);
       sync();
+    });
+    // Document-level: two groups sharing one radio `name` stay in sync.
+    document.addEventListener("change", (e) => {
+      if (e.target?.closest?.(".tabs")) syncAll();
     });
   }
 
@@ -272,6 +315,7 @@
           const j = from + k;
           if (j >= boxes.length) return;
           boxes[j].value = c;
+          boxes[j].dispatchEvent(new Event("input", { bubbles: true }));
           last = j;
         });
         go(Math.min(last + 1, boxes.length - 1));
@@ -295,7 +339,8 @@
         box.addEventListener("keydown", (e) => {
           if (e.key === "Backspace" && box.value === "") {
             e.preventDefault();
-            const prev = Math.max(0, i - 1);
+            if (i === 0) return; // first box, nothing to delete
+            const prev = i - 1;
             boxes[prev].value = ""; // delete previous digit so a new one can be typed right away
             go(prev);
           }
@@ -332,10 +377,12 @@
    * @returns {HTMLElement} the toast element
    */
   function showToast({ tone = "info", title = "", message = "", ms = 5000, placement = "bottom-right" } = {}) {
-    // One tray per spot; a tray without the attribute counts as bottom-right.
+    // One tray per spot; a tray without the attribute counts as bottom-right
+    // and is normalized so later calls find it by attribute.
     let tray = document.querySelector(`.toasts[data-placement="${placement}"]`);
     if (!tray && placement === "bottom-right") {
       tray = document.querySelector(".toasts:not([data-placement])");
+      if (tray) tray.dataset.placement = "bottom-right";
     }
     if (!tray) {
       tray = document.createElement("div");
@@ -400,13 +447,17 @@
    * @returns {void}
    */
   function bindCopyButtons() {
+    const kopiert = root.lang === "de" ? "Kopiert" : "Copied";
+    const markiert = root.lang === "de"
+      ? ["Text markiert", "Mit Strg+C kopieren."]
+      : ["Text selected", "Copy with Ctrl+C."];
     document.addEventListener("click", (e) => {
       const btn = e.target.closest?.("[data-lui-copy]");
       if (!btn) return;
       const target = document.getElementById(btn.dataset.luiCopy);
       if (!target) return;
       const text = target.textContent || "";
-      const done = () => showToast({ tone: "success", title: "Kopiert", ms: 2000 });
+      const done = () => showToast({ tone: "success", title: kopiert, ms: 2000 });
       if (navigator.clipboard?.writeText) {
         navigator.clipboard.writeText(text).then(done, () => fallbackSelect(target));
       } else {
@@ -419,8 +470,43 @@
       const sel = getSelection();
       sel?.removeAllRanges();
       sel?.addRange(range);
-      showToast({ tone: "info", title: "Text markiert", message: "Mit Strg+C kopieren.", ms: 4000 });
+      showToast({ tone: "info", title: markiert[0], message: markiert[1], ms: 4000 });
     }
+  }
+
+  /**
+   * Chip removal: `[data-lui-chip-close]` inside a `.chip` removes the chip.
+   * Delegated (works for dynamically added chips); the button keeps its
+   * accessible name via `aria-label`.
+   * @returns {void}
+   */
+  function bindChipClose() {
+    document.addEventListener("click", (e) => {
+      const btn = e.target.closest?.("[data-lui-chip-close]");
+      if (!btn) return;
+      btn.closest(".chip")?.remove();
+    });
+  }
+
+  /**
+   * Activation guard: widgets marked `aria-disabled="true"` (e.g. loading
+   * buttons, `<a class="btn">` that must not navigate) never activate via
+   * mouse, touch, or keyboard. Native `disabled` needs no guard.
+   * @returns {void}
+   */
+  function bindActivationGuards() {
+    document.addEventListener("click", (e) => {
+      if (e.target.closest?.('[aria-disabled="true"]')) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }, true);
+    document.addEventListener("keydown", (e) => {
+      if ((e.key === "Enter" || e.key === " ") && e.target.closest?.('[aria-disabled="true"]')) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }, true);
   }
 
   /**
@@ -462,5 +548,7 @@
   enhanceOtp();
   bindToasts();
   bindCopyButtons();
+  bindActivationGuards();
+  bindChipClose();
   highlightCodeBlocks();
 })();

@@ -1,9 +1,11 @@
 /* linkedui — components/layout.css — page-structure primitives.
  *
  * Classes: .stack (vertical rhythm via gap, not margins), .cluster
- * (wrapping horizontal row), .split (halves that stack on mobile),
+ * (wrapping horizontal row, data-justify/data-align/data-gap), .split
+ * (halves, or thirds via data-columns="3", that stack on mobile),
  * .with-sidebar (sticky side nav on desktop, stacked on mobile),
- * .stage (framed demo box), .hero (page title + lead).
+ * .shell (full-height app rail), .stage (framed demo box),
+ * .hero (page title + lead), .pad (padded section), .spacer (flex fill).
  *
  * Markup:
  *   <div class="stack"><section>…</section><section>…</section></div>
@@ -21,6 +23,7 @@
  * breakpoint is the lib-wide 48rem, width-only. .stack zeroes child
  * margins (rhythm comes from gap alone); .with-sidebar needs
  * minmax(0, 1fr) so wide <pre> content can't push the sidebar off.
+ * .hero type stays a fluid clamp (deliberate exception to the type scale).
  */
 @layer components {
   /* Vertical rhythm: gap instead of stacked margins (no collapsing,
@@ -95,6 +98,7 @@
   .with-sidebar {
     display: grid;
     gap: var(--lui-space-3);
+    /* Fixed sidebar measure (not a token): layout width, see .shell. */
     grid-template-columns: 15rem minmax(0, 1fr);
     align-items: start;
   }
@@ -105,24 +109,28 @@
     .with-sidebar > aside {
       position: sticky;
       top: var(--lui-space-3);
+      max-height: calc(100vh - var(--lui-space-3) * 2);
       max-height: calc(100dvh - var(--lui-space-3) * 2);
       overflow-y: auto;
     }
   }
 
-  /* App shell: volle linke Randleiste statt zentrierter Sidebar.
-     Aside klebt oben (sticky) mit eigenem Scroll, darunter bricht
-     das Layout einspaltig um.
+  /* App shell: full-height left rail instead of a centered sidebar.
+     Aside sticks to the top with its own scroll; below the breakpoint
+     the layout collapses to one column.
      <div class="shell"><aside>...</aside><main class="lui-container">...
      ZWEISTUFIGE-SIDEBAR: passt zu .menu-sub in nav-overlays.css. */
   .shell {
     display: grid;
+    /* Fixed rail widths (not tokens): layout measures, unlike the tokenized
+       overlay app-nav widths. */
     grid-template-columns: 19rem minmax(0, 1fr);
     align-items: start;
   }
   .shell > aside {
     position: sticky;
     top: 0;
+    max-height: 100vh;
     max-height: 100dvh;
     overflow-y: auto;
     padding: var(--lui-space-3);
@@ -138,9 +146,9 @@
       border-bottom: var(--lui-border-width) solid var(--lui-border);
     }
   }
-  /* Sidebar links may wrap (long labels, narrow rail), gilt fuer
-     alle Ebenen (auch verschachtelte .menu-sub-Links); die 48px
-     min-height from .menu keeps touch targets intact. */
+  /* Sidebar links may wrap (long labels, narrow rail) on every level
+     (including nested .menu-sub links); the 48px min-height from .menu
+     keeps touch targets intact. */
   .with-sidebar .menu a {
     white-space: normal;
   }

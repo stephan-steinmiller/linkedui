@@ -29,7 +29,7 @@
     densY: $("in-density-y"), densYNum: $("in-density-y-num"),
     shape: $("in-shape"), curve: $("in-curve"), curveNum: $("in-curve-num"),
     outR: $("out-radius"), outDX: $("out-density-x"), outDY: $("out-density-y"), outC: $("out-curve"),
-    outCT: $("out-contrast"), livePage: $("in-live-page"),
+    outCT: $("out-contrast"), livePage: $("in-live-page"), warn: $("out-warn"),
   };
 
   /**
@@ -224,30 +224,6 @@
     const to = (n) => clamp(n, 0, 255).toString(16).padStart(2, "0");
     return `#${to(ch(16))}${to(ch(8))}${to(ch(0))}`;
   }
-  /**
-   * Guarantee a color stays visible on a background: if contrast is below
-   * `min`, move brightness away from the background (toward black for light
-   * colors, toward white for dark ones) with the smallest effective shift.
-   * Colors that already pass come back byte-identical — brand colors that
-   * work in both modes are never touched.
-   * @param {string} color picked color as hex
-   * @param {string} bg background color as hex
-   * @param {number} [min=3] minimum WCAG ratio (fills, charts, large text)
-   * @returns {string} original or adjusted color as hex
-   */
-  function ensureVisible(color, bg, min = 3) {
-    if (!/^#[0-9a-f]{6}$/i.test(color || "") || !/^#[0-9a-f]{6}$/i.test(bg || "")) return color;
-    if (contrastRatio(color, bg) >= min) return color.toLowerCase();
-    const toward = luminance(color) > luminance(bg) ? "#000000" : "#ffffff";
-    let lo = 0, hi = 1;
-    for (let i = 0; i < 12; i++) {
-      const mid = (lo + hi) / 2;
-      if (contrastRatio(mixHex(color, toward, mid), bg) >= min) hi = mid;
-      else lo = mid;
-    }
-    return mixHex(color, toward, hi);
-  }
-
   // CSS color (oklch(), …) → #hex via canvas normalization
   /**
    * Convert any CSS color to hex (used when loading a theme into the builder).
@@ -301,16 +277,36 @@
       accent,
       accentHover: mix(accent, "black", 88),
       accentActive: mix(accent, "black", 78),
+      accentHoverHex: mixHex(accent, "#000000", 0.12),
+      accentActiveHex: mixHex(accent, "#000000", 0.22),
+      accentHoverW: mix(accent, "white", 88),
+      accentActiveW: mix(accent, "white", 78),
+      accentHoverWHex: mixHex(accent, "#ffffff", 0.12),
+      accentActiveWHex: mixHex(accent, "#ffffff", 0.22),
       onAccent: luminance(accent) > 0.45 ? "#1c2333" : "#ffffff",
       hover: mix(primary, "black", 88),
       active: mix(primary, "black", 78),
+      hoverHex: mixHex(primary, "#000000", 0.12),
+      activeHex: mixHex(primary, "#000000", 0.22),
+      hoverW: mix(primary, "white", 88),
+      activeW: mix(primary, "white", 78),
+      hoverWHex: mixHex(primary, "#ffffff", 0.12),
+      activeWHex: mixHex(primary, "#ffffff", 0.22),
       onPrimary: luminance(primary) > 0.45 ? "#1c2333" : "#ffffff",
       secondaryHover: mix(secondary, "black", 88),
       secondaryActive: mix(secondary, "black", 78),
+      secondaryHoverHex: mixHex(secondary, "#000000", 0.12),
+      secondaryActiveHex: mixHex(secondary, "#000000", 0.22),
+      secondaryHoverW: mix(secondary, "white", 88),
+      secondaryActiveW: mix(secondary, "white", 78),
+      secondaryHoverWHex: mixHex(secondary, "#ffffff", 0.12),
+      secondaryActiveWHex: mixHex(secondary, "#ffffff", 0.22),
       onSecondary: luminance(secondary) > 0.45 ? "#1c2333" : "#ffffff",
       surface: mix(accent, bg, share),
       surfaceHi: surfaceHi(accent, bg, ct),
+      surfaceHex: mixHex(accent, bg, 1 - share / 100),
       muted: mix(text, bg, 62),
+      mutedHex: mixHex(text, bg, 0.38),
       border: mix(text, bg, borderShare(ct)),
       chevron: chev(text),
     };
@@ -384,6 +380,27 @@
     clearVars(document.documentElement);
   }
   /**
+   * Contrast check for text/fill pairs (AA 4.5 for normal text). Fills in the
+   * luminance dead zone (~0.18–0.38) fail with both black and white text —
+   * only a darker/lighter brand color fixes those, hence a warning, not an
+   * auto-fix. Muted/surface uses sRGB-mix approximations (heuristic).
+   * @param {object} d result of {@link derived}
+   * @returns {string[]} failing pair descriptions with ratios
+   */
+  function contrastWarnings(d) {
+    const bad = [];
+    const check = (label, fg, bgr) => {
+      const r = contrastRatio(fg, bgr);
+      if (r < 4.5) bad.push(`${label} ${r.toFixed(1)}`);
+    };
+    check("primary", d.primary, d.onPrimary);
+    check("secondary", d.secondary, d.onSecondary);
+    check("accent", d.accent, d.onAccent);
+    check("muted/surface", d.mutedHex, d.surfaceHex);
+    return bad;
+  }
+
+  /**
    * Build the export snippet for `themes.css` (`[data-theme="<slug>"]` + optional
    * @supports compensation). Also present without JS as default text in `<pre>`.
    * @returns {string} CSS snippet
@@ -393,10 +410,22 @@
     const d = derived();
     return `[data-theme="${name}"] {\n` +
       `  --lui-primary: ${d.primary};\n` +
+      `  --lui-primary-hover: ${d.hoverHex};\n` +
+      `  --lui-primary-hover: ${d.hover};\n` +
+      `  --lui-primary-active: ${d.activeHex};\n` +
+      `  --lui-primary-active: ${d.active};\n` +
       `  --lui-on-primary: ${d.onPrimary};\n` +
       `  --lui-secondary: ${d.secondary};\n` +
+      `  --lui-secondary-hover: ${d.secondaryHoverHex};\n` +
+      `  --lui-secondary-hover: ${d.secondaryHover};\n` +
+      `  --lui-secondary-active: ${d.secondaryActiveHex};\n` +
+      `  --lui-secondary-active: ${d.secondaryActive};\n` +
       `  --lui-on-secondary: ${d.onSecondary};\n` +
       `  --lui-accent: ${d.accent};\n` +
+      `  --lui-accent-hover: ${d.accentHoverHex};\n` +
+      `  --lui-accent-hover: ${d.accentHover};\n` +
+      `  --lui-accent-active: ${d.accentActiveHex};\n` +
+      `  --lui-accent-active: ${d.accentActive};\n` +
       `  --lui-on-accent: ${d.onAccent};\n` +
       `  --lui-bg: ${d.bg};\n` +
       `  --lui-surface: ${d.surface};\n` +
@@ -432,7 +461,39 @@
     const name = slug(els.name.value);
     const d = derived();
     const light = snippet();
-    const dark = `[data-mode="dark"][data-theme="${name}"] {\n  color-scheme: dark;\n  --lui-primary: ${d.primary};\n  --lui-on-primary: ${d.onPrimary};\n  --lui-secondary: ${d.secondary};\n  --lui-on-secondary: ${d.onSecondary};\n  --lui-accent: ${d.accent};\n  --lui-on-accent: ${d.onAccent};\n  --lui-bg: #161b28;\n  --lui-surface: #252a36;\n  --lui-text: #f2f3f5;\n  --lui-muted: #9aa3b5;\n  --lui-border: color-mix(in oklch, #f2f3f5 22%, #161b28);\n  --lui-chevron: ${chev("#e8eaf0")};\n}\n@media (prefers-color-scheme: dark) {\n  [data-mode="auto"][data-theme="${name}"] {\n    color-scheme: dark;\n    --lui-primary: ${d.primary};\n    --lui-on-primary: ${d.onPrimary};\n    --lui-secondary: ${d.secondary};\n    --lui-on-secondary: ${d.onSecondary};\n    --lui-bg: #161b28;\n    --lui-surface: #252a36;\n    --lui-text: #f2f3f5;\n    --lui-muted: #9aa3b5;\n    --lui-border: color-mix(in oklch, #f2f3f5 22%, #161b28);\n    --lui-chevron: ${chev("#e8eaf0")};\n  }\n}`;
+    // NOTE: status tones, shadows and danger keep the lib :root defaults
+    // (not builder inputs) — override them per theme when they must adapt.
+    const darkBlock = (mode) =>
+      `[data-mode="${mode}"][data-theme="${name}"] {\n` +
+      `  color-scheme: dark;\n` +
+      `  --lui-primary: ${d.primary};\n` +
+      `  --lui-primary-hover: ${d.hoverWHex};\n` +
+      `  --lui-primary-hover: ${d.hoverW};\n` +
+      `  --lui-primary-active: ${d.activeWHex};\n` +
+      `  --lui-primary-active: ${d.activeW};\n` +
+      `  --lui-on-primary: ${d.onPrimary};\n` +
+      `  --lui-secondary: ${d.secondary};\n` +
+      `  --lui-secondary-hover: ${d.secondaryHoverWHex};\n` +
+      `  --lui-secondary-hover: ${d.secondaryHoverW};\n` +
+      `  --lui-secondary-active: ${d.secondaryActiveWHex};\n` +
+      `  --lui-secondary-active: ${d.secondaryActiveW};\n` +
+      `  --lui-on-secondary: ${d.onSecondary};\n` +
+      `  --lui-accent: ${d.accent};\n` +
+      `  --lui-accent-hover: ${d.accentHoverWHex};\n` +
+      `  --lui-accent-hover: ${d.accentHoverW};\n` +
+      `  --lui-accent-active: ${d.accentActiveWHex};\n` +
+      `  --lui-accent-active: ${d.accentActiveW};\n` +
+      `  --lui-on-accent: ${d.onAccent};\n` +
+      `  --lui-bg: #161b28;\n` +
+      `  --lui-surface: #252a36;\n` +
+      `  --lui-surface: ${surfaceHi(d.accent, "#161b28", d.contrastRaw)};\n` +
+      `  --lui-text: #f2f3f5;\n` +
+      `  --lui-muted: #9aa3b5;\n` +
+      `  --lui-border: #3a4152;\n` +
+      `  --lui-border: color-mix(in oklch, #f2f3f5 calc(8% + ${d.contrastRaw.toFixed(2)} * 20%), #161b28);\n` +
+      `  --lui-chevron: ${chev("#e8eaf0")};\n` +
+      `}`;
+    const dark = `${darkBlock("dark")}\n@media (prefers-color-scheme: dark) {\n  ${darkBlock("auto").replace(/\n/g, "\n  ")}\n}`;
     return `/* linkedui theme: ${name} — paste into themes.css */\n${light}\n${dark}\n`;
   }
 
@@ -455,6 +516,18 @@
     if (els.outDY) els.outDY.textContent = d.densityY;
     if (els.outC) els.outC.textContent = els.shape.value === "squircle" ? String(curveVal()) : "—";
     if (els.outCT) els.outCT.textContent = `${d.contrast}%`;
+    if (els.warn) {
+      const bad = contrastWarnings(d);
+      els.warn.hidden = bad.length === 0;
+      if (bad.length) {
+        const de = document.documentElement.lang === "de";
+        els.warn.textContent = de
+          ? `Kontrast unter 4,5: ${bad.join(", ")} — Farbe abdunkeln oder dunkleren Ton wählen.`
+          : `Contrast below 4.5: ${bad.join(", ")} — darken the color or pick a darker shade.`;
+      } else {
+        els.warn.textContent = "";
+      }
+    }
     if (els.curve) els.curve.disabled = els.shape.value !== "squircle";
     if (els.curveNum) els.curveNum.disabled = els.shape.value !== "squircle";
 

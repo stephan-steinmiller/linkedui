@@ -42,9 +42,9 @@
     letter-spacing: -0.01em;
     margin-block: var(--lui-space-3) var(--lui-space-2);
   }
-  :where(h1) { font-size: 2rem; }
-  :where(h2) { font-size: 1.5rem; }
-  :where(h3) { font-size: 1.25rem; }
+  :where(h1) { font-size: var(--lui-font-3xl); }
+  :where(h2) { font-size: var(--lui-font-2xl); }
+  :where(h3) { font-size: var(--lui-font-xl); }
   :where(p) { margin-block: var(--lui-space-2); }
   :where(small) { font-size: var(--lui-font-sm); color: var(--lui-muted); }
 
@@ -97,6 +97,10 @@
   :where(button:hover) { background: var(--lui-primary-hover); }
   :where(button:active) { background: var(--lui-primary-active); transform: translateY(1px); }
   :where(button:disabled) { opacity: 0.5; cursor: not-allowed; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    :where(button:active) { transform: none; }
+    :where(input[type="checkbox"]:not([role="switch"]), input[type="radio"]) { transition: none; }
+  }
 
   :where(input:not([type="checkbox"], [type="radio"], [type="color"], [type="range"]), select) {
     height: var(--lui-control-h-md);
@@ -162,6 +166,10 @@
   }
   :where(input[type="checkbox"]:not([role="switch"]):hover, input[type="radio"]:hover) {
     border-color: var(--lui-primary);
+  }
+  :where(input[type="checkbox"]:not([role="switch"]):focus-visible, input[type="radio"]:focus-visible) {
+    outline: 2px solid var(--lui-ring);
+    outline-offset: 2px;
   }
   /* Checkbox follows the control radius only for small values, then caps:
      damping so the box stays box-like (pill shape would turn it circular). */
@@ -247,7 +255,7 @@
      (The calendar/color popup panels themselves are browser UI and cannot
      be styled — color-scheme keeps them in the right mode.) */
   :where(input[type="date"], input[type="time"], input[type="datetime-local"], input[type="month"], input[type="week"]) {
-    padding-block: 0.25rem;
+    padding-block: var(--lui-space-1);
   }
   :where(input[type="date"], input[type="time"], input[type="datetime-local"], input[type="month"], input[type="week"])::-webkit-calendar-picker-indicator {
     cursor: pointer;
@@ -256,7 +264,7 @@
        screenshot-verified to nearly fill the content height. */
     height: auto;
     min-height: 2.375rem;
-    padding-block: 0.25rem;
+    padding-block: var(--lui-space-1);
     padding-inline: var(--lui-control-px);
     border: var(--lui-border-width) solid var(--lui-border);
     border-radius: var(--lui-radius-control);
@@ -311,6 +319,9 @@
   :where(input[type="range"]:hover)::-webkit-slider-thumb {
     width: calc(var(--lui-thumbw) * 1.25);
   }
+  :where(input[type="range"]:focus-visible)::-webkit-slider-thumb {
+    width: calc(var(--lui-thumbw) * 1.25);
+  }
   :where(input[type="range"]:active)::-webkit-slider-thumb {
     border-width: calc(var(--lui-thumb) / 8);
   }
@@ -330,7 +341,10 @@
     transition: filter 0.1s ease-in-out;
   }
   :where(input[type="range"]:hover)::-moz-range-thumb {
-    filter: brightness(1.12);
+    width: calc(var(--lui-thumbw) * 1.25);
+  }
+  :where(input[type="range"]:focus-visible)::-moz-range-thumb {
+    width: calc(var(--lui-thumbw) * 1.25);
   }
   :where(input[type="range"]:active)::-moz-range-thumb {
     border-width: calc(var(--lui-thumb) / 8);
@@ -338,6 +352,10 @@
   :where(input[type="range"]:disabled) {
     opacity: 0.5;
     cursor: not-allowed;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :where(input[type="range"])::-webkit-slider-thumb,
+    :where(input[type="range"])::-moz-range-thumb { transition: none; }
   }
   /* Secondary variant: thumb ring + fill follow --lui-secondary.
      <input type="range" data-variant="secondary" … /> */
@@ -469,7 +487,7 @@
      font metrics keep it immune to surrounding font size; the padding
      formula stays exact under density scaling and zoom. */
   :where(input[type="file"]) {
-    padding: 0 var(--lui-control-px) 0 0.25rem;
+    padding: 0 var(--lui-control-px) 0 var(--lui-space-1);
     line-height: calc(var(--lui-control-h-md) - (2 * var(--lui-border-width)));
   }
   :where(input[type="file"])::file-selector-button,
@@ -477,7 +495,6 @@
     height: auto;
     margin: 0;
     padding: calc((var(--lui-control-h-md) - (2 * var(--lui-border-width)) - 1.2rem - (2 * var(--lui-border-width))) / 2) var(--lui-control-px);
-    vertical-align: middle;
     vertical-align: middle;
     border: var(--lui-border-width) solid var(--lui-border);
     border-radius: var(--lui-radius-control);
@@ -563,7 +580,8 @@
     border-radius: var(--lui-radius-full);
     corner-shape: var(--lui-corner-shape);
     box-sizing: border-box;
-    /* Text-colored knob, ring in track color as joint */
+    /* Text-colored knob, ring in track color as joint (assumes the field
+       track — on tinted surfaces the seam shows the field hue). */
     background-color: var(--lui-text);
     border: 3px solid var(--lui-field);
     box-shadow: var(--lui-shadow-sm);
@@ -705,6 +723,7 @@
     color: var(--lui-text);
     padding: var(--lui-space-4);
     max-width: min(32rem, calc(100vw - 2rem));
+    max-height: min(40rem, calc(100vh - 2rem));
     max-height: min(40rem, calc(100dvh - 2rem));
     box-shadow: var(--lui-shadow-md);
   }
@@ -718,7 +737,7 @@
   /* NOTE: :where() wraps only `dialog` — ::backdrop itself must stay
      outside (:where(dialog::backdrop) never matches in Chrome). */
   :where(dialog)::backdrop {
-    background: rgb(0 0 0 / 0.6);
+    background: rgb(0 0 0 / 0.6); /* --lui-scrim deliberately not tokenized: single use, intentionally constant in both modes */
     -webkit-backdrop-filter: blur(4px);
     backdrop-filter: blur(4px);
   }
@@ -728,6 +747,7 @@
      ::backdrop. Values mirror the backdrop (60% black ≈ brightness(.4)). */
   body:has(dialog[open]:not(:modal)) > :not(dialog):not(script) {
     filter: blur(4px) brightness(0.4);
+    filter: blur(4px) brightness(light-dark(0.4, 0.7));
   }
 
   :where(code, kbd) {

@@ -70,7 +70,10 @@ TOKEN_RE = re.compile(
 
 
 def minify_css(text):
-    """Strip comments, collapse whitespace. Strings/urls pass through untouched."""
+    """Strip comments, collapse whitespace. Strings/urls pass through untouched.
+
+    Constraint: safe for calc()/min()/clamp() only because bare + and -
+    (spaced operators) are never in the strip class - do not add them."""
     out = []
     pos = 0
     for m in TOKEN_RE.finditer(text):
@@ -96,9 +99,13 @@ def minify_css(text):
 
 
 def count_rules(text):
-    """Rough rule count = number of non-empty '{...}' blocks (for drift checks)."""
-    check(text.count("{") == text.count("}"), "Klammern unbalanciert")
-    return text.count("{")
+    """Rough rule count = number of non-empty '{...}' blocks (for drift checks).
+
+    Strings/urls are blanked first so braces inside content (e.g.
+    content:"{") can't skew the balance check."""
+    probe = TOKEN_RE.sub(lambda m: "" if m.lastgroup == "comment" else '""', text)
+    check(probe.count("{") == probe.count("}"), "Klammern unbalanciert")
+    return probe.count("{")
 
 
 # --------------------------------------------------------------------------
@@ -106,7 +113,11 @@ def count_rules(text):
 # --------------------------------------------------------------------------
 
 def minify_js(text):
-    """Strip // and /* */ comments with string awareness; collapse blank lines."""
+    """Strip // and /* */ comments with string awareness; collapse blank lines.
+
+    Constraint: no regex literals containing // or /* (e.g. /a\\/b/ is fine,
+    /\\/\\// is not) - the scanner cannot tell them from comments.
+    Blank lines inside multiline template literals are preserved."""
     out_lines = []
     i, n = 0, len(text)
     in_str = None  # None | quote char
@@ -153,10 +164,20 @@ def minify_js(text):
             buf.append(c)
             i += 1
     text = "".join(buf)
-    # drop empty lines + trailing whitespace per line (never join lines: ASI)
+    # drop empty lines + trailing whitespace per line (never join lines: ASI),
+    # but keep blank lines that sit inside a multiline template literal.
     lines = [ln.rstrip() for ln in text.split("\n")]
-    lines = [ln for ln in lines if ln.strip() != ""]
-    return "\n".join(lines) + "\n"
+    kept = []
+    in_tpl = False
+    for ln in lines:
+        if ln.strip() == "" and not in_tpl:
+            continue
+        kept.append(ln)
+        # toggle on unescaped backticks (naive ${} nesting accepted, see constraint)
+        unescaped = re.sub(r"\\.", "", ln).count("`")
+        if unescaped % 2 == 1:
+            in_tpl = not in_tpl
+    return "\n".join(kept) + "\n"
 
 
 # --------------------------------------------------------------------------
@@ -275,8 +296,10 @@ def _split_selectors(prelude):
 
 
 def _theme_mentions(selector):
-    """All data-theme="X" values mentioned in a selector string."""
-    return set(re.findall(r'\[data-theme="([^"]+)"', selector))
+    """All data-theme="X" (or 'X') values mentioned in a selector string."""
+    return set(re.findall(r'\[data-theme="([^"]+)"', selector)) | set(
+        re.findall(r"\[data-theme='([^']+)'", selector)
+    )
 
 
 def _filter_rules(text, theme, dropped):

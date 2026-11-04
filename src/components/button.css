@@ -65,13 +65,13 @@
   }
   .btn[data-variant="danger"], .btn[data-variant="destructive"] {
     background: var(--lui-danger);
-    color: oklch(0.99 0 0);
+    color: var(--lui-on-danger);
   }
   .btn[data-variant="danger"]:hover, .btn[data-variant="destructive"]:hover {
-    background: color-mix(in oklch, var(--lui-danger) 88%, black);
+    background: var(--lui-danger-hover);
   }
   .btn[data-variant="danger"]:active, .btn[data-variant="destructive"]:active {
-    background: color-mix(in oklch, var(--lui-danger) 78%, black);
+    background: var(--lui-danger-active);
     transform: translateY(1px);
   }
 
@@ -92,14 +92,19 @@
   }
 
   /* Size variants scale height + type only — horizontal padding stays on
-     the base token so all sizes align in a row. Ladder 44 / 48 / 56. */
+     the base token so all sizes align in a row. Ladder 44 / 48 / 56
+     (density-scaled; coarse pointers keep the 44px touch floor). */
   .btn[data-size="sm"] {
-    height: 2.75rem;
+    height: var(--lui-control-h-sm);
     font-size: var(--lui-font-sm);
   }
   .btn[data-size="lg"] {
-    height: 3.5rem;
+    height: var(--lui-control-h-lg);
     font-size: var(--lui-font-lg);
+  }
+  @media (pointer: coarse) {
+    .btn[data-size="sm"] { min-height: 2.75rem; }
+    .btn[data-size="lg"] { min-height: 3.5rem; }
   }
 
   /* Full width */
@@ -115,14 +120,15 @@
     width: var(--lui-control-h-md);
     padding: 0;
     flex: none;
-    font-size: 1.8rem;
     line-height: 1;
   }
   .btn[data-icon="true"][data-size="sm"] { width: 2.75rem; font-size: 2rem; }
   .btn[data-icon="true"]:not([data-size]) { font-size: 2.2rem; }
   .btn[data-icon="true"][data-size="lg"] { width: 3.5rem; font-size: 2.5rem; }
 
-  /* Loading: spinner via ::before (currentColor), clicks blocked — pure CSS */
+  /* Loading: spinner via ::before (currentColor). A loading button must
+     also carry disabled/aria-disabled (JS guard blocks activation):
+     pointer-events alone never stops keyboard activation. */
   .btn[data-loading="true"] {
     pointer-events: none;
   }
@@ -139,16 +145,25 @@
   @keyframes lui-spin {
     to { transform: rotate(360deg); }
   }
+  /* NOTE: feedback.css defines an identical lui-spin (later import wins).
+     Kept in both on purpose: custom pruning entries may import only one. */
   @media (prefers-reduced-motion: reduce) {
     .btn[data-loading="true"]::before { animation: none; }
     .btn:active { transform: none; }
   }
 
-  /* Disabled: applies to all variants (late in the cascade → beats hover/active) */
+  /* Disabled: applies to all variants (late in the cascade → beats hover/active).
+     Covers native disabled and aria-disabled (for loading/non-button widgets);
+     enhance.js blocks activation on aria-disabled buttons. */
   .btn:disabled, .btn[aria-disabled="true"] {
     opacity: 0.5;
     cursor: not-allowed;
     transform: none;
+  }
+  /* aria-disabled widgets (e.g. <a class="btn">) stay focusable for AT but
+     must not activate: mouse is blocked here, keyboard via enhance.js. */
+  .btn[aria-disabled="true"] {
+    pointer-events: none;
   }
   .btn:disabled:active, .btn[aria-disabled="true"]:active {
     transform: none;

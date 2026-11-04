@@ -20,6 +20,9 @@
     --lui-font-sm: 0.8125rem;
     --lui-font-md: 1rem;
     --lui-font-lg: 1.125rem;
+    --lui-font-xl: 1.25rem;
+    --lui-font-2xl: 1.5rem;
+    --lui-font-3xl: 2rem;
 
     /* Base colors (light) */
     --lui-bg: oklch(0.99 0.005 95);
@@ -71,7 +74,12 @@
     /* Status */
     --lui-success: oklch(0.65 0.15 150);
     --lui-warning: oklch(0.75 0.15 80);
-    --lui-danger: oklch(0.62 0.2 25);
+    --lui-danger: oklch(0.58 0.2 25);
+    --lui-danger-hover: #b52a2d;
+    --lui-danger-hover: color-mix(in oklch, var(--lui-danger) 88%, black);
+    --lui-danger-active: #9a2225;
+    --lui-danger-active: color-mix(in oklch, var(--lui-danger) 78%, black);
+    --lui-on-danger: oklch(0.99 0 0);
     /* Info is always blue — never primary, so it reads as info in any theme */
     --lui-info: oklch(0.65 0.16 250);
     --lui-ring: #9db8f0;
@@ -106,11 +114,13 @@
        inputs, selects and every control-height component follow together,
        so text controls and buttons always align. */
     --lui-control-h-md: calc(3rem * var(--lui-density-y));
-    --lui-control-h-lg: calc(3rem * var(--lui-density-y));
+    --lui-control-h-lg: calc(3.5rem * var(--lui-density-y));
 
     /* Compact form controls (checkbox, radio, switch track, slider):
        text-sized (1.5rem, like running text) and deliberately NOT
-       density-scaled — vertical padding must never stretch them. */
+       density-scaled — vertical padding must never stretch them.
+       Coarse pointers get a larger --lui-check so touch targets grow
+       everywhere it is used. */
     --lui-check: 1.5rem;
 
     /* App nav (sidebar ↔ bottom bar): expanded sidebar width vs. collapsed
@@ -135,12 +145,20 @@
     --lui-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.06);
     --lui-shadow-md: 0 4px 16px rgb(0 0 0 / 0.08);
     --lui-maxw: 72rem;
-    /* Layout-Rhythmus (stack/cluster/grid/card/field-Gaps): bewusst NICHT
-       density-skaliert. Dichte macht Controls kompakt, das Layout bleibt
-       luftig — sonst klebt bei niedriger Density alles aneinander. */
+    /* Layout rhythm (stack/cluster/grid/card/field gaps): deliberately NOT
+       density-scaled. Density compacts controls, layout stays airy —
+       otherwise everything sticks together at low density. */
     --lui-space-1: 0.25rem;
     --lui-space-2: 0.5rem;
     --lui-space-3: 1rem;
     --lui-space-4: 1.5rem;
+  }
+
+  /* Coarse pointers: every --lui-check consumer (checkbox, radio, switch
+     track, slider, spinner, chip close) grows its touch target. */
+  @media (pointer: coarse) {
+    :root {
+      --lui-check: 2rem;
+    }
   }
 }

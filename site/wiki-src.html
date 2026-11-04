@@ -5,12 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>linkedui Wiki — using the library</title>
   <meta name="description" content="Using linkedui: quick start, components, theming, JS API, no-JS matrix." />
-  <link rel="stylesheet" href="../src/linkedui.css?v=77" />
+  <link rel="stylesheet" href="../src/linkedui.css?v=80" />
   <script>
     try {
-      const t = localStorage.getItem("lui-theme"), m = localStorage.getItem("lui-mode");
-      if (t) document.documentElement.dataset.theme = t;
-      if (m) document.documentElement.dataset.mode = m;
+      const q = new URLSearchParams(location.search);
+      const t = localStorage.getItem("lui-theme") || q.get("theme"), m = localStorage.getItem("lui-mode") || q.get("mode");
+      if (t && ["default", "ocean", "squishy"].includes(t)) document.documentElement.dataset.theme = t;
+      if (m && ["auto", "light", "dark"].includes(m)) document.documentElement.dataset.mode = m;
     } catch (e) {}
   </script>
 </head>
@@ -132,14 +133,14 @@
 &lt;/div&gt;</code></pre>
     <h3 id="rating">Star rating <small>radio-based, no JS — stars 5→1 in the DOM</small></h3>
     <div class="rating" role="radiogroup" aria-label="Rate this demo">
-      <input type="radio" name="wiki-rate" id="wiki-rate-5" value="5" /><label for="wiki-rate-5" aria-label="5 stars">★</label>
-      <input type="radio" name="wiki-rate" id="wiki-rate-4" value="4" /><label for="wiki-rate-4" aria-label="4 stars">★</label>
-      <input type="radio" name="wiki-rate" id="wiki-rate-3" value="3" checked /><label for="wiki-rate-3" aria-label="3 stars">★</label>
-      <input type="radio" name="wiki-rate" id="wiki-rate-2" value="2" /><label for="wiki-rate-2" aria-label="2 stars">★</label>
-      <input type="radio" name="wiki-rate" id="wiki-rate-1" value="1" /><label for="wiki-rate-1" aria-label="1 star">★</label>
+      <input type="radio" name="wiki-rate" id="wiki-rate-5" value="5" aria-label="5 stars" /><label for="wiki-rate-5">★</label>
+      <input type="radio" name="wiki-rate" id="wiki-rate-4" value="4" aria-label="4 stars" /><label for="wiki-rate-4">★</label>
+      <input type="radio" name="wiki-rate" id="wiki-rate-3" value="3" checked aria-label="3 stars" /><label for="wiki-rate-3">★</label>
+      <input type="radio" name="wiki-rate" id="wiki-rate-2" value="2" aria-label="2 stars" /><label for="wiki-rate-2">★</label>
+      <input type="radio" name="wiki-rate" id="wiki-rate-1" value="1" aria-label="1 star" /><label for="wiki-rate-1">★</label>
     </div>
     <pre><code>&lt;div class="rating" role="radiogroup" aria-label="Rate this"&gt;
-  &lt;input type="radio" name="rate" id="r5" value="5" /&gt;&lt;label for="r5" aria-label="5 stars"&gt;★&lt;/label&gt;
+  &lt;input type="radio" name="rate" id="r5" value="5" aria-label="5 stars" /&gt;&lt;label for="r5"&gt;★&lt;/label&gt;
   &lt;!-- … down to 1 … --&gt;
 &lt;/div&gt;</code></pre>
     <h3 id="range">Range</h3>
@@ -328,7 +329,7 @@
 
     <h2 id="overlays">6. Overlays &amp; disclosure</h2>
     <h3 id="tooltip">Tooltip <small>pure CSS, :hover/:focus</small></h3>
-    <p><span data-tooltip="Pure CSS">Hover me for tooltip</span></p>
+    <p><span data-tooltip="Pure CSS" tabindex="0">Hover or focus me for tooltip</span></p>
     <h3 id="dropdown">Dropdown <small>details-first, no JS</small></h3>
     <p><details class="dropdown" style="display:inline-block"><summary>Dropdown</summary><div><a href="#dropdown">Entry</a></div></details></p>
     <h3 id="popover">Popover <small>details-first; ESC + outside-click via enhance.js</small></h3>
@@ -457,7 +458,7 @@
     <p><span class="badge">New</span></p>
     <pre><code>&lt;span class="badge"&gt;New&lt;/span&gt;</code></pre>
     <h3 id="chip">Chips <small>removal is app JS</small></h3>
-    <p><span class="chip">Photo<button type="button" data-lui-chip-close aria-label="Remove photo filter" onclick="this.closest('.chip').remove()">×</button></span></p>
+    <p><span class="chip">Photo<button type="button" data-lui-chip-close aria-label="Remove photo filter">×</button></span></p>
     <pre><code>&lt;span class="chip"&gt;Photo&lt;button data-lui-chip-close aria-label="Remove …"&gt;×&lt;/button&gt;&lt;/span&gt;
 &lt;!-- chip removal is app JS (el.remove()); the × above works --&gt;</code></pre>
     <h3 id="skeleton">Skeleton</h3>
@@ -474,13 +475,13 @@
     <h3 id="quiz">Quiz <small>src/components/quiz.css, radio-based, no JS needed to choose</small></h3>
     <fieldset class="quiz">
       <legend>Which statement reads a field value?</legend>
-      <label class="quiz-option" data-state="ok"><input type="radio" name="demo-q" disabled /><span><code>Me!Field</code></span></label>
-      <label class="quiz-option" data-state="falsch"><input type="radio" name="demo-q" checked disabled /><span><code>Me(Field)</code></span></label>
+      <label class="quiz-option" data-state="success"><input type="radio" name="demo-q" disabled /><span><code>Me!Field</code></span></label>
+      <label class="quiz-option" data-state="error"><input type="radio" name="demo-q" checked disabled /><span><code>Me(Field)</code></span></label>
       <div class="quiz-feedback">Correct: <code>Me!</code> addresses controls/fields.</div>
     </fieldset>
     <p class="quiz-stand"><progress value="1" max="2">1/2</progress> 1 / 2 correct</p>
     <pre><code>&lt;fieldset class="quiz"&gt;&lt;legend&gt;…&lt;/legend&gt;
-  &lt;label class="quiz-option" data-state="ok|falsch"&gt;&lt;input type="radio" name="q1" /&gt;&lt;span&gt;…&lt;/span&gt;&lt;/label&gt;
+  &lt;label class="quiz-option" data-state="success|error"&gt;&lt;input type="radio" name="q1" /&gt;&lt;span&gt;…&lt;/span&gt;&lt;/label&gt;
   &lt;div class="quiz-feedback"&gt;…&lt;/div&gt;
 &lt;/fieldset&gt;</code></pre>
 

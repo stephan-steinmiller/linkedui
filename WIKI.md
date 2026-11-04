@@ -95,7 +95,7 @@ ok/wrong states + feedback).
   <input type="checkbox" id="f-video" /><label for="f-video">Video</label>
 </div>
 <div class="rating" role="radiogroup" aria-label="Rate this"><!-- stars, 5→1 in DOM -->
-  <input type="radio" name="rate" id="rate-5" value="5" /><label for="rate-5" aria-label="5 stars">★</label>
+  <input type="radio" name="rate" id="rate-5" value="5" aria-label="5 stars" /><label for="rate-5">★</label>
   <!-- … down to 1 … -->
 </div>
 <label class="dropzone"><input type="file" /><!-- click-to-browse card -->
@@ -120,9 +120,11 @@ ok/wrong states + feedback).
 ```
 
 Single-line controls (button, input, select) share exactly one height
-(`--lui-control-h-md`, 48px — every control clears the 44pt touch
-guideline for real). Sizes scale both axes: `sm` 44px, `md` 48px,
-`lg` 56px. Checkbox/radio are control-S sized.
+(`--lui-control-h-md`, density-scaled — 36px in the default theme at
+`--lui-density-y: 0.75`). Size ladder: `sm` (`--lui-control-h-sm`),
+`md`, `lg` (`--lui-control-h-lg`); coarse pointers keep a 44px touch
+floor on buttons. Checkbox/radio/switch/slider stay text-sized
+(`--lui-check`, 24px) by design.
 
 ### Field hints — `src/components/card.css` (`.field`)
 
@@ -313,7 +315,8 @@ it only selects a value.
 ### Popover menu — `src/components/popover.css` + `enhance.js`
 
 Trigger + floating panel, `details`-first (click/Enter/Space/Tab work
-without JS). With JS: ESC + outside-click close. Placements: top |
+without JS). With JS: ESC + outside-click close, ArrowUp/Down/Home/End
+move between `menuitem`s. Placements: top |
 bottom (default) | left | right — same vocabulary as toasts.
 
 ```html
@@ -331,12 +334,15 @@ bottom (default) | left | right — same vocabulary as toasts.
 ### Tooltip, dropdown — classless
 
 ```html
-<span data-tooltip="Pure CSS">Hover me</span>
+<span data-tooltip="Pure CSS" tabindex="0">Hover or focus me</span>
 <details class="dropdown">
   <summary>Menu</summary>
   <div><a href="…">Entry</a></div>
 </details>
 ```
+
+Tooltip triggers must be keyboard-focusable (`tabindex="0"` or a natively
+focusable element) or the `:focus-visible` tooltip never shows.
 
 ### Toasts — `src/components/nav-overlays.css` + `enhance.js`
 
@@ -364,7 +370,8 @@ button) or declarative triggers — also exposed as `window.luiToast`.
 </dialog>
 ```
 
-ESC + backdrop click included. Without JS: set the `open` attribute.
+ESC + backdrop click included for modal (`showModal()`) dialogs. Without
+JS: set the `open` attribute (no native ESC there — add your own handler).
 
 ### Drawer — `src/components/drawer.css` (no extra JS)
 
@@ -426,29 +433,30 @@ unhides `.quiz-feedback`. Score line via `.quiz-stand`.
 
 ```html
 <fieldset class="quiz">
-  <legend>Welche Anweisung liest ein Feld?</legend>
-  <label class="quiz-option" data-state="ok">
+  <legend>Which statement reads a field?</legend>
+  <label class="quiz-option" data-state="success">
     <input type="radio" name="q1" disabled />
-    <span>Me!Feld</span>
+    <span>Me!Field</span>
   </label>
-  <label class="quiz-option" data-state="falsch">
+  <label class="quiz-option" data-state="error">
     <input type="radio" name="q1" checked disabled />
-    <span>Me(Feld)</span>
+    <span>Me(Field)</span>
   </label>
-  <div class="quiz-feedback">Richtig: Me! greift auf Steuerelement/Feld zu.</div>
+  <div class="quiz-feedback">Correct: Me! accesses a control/field.</div>
 </fieldset>
-<p class="quiz-stand"><progress value="3" max="5"></progress> 3 / 5 richtig</p>
+<p class="quiz-stand"><progress value="3" max="5"></progress> 3 / 5 correct</p>
 ```
 
-`data-state` on `.quiz-option`: `ok` (success tint) | `falsch` (danger
-tint). Without it the option is neutral; `:checked` shows the primary ring.
+`data-state` on `.quiz-option`: `success` (success tint) | `error` (danger
+tint) — `ok`/`falsch` still work as deprecated aliases. Without it the
+option is neutral; `:checked` shows the primary ring.
 Disable the radios once answered.
 
 ### Code copy button — `src/enhance.js` (`bindCopyButtons`)
 
 ```html
-<pre><code id="snippet">Me!KundenNr</code></pre>
-<button class="btn" data-variant="secondary" data-size="sm" data-lui-copy="snippet">Kopieren</button>
+<pre><code id="snippet">Me!CustomerNo</code></pre>
+<button class="btn" data-variant="secondary" data-size="sm" data-lui-copy="snippet">Copy</button>
 ```
 
 `data-lui-copy="<target-id>"` copies the target's text to the clipboard and
@@ -458,7 +466,7 @@ instead (toast explains Ctrl+C).
 ### No-wrap utility — `src/base.css`
 
 ```html
-<code class="nowrap">Me!Feld</code>
+<code class="nowrap">Me!Field</code>
 ```
 
 Keeps short code/identifiers on one line instead of breaking mid-token.
@@ -492,7 +500,8 @@ same-side messages group tighter automatically (`:has()`).
 <!-- data-tone: success | warning | danger (none: neutral) -->
 <span class="badge">New</span>
 <span class="chip">Photo<button type="button" data-lui-chip-close aria-label="Remove photo filter">×</button></span>
-<!-- chip removal is app JS (el.remove()); everything else here is CSS-only -->
+<!-- data-lui-chip-close is a docs naming convention (no lib handler);
+     chip removal is app JS (el.remove()); everything else here is CSS-only -->
 <!-- skeleton: shimmer placeholder, pair with screen-reader text -->
 <span class="skeleton" style="width:12rem" aria-hidden="true"></span>
 <span class="visually-hidden">Loading…</span>
@@ -520,7 +529,10 @@ same-side messages group tighter automatically (`:has()`).
 |---|---|
 | `default` · `ocean` · `squishy` · custom | `auto` (system, default) · `light` · `dark` (override) |
 
-Theme switcher (persistent + reload-free with JS, plain form without JS):
+Theme switcher (persistent + reload-free with JS; decorative without JS —
+the form submits `theme`/`mode` params that nothing reads, system `auto`
+applies). With JS, `?theme=ocean&mode=dark` links also work (validated,
+stored choice wins) — handy for sharing a theme view.
 
 ```html
 <select data-lui-theme>
@@ -559,7 +571,8 @@ Colors (all OKLCH): `--lui-bg`, `--lui-surface` (accent-tinted, never
 colorless), `--lui-field` (controls, contrast-driven), `--lui-text`, `--lui-muted`,
 `--lui-border` (contrast-driven), `--lui-primary` (+ `-hover`, `-active`, `--lui-on-primary`),
 `--lui-secondary` (+ …), `--lui-accent` (+ `-hover`, `-active`, `--lui-on-accent`,
-feeds surfaces + `data-variant="accent"`), `--lui-success`, `--lui-warning`, `--lui-danger`,
+feeds surfaces + `data-variant="accent"`), `--lui-success`, `--lui-warning`, `--lui-danger`
+(+ `-hover`, `-active`, `--lui-on-danger`),
 `--lui-info` (toast info, always blue), `--lui-ring`, `--lui-chevron` (select arrow as SVG data URI).
 
 Shape/size: `--lui-radius` (+ `-sm`, `-md`, `-lg`, `-full`), `--lui-radius-control`,
@@ -567,7 +580,7 @@ Shape/size: `--lui-radius` (+ `-sm`, `-md`, `-lg`, `-full`), `--lui-radius-contr
 segmented and toasts), `--lui-density` (master) or `--lui-density-x`/`-y`,
 `--lui-control-h-sm/-md/-lg`, `--lui-check` (checkbox/radio/switch/slider),
 `--lui-control-py/-px`, `--lui-space-1..4`,
-`--lui-font-sans/-mono/-sm/-md/-lg`, `--lui-border-width`, `--lui-shadow-sm/-md`,
+`--lui-font-sans/-mono/-sm/-md/-lg/-xl/-2xl/-3xl`, `--lui-border-width`, `--lui-shadow-sm/-md`,
 `--lui-maxw`. Complete list: `src/tokens.css`.
 
 ## 6. JS API (`src/enhance.js`, JSDoc in code)
@@ -576,12 +589,15 @@ segmented and toasts), `--lui-density` (master) or `--lui-density-x`/`-y`,
 |---|---|
 | `restoreTheme()` | localStorage → `data-*` before paint |
 | `bindThemeSwitchers()` | `data-lui-theme`/`data-lui-mode` selects (persistent, synced) |
-| `bindDialogs()` | `data-lui-open`/`data-lui-close` + backdrop click |
-| `bindPopovers()` | `.popover` ESC + outside-click close |
+| `bindDialogs()` | `data-lui-open`/`data-lui-close` + backdrop click (modal-safe) |
+| `bindPopovers()` | `.popover` ESC + outside-click close + arrow-key item nav |
 | `enhanceTabs()` | `.tabs` → tablist (ARIA, roving tabindex, keys) |
 | `enhanceOtp()` | `.otp` → advance, backspace, paste-split |
-| `bindToasts()` / `showToast()` | toasts via `data-lui-toast` or `luiToast({tone,title,message,ms})` |
+| `bindToasts()` / `showToast()` | toasts via `data-lui-toast` or `luiToast({tone,title,message,ms,placement})` |
 | `bindCopyButtons()` | `data-lui-copy="<id>"` copies target text + toast |
+| `highlightCodeBlocks()` / `highlightVBA()` | VBA highlighting for `.code-block` |
+| `bindChipClose()` | `data-lui-chip-close` removes its `.chip` |
+| `bindActivationGuards()` | `aria-disabled` widgets never activate |
 
 Builder (`site/app.js`, JSDoc everywhere): `derived()` (derive theme),
 `snippet()` / `fullFile()` (export), `render()` (live; density applies on release),
@@ -595,30 +611,30 @@ generated and checked in so `<link>`/CDN users get minified files:
 
 ```sh
 python3 tools/minify.py                    # full build -> dist/
-python3 tools/minify.py --check            # CI/manual check: dist aktuell?
-python3 tools/minify.py --entry slim.css   # nur gelistete @imports (Pruning)
-python3 tools/minify.py --theme default    # nur dieses Theme (+ generics)
+python3 tools/minify.py --check            # CI/manual check: is dist current?
+python3 tools/minify.py --entry slim.css   # only the listed @imports (pruning)
+python3 tools/minify.py --theme default    # only this theme (+ generics)
 ```
 
-- Full minified: CSS ~11 KB gzip, JS ~2.4 KB gzip (Stand: gemessen am Repo).
-- Custom-Entry: eigene `@import`-Liste (vgl. `src/linkedui.css`), z. B. nur
-  genutzte Komponenten — Beispiel: tokens+reset+base+button+card, default-Theme
+- Full minified: CSS ~11 KB gzip, JS ~2.4 KB gzip (measured at the repo).
+- Custom entry: your own `@import` list (see `src/linkedui.css`), e.g. only
+  the components you use — example: tokens+reset+base+button+card, default theme
   ≈ 6 KB CSS gzip + 2.4 KB JS.
-- `--theme` filtert `[data-theme="…"]`-Blöcke; theme-lose Regeln (Fallbacks,
-  dark-generics, `@supports`) bleiben immer drin — lieber korrekt als maximal klein.
-- Nach `src/`-Änderungen: Skript laufen lassen, `git diff --stat dist/` prüfen
-  (unerwartete Sprünge = Hinweis auf versehentlichen Ballast), committen.
-- Kein Mangling, kein Bundler: absichtlich konservativ (Kommentare raus,
-  Whitespace kollabiert, Strings/`url()`/`calc()` unangetastet). Wer echtes
-  Tree-Shaking braucht, nimmt lightningcss & Co. — bewusst *nicht* Teil der Lib.
+- `--theme` filters `[data-theme="…"]` blocks; theme-free rules (fallbacks,
+  dark generics, `@supports`) always survive — correctness over max size.
+- After `src/` changes: run the script, check `git diff --stat dist/`
+  (unexpected jumps hint at accidental bloat), commit.
+- No mangling, no bundler: deliberately conservative (comments out,
+  whitespace collapsed, strings/`url()`/`calc()` untouched). For real
+  tree-shaking use lightningcss & co. — deliberately *not* part of the lib.
 
 ## 8. No-JS matrix
 
 Works without JS: system theme, all content, accordion/dropdown (`details`),
 popover toggle (`details`), dialog via `open`, drawer via `open`, tabs
-(radio keys), OTP (type + paste), forms, pagination (links).
+(radio keys), OTP (type one digit per box + Tab), forms, pagination (links).
 Needs JS: persistent theme choice, `showModal()`, tablist ARIA,
-copy/download/share buttons (manual copy from `<pre>` works).
+OTP paste-split, copy/download/share buttons (manual copy from `<pre>` works).
 
 ## 9. Browser support
 

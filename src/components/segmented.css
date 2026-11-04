@@ -3,7 +3,8 @@
    Unlike .tabs there are no panels — it only selects a value.
    Sizing rule: container is exactly control height (density-driven via
    --lui-control-h-md) like inputs/buttons/selects; segments fill it.
-   Uniform 0.25rem inset on both axes. No px anywhere — rem only.
+   Uniform 0.25rem inset on both axes. No px for layout — rem only
+   (2px focus outlines and 1px screen-reader boxes are intentional).
    Roundness follows --lui-radius-control, so the builder's radius/shape
    slider drives it (pill shape keeps the classic pill look).
    Active segment: a sliding pill (::before) anchored to the checked label
@@ -21,25 +22,27 @@
 @layer components {
   .segmented {
     /* Single source for all pill paint (fallback label, slider, hover).
-       Deliberately primary-free: neutral text-ink mixes read as selected
-       in every theme, where primary tints wash out. */
+       Track is the field tint (like inputs/check-chips) so the control
+       carries the theme hue; the active pill is the primary-tinted
+       surface (like the file button / date picker indicator). */
+    position: relative;
     --seg-track: var(--lui-field);
-    --seg-track: color-mix(in oklch, var(--lui-text) 12%, var(--lui-bg));
     --seg-pill: var(--lui-surface);
-    --seg-pill: var(--lui-bg);
+    --seg-pill: color-mix(in oklch, var(--lui-primary) 12%, var(--lui-surface));
     --seg-edge: var(--lui-border);
-    --seg-hover: color-mix(in oklch, var(--lui-text) 6%, var(--lui-bg));
+    --seg-hover: var(--lui-surface);
+    --seg-hover: color-mix(in oklch, var(--lui-primary) 12%, var(--lui-field));
     display: inline-flex;
     align-items: stretch;
-    gap: 0.25rem;
+    gap: var(--lui-space-1);
     /* Uniform inset on both axes. 0.25rem is the max that still fits control
        height with a tall pill (0.5rem uniform would leave only ~22px for
        the pill at density 1). */
-    padding: 0.25rem;
+    padding: var(--lui-space-1);
     /* Exactly control height like inputs/buttons/selects (density-driven).
        Border is inside (border-box) like inputs, pill fills the rest. */
     height: var(--lui-control-h-md);
-    /* Neutral track + input-like edge (see --seg-* above) */
+    /* Field-tinted track + input-like edge (see --seg-* above) */
     background: var(--seg-track);
     border: var(--lui-border-width) solid var(--lui-border);
     border-radius: var(--lui-radius-control);
@@ -89,7 +92,7 @@
        transparent (see @supports block below). */
     background: var(--seg-pill);
     border-color: var(--seg-edge);
-    color: var(--lui-text);
+    color: var(--lui-primary);
     box-shadow: var(--lui-shadow-sm);
   }
   .segmented > input:focus-visible + label {

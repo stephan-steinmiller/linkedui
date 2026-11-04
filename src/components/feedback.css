@@ -1,9 +1,11 @@
-/* linkedui — components/feedback.css — alert + badge + chip.
+/* linkedui — components/feedback.css — alert + badge + chip + skeleton + spinner.
  *
  * Markup:
  *   <div class="alert" data-tone="success|warning|danger"><span>Text</span></div>
  *   <span class="badge">New</span>
  *   <span class="chip">Filter<button type="button" data-lui-chip-close aria-label="Remove filter">×</button></span>
+ *   <span class="skeleton" aria-hidden="true"></span>
+ *   <span class="spinner" role="status" aria-label="Loading"></span>
  * Tones come from --lui-success/--lui-warning/--lui-danger.
  * Chip removal is app JS (one .remove() on click) — no library JS needed.
  */
@@ -81,9 +83,11 @@
     align-items: center;
     justify-content: center;
     flex: none;
-    width: 1.5rem;
-    height: 1.5rem;
-    margin-left: auto;
+    /* Glyph stays 1.5rem but the hit area reaches 44px via padding. */
+    width: var(--lui-check);
+    height: var(--lui-check);
+    padding: 0.625rem;
+    margin: -0.625rem 0 -0.625rem auto;
     padding: 0;
     background: none;
     border: 0;
@@ -116,6 +120,7 @@
     border-radius: var(--lui-radius-sm);
     corner-shape: var(--lui-corner-shape);
     background: var(--lui-surface);
+    /* Neutral shimmer band (intentionally unthemed gray: visible on every tint). */
     background-image: linear-gradient(100deg, transparent 20%, rgb(128 128 128 / 0.18) 50%, transparent 80%);
     background-size: 200% 100%;
     animation: lui-shimmer 1.4s linear infinite;
@@ -141,6 +146,7 @@
     width: var(--lui-check);
     height: var(--lui-check);
     border-radius: 50%;
+    /* 3px ring (button spinner uses 2px): scaled to the larger standalone size. */
     border: 3px solid var(--lui-border);
     border-top-color: var(--lui-primary);
     animation: lui-spin 0.8s linear infinite;
@@ -149,6 +155,8 @@
   @keyframes lui-spin {
     to { transform: rotate(360deg); }
   }
+  /* NOTE: button.css defines an identical lui-spin (this later import wins).
+     Kept in both on purpose: custom pruning entries may import only one. */
   @media (prefers-reduced-motion: reduce) {
     .spinner { animation: none; }
   }

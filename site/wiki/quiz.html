@@ -5,12 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Quiz — linkedui Wiki</title>
   <meta name="description" content="linkedui docs: every component on its own page, with live demos." />
-  <link rel="stylesheet" href="../../src/linkedui.css?v=79" />
+  <link rel="stylesheet" href="../../src/linkedui.css?v=80" />
   <script>
     try {
-      const t = localStorage.getItem("lui-theme"), m = localStorage.getItem("lui-mode");
-      if (t) document.documentElement.dataset.theme = t;
-      if (m) document.documentElement.dataset.mode = m;
+      const q = new URLSearchParams(location.search);
+      const t = localStorage.getItem("lui-theme") || q.get("theme"), m = localStorage.getItem("lui-mode") || q.get("mode");
+      if (t && ["default", "ocean", "squishy"].includes(t)) document.documentElement.dataset.theme = t;
+      if (m && ["auto", "light", "dark"].includes(m)) document.documentElement.dataset.mode = m;
     } catch (e) {}
   </script>
 </head>
@@ -119,13 +120,13 @@
           </div>
     <fieldset class="quiz">
       <legend>Which statement reads a field value?</legend>
-      <label class="quiz-option" data-state="ok"><input type="radio" name="demo-q" disabled /><span><code>Me!Field</code></span></label>
-      <label class="quiz-option" data-state="falsch"><input type="radio" name="demo-q" checked disabled /><span><code>Me(Field)</code></span></label>
+      <label class="quiz-option" data-state="success"><input type="radio" name="demo-q" disabled /><span><code>Me!Field</code></span></label>
+      <label class="quiz-option" data-state="error"><input type="radio" name="demo-q" checked disabled /><span><code>Me(Field)</code></span></label>
       <div class="quiz-feedback">Correct: <code>Me!</code> addresses controls/fields.</div>
     </fieldset>
     <p class="quiz-stand"><progress value="1" max="2">1/2</progress> 1 / 2 correct</p>
     <pre><code>&lt;fieldset class="quiz"&gt;&lt;legend&gt;…&lt;/legend&gt;
-  &lt;label class="quiz-option" data-state="ok|falsch"&gt;&lt;input type="radio" name="q1" /&gt;&lt;span&gt;…&lt;/span&gt;&lt;/label&gt;
+  &lt;label class="quiz-option" data-state="success|error"&gt;&lt;input type="radio" name="q1" /&gt;&lt;span&gt;…&lt;/span&gt;&lt;/label&gt;
   &lt;div class="quiz-feedback"&gt;…&lt;/div&gt;
 &lt;/fieldset&gt;</code></pre>
           <hr />

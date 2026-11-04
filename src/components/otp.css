@@ -20,7 +20,7 @@
   }
   .otp > span[aria-hidden="true"] {
     color: var(--lui-muted);
-    font: 1.25rem var(--lui-font-mono);
+    font: var(--lui-font-xl) var(--lui-font-mono);
     user-select: none;
   }
   .otp > input {
@@ -29,10 +29,11 @@
     flex: none;
     padding: 0;
     text-align: center;
-    font: 1.25rem/1 var(--lui-font-mono);
+    font: var(--lui-font-xl)/1 var(--lui-font-mono);
     color: var(--lui-text);
     background: var(--lui-field);
     border: var(--lui-border-width) solid var(--lui-border);
+    /* Chunky-box radius (not --lui-radius-control): reads as digit tiles. */
     border-radius: var(--lui-radius-lg);
     caret-color: var(--lui-primary);
   }
@@ -43,6 +44,7 @@
   .otp > input:focus-visible {
     outline: none;
     border-color: var(--lui-primary);
+    box-shadow: 0 0 0 3px var(--lui-ring);
     box-shadow: 0 0 0 3px color-mix(in oklch, var(--lui-primary) 40%, transparent);
   }
 }

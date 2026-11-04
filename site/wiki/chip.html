@@ -5,12 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Chips — linkedui Wiki</title>
   <meta name="description" content="linkedui docs: every component on its own page, with live demos." />
-  <link rel="stylesheet" href="../../src/linkedui.css?v=79" />
+  <link rel="stylesheet" href="../../src/linkedui.css?v=80" />
   <script>
     try {
-      const t = localStorage.getItem("lui-theme"), m = localStorage.getItem("lui-mode");
-      if (t) document.documentElement.dataset.theme = t;
-      if (m) document.documentElement.dataset.mode = m;
+      const q = new URLSearchParams(location.search);
+      const t = localStorage.getItem("lui-theme") || q.get("theme"), m = localStorage.getItem("lui-mode") || q.get("mode");
+      if (t && ["default", "ocean", "squishy"].includes(t)) document.documentElement.dataset.theme = t;
+      if (m && ["auto", "light", "dark"].includes(m)) document.documentElement.dataset.mode = m;
     } catch (e) {}
   </script>
 </head>
@@ -117,7 +118,7 @@
             <h1>Chips</h1>
           <p><small>removal is app JS</small></p>
           </div>
-    <p><span class="chip">Photo<button type="button" data-lui-chip-close aria-label="Remove photo filter" onclick="this.closest('.chip').remove()">×</button></span></p>
+    <p><span class="chip">Photo<button type="button" data-lui-chip-close aria-label="Remove photo filter">×</button></span></p>
     <pre><code>&lt;span class="chip"&gt;Photo&lt;button data-lui-chip-close aria-label="Remove …"&gt;×&lt;/button&gt;&lt;/span&gt;
 &lt;!-- chip removal is app JS (el.remove()); the × above works --&gt;</code></pre>          <hr />
           <div class="cluster">

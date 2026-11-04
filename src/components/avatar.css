@@ -60,8 +60,8 @@
   .avatar[data-status="busy"]::after { background: var(--lui-danger); }
   .avatar[data-status="off"]::after { background: var(--lui-muted); }
 
-  /* Overlap stack: later avatars sit on top; page-colored ring separates.
-     A headless avatar with data-more shows the overflow count instead. */
+  /* Overlap stack: later avatars sit on top; page-colored ring separates
+     (assumes page background — on cards the seam shows the page hue). */
   .avatar-stack {
     display: inline-flex;
     align-items: center;

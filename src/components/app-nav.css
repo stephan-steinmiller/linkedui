@@ -18,7 +18,8 @@
    could). Ship `open` on the details to default to the wide sidebar.
    First width breakpoint in the lib: 48rem (= 768px at default root, rem
    so it follows user zoom). Width alone switches layout — (pointer:
-   coarse) only sizes targets, never layout. No px anywhere. */
+   coarse) only sizes targets, never layout. No px for layout — rem only
+   (2px focus outlines and 1px screen-reader boxes are intentional). */
 @layer components {
   .app-nav {
     position: fixed;
@@ -126,6 +127,8 @@
       position: absolute;
       width: 1px;
       height: 1px;
+      clip: rect(0 0 0 0);
+      -webkit-clip-path: inset(50%);
       clip-path: inset(50%);
       overflow: hidden;
       white-space: nowrap;
@@ -167,7 +170,7 @@
       flex-direction: column;
       justify-content: center;
       gap: 0.125rem;
-      padding: var(--lui-space-1) 0.25rem;
+      padding: var(--lui-space-1) var(--lui-space-1);
       font-size: var(--lui-font-sm);
     }
     .app-nav > a > span:not([aria-hidden="true"]) {

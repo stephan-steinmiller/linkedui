@@ -1,7 +1,8 @@
 /* linkedui — components/popover.css — popover menu (details-first).
    Trigger + floating panel. Without JS: native <details> toggle (click,
    Enter/Space, Tab reach the items). With JS (enhance.js bindPopovers):
-   ESC closes, outside pointer closes.
+   ESC closes, outside pointer closes, ArrowUp/Down/Home/End move between
+   items (roving focus, APG menu pattern).
    <details class="popover" data-placement="bottom">
      <summary>Trigger</summary>
      <div role="menu">
@@ -12,7 +13,8 @@
      </div>
    </details>
    Placements: top | bottom (default) | left | right — same vocabulary as
-   toasts (corners don't apply to anchored panels). No px anywhere. */
+   toasts (corners don't apply to anchored panels). No px for layout
+   (2px focus outlines and 1px boxes are intentional). */
 @layer components {
   .popover {
     position: relative;
@@ -54,20 +56,20 @@
   /* Placement (bottom default — only the set axis overrides) */
   .popover[data-placement="bottom"] > div,
   .popover:not([data-placement]) > div {
-    top: calc(100% + 6px);
+    top: calc(100% + 0.375rem);
     left: 0;
   }
   .popover[data-placement="top"] > div {
-    bottom: calc(100% + 6px);
+    bottom: calc(100% + 0.375rem);
     left: 0;
   }
   .popover[data-placement="left"] > div {
     top: 0;
-    right: calc(100% + 6px);
+    right: calc(100% + 0.375rem);
   }
   .popover[data-placement="right"] > div {
     top: 0;
-    left: calc(100% + 6px);
+    left: calc(100% + 0.375rem);
   }
   /* Items: links + buttons share one look, control height for targets */
   .popover [role="menuitem"] {
@@ -78,9 +80,10 @@
     gap: var(--lui-space-2);
     width: 100%;
     /* Override the fixed base-button height — links and buttons share
-       min-height so every row measures the same. */
+       min-height so every row measures the same. 44px floor holds the
+       touch target even at compact densities. */
     height: auto;
-    min-height: var(--lui-control-h-sm);
+    min-height: max(2.75rem, var(--lui-control-h-md));
     padding: var(--lui-space-1) var(--lui-space-2);
     border: 0;
     border-radius: var(--lui-radius-sm);

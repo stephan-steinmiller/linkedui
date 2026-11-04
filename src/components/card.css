@@ -1,11 +1,13 @@
 /* linkedui — components/card.css — layout + container.
  *
  * Classes: .lui-container (centered, max --lui-maxw), .lui-grid
- * (responsive auto-fit grid), .card (box), .field (label + control,
- * full width — ideal for forms and range demos), .form-grid (multi-column
- * fields), .input-group (joined control + addons/button), .table-wrap
- * (scrolling table frame + table modifiers), .toolbar (title + actions
- * row), .footer (bottom bar).
+ * (responsive auto-fit grid), .card (box), .empty (placeholder),
+ * .field (label + control, full width — ideal for forms and range demos),
+ * .form-grid (multi-column fields), .input-group (joined control +
+ * addons/button), .check-chips (multi-select pills), .ticks (range stops),
+ * .table-wrap (scrolling table frame + table modifiers), .toolbar
+ * (title + actions row), .stat (metric block), .dropzone (file drop),
+ * .footer (bottom bar).
  *
  * Markup:
  *   <main class="lui-container">
@@ -56,7 +58,7 @@
     padding: var(--lui-space-4) var(--lui-space-3);
   }
   .empty > [aria-hidden="true"] {
-    font-size: 2rem;
+    font-size: var(--lui-font-3xl);
     line-height: 1;
     color: var(--lui-muted);
   }
@@ -152,7 +154,7 @@
     height: auto;
     /* Floating action: rounded + a hair of margin so it reads as a button
        docked in the field, not an extension of its edge. */
-    margin: 0.25rem;
+    margin: var(--lui-space-1);
     border: 0;
     border-radius: var(--lui-radius-control);
     corner-shape: var(--lui-corner-shape);
@@ -184,6 +186,7 @@
        <input type="checkbox" id="f-video" /><label for="f-video">Video</label>
      </div> */
   .check-chips {
+    position: relative;
     display: inline-flex;
     flex-wrap: wrap;
     gap: var(--lui-space-2);
@@ -213,11 +216,14 @@
   }
   .check-chips > label:hover {
     color: var(--lui-text);
+    background: rgb(128 128 128 / 0.12);
+    background: color-mix(in oklch, var(--lui-primary) 12%, var(--lui-field));
   }
   .check-chips > input:checked + label {
     background: var(--lui-primary);
     border-color: transparent;
     color: var(--lui-on-primary);
+    box-shadow: var(--lui-shadow-sm);
   }
   .check-chips > input:focus-visible + label {
     outline: 2px solid var(--lui-ring);
@@ -273,6 +279,8 @@
     background: rgb(128 128 128 / 0.06);
     background: color-mix(in oklch, var(--lui-accent) 6%, transparent);
   }
+  /* Hover intentionally uses the primary family while stripes use accent:
+     the two never fully merge, so a hovered striped row stays visible. */
   table[data-hover="true"] > tbody > tr:hover {
     background: rgb(128 128 128 / 0.12);
     background: color-mix(in oklch, var(--lui-primary) 12%, transparent);
@@ -357,7 +365,7 @@
     color: var(--lui-muted);
   }
   .stat > strong {
-    font-size: 2rem;
+    font-size: var(--lui-font-3xl);
     line-height: 1;
     letter-spacing: -0.01em;
   }
@@ -410,7 +418,7 @@
     outline-offset: 2px;
   }
   .dropzone > [aria-hidden="true"] {
-    font-size: 2rem;
+    font-size: var(--lui-font-3xl);
     line-height: 1;
     color: var(--lui-muted);
   }

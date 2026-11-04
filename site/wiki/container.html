@@ -5,12 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Container, grid, card — linkedui Wiki</title>
   <meta name="description" content="linkedui docs: every component on its own page, with live demos." />
-  <link rel="stylesheet" href="../../src/linkedui.css?v=79" />
+  <link rel="stylesheet" href="../../src/linkedui.css?v=80" />
   <script>
     try {
-      const t = localStorage.getItem("lui-theme"), m = localStorage.getItem("lui-mode");
-      if (t) document.documentElement.dataset.theme = t;
-      if (m) document.documentElement.dataset.mode = m;
+      const q = new URLSearchParams(location.search);
+      const t = localStorage.getItem("lui-theme") || q.get("theme"), m = localStorage.getItem("lui-mode") || q.get("mode");
+      if (t && ["default", "ocean", "squishy"].includes(t)) document.documentElement.dataset.theme = t;
+      if (m && ["auto", "light", "dark"].includes(m)) document.documentElement.dataset.mode = m;
     } catch (e) {}
   </script>
 </head>

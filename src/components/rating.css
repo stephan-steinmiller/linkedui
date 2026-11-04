@@ -1,17 +1,19 @@
 /* linkedui — components/rating.css — star rating, CSS-only.
    Radio-based like tabs/segmented (Tab + arrows work natively, no JS).
    DOM order 5→1 with row-reverse: :checked and :hover fill the hovered
-   star and everything below it. Full stars only.
+   star and everything below it. Full stars only. The accessible name
+   goes on the input (labels take no name from aria-label).
    <div class="rating" role="radiogroup" aria-label="Rate this">
-     <input type="radio" name="rate" id="rate-5" value="5" /><label for="rate-5" aria-label="5 stars">★</label>
-     <input type="radio" name="rate" id="rate-4" value="4" /><label for="rate-4" aria-label="4 stars">★</label>
+     <input type="radio" name="rate" id="rate-5" value="5" aria-label="5 stars" /><label for="rate-5">★</label>
+     <input type="radio" name="rate" id="rate-4" value="4" aria-label="4 stars" /><label for="rate-4">★</label>
      <!-- … down to 1 … -->
    </div> */
 @layer components {
   .rating {
+    position: relative;
     display: inline-flex;
     flex-direction: row-reverse;
-    gap: 0.25rem;
+    gap: var(--lui-space-1);
   }
   /* Radios participate but stay invisible (no display:none → keyboard works) */
   .rating > input[type="radio"] {
@@ -22,16 +24,24 @@
     margin: 0;
   }
   .rating > label {
-    font-size: 1.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    margin: 0;
+    font-size: var(--lui-font-2xl);
     line-height: 1;
     color: var(--lui-muted);
     opacity: 0.45;
     cursor: pointer;
   }
-  /* Filled: the checked star + all below it; hover previews the same */
+  /* Filled: the checked star + all below it; hover previews the same.
+     Keyboard focus previews the focused value too (not just a ring). */
   .rating > input:checked ~ label,
   .rating > label:hover,
-  .rating > label:hover ~ label {
+  .rating > label:hover ~ label,
+  .rating > input:focus-visible ~ label {
     color: var(--lui-warning);
     opacity: 1;
   }

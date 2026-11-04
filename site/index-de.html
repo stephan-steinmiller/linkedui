@@ -6,13 +6,15 @@
   <title>linkedui — CSS-first UI + Theme Builder</title>
   <meta name="description" content="Classless Basis, Varianten via Klassen, Theming via CSS-Variablen. Ohne JS nutzbar, mit JS besser." />
   <!-- ?v= bei Asset-Änderungen hochzählen → umgeht stale Cache -->
-  <link rel="stylesheet" href="../src/linkedui.css?v=78" />
+  <link rel="stylesheet" href="../src/linkedui.css?v=80" />
   <script>
     // Vor Paint: gespeicherte Wahl anwenden (FOUC vermeiden). Ohne JS greift data-mode="auto" → System.
+    // ?theme=/ ?mode=-Links funktionieren ebenfalls (validiert, Storage gewinnt).
     try {
-      const t = localStorage.getItem("lui-theme"), m = localStorage.getItem("lui-mode");
-      if (t) document.documentElement.dataset.theme = t;
-      if (m) document.documentElement.dataset.mode = m;
+      const q = new URLSearchParams(location.search);
+      const t = localStorage.getItem("lui-theme") || q.get("theme"), m = localStorage.getItem("lui-mode") || q.get("mode");
+      if (t && ["default", "ocean", "squishy"].includes(t)) document.documentElement.dataset.theme = t;
+      if (m && ["auto", "light", "dark"].includes(m)) document.documentElement.dataset.mode = m;
     } catch (e) {}
   </script>
   <link rel="stylesheet" href="./site.css?v=2" />
@@ -66,10 +68,11 @@
       <div class="builder">
         <form class="panel controls" id="controls" method="get" action="#export">
           <label>Name <input name="name" id="in-name" value="mein-theme" maxlength="40" /></label>
-          <label>Primary <input type="color" id="in-primary" value="#4f7dd9" /></label>
-          <label>Secondary <input type="color" id="in-secondary" value="#58678d" /></label>
-          <label>Akzent <input type="color" id="in-accent" value="#4f7dd9" /></label>
+          <label>Primary <input type="color" id="in-primary" value="#2272ce" /></label>
+          <label>Secondary <input type="color" id="in-secondary" value="#5d7295" /></label>
+          <label>Akzent <input type="color" id="in-accent" value="#2272ce" /></label>
           <label>Hintergrund <input type="color" id="in-bg" value="#161b28" /></label>
+          <p class="hint" id="out-warn" role="status" hidden></p>
           <label>Kontrast (Abhebung): <output id="out-contrast" for="in-contrast">50%</output>
             <span class="pair">
               <input type="range" id="in-contrast" min="0" max="100" step="1" value="50" />
@@ -131,7 +134,7 @@
             <button class="btn" type="button" data-size="lg">Large</button>
             <button class="btn" type="button" data-icon="true" aria-label="Suchen">⌕</button>
             <span class="badge">Badge</span>
-            <span data-tooltip="Rein CSS">Tooltip-Hover mich</span>
+            <span data-tooltip="Rein CSS" tabindex="0">Tooltip per Hover oder Fokus</span>
           </div>
           <div class="lui-grid">
             <article class="card"><h3>Card</h3><p>Konsistente Höhen, Radius + Density kommen aus dem Theme.</p></article>
@@ -161,8 +164,8 @@
             <div class="field"><span>Einladen</span><div class="input-group"><input aria-label="E-Mail-Adresse" placeholder="du@beispiel.de" /><button class="btn" type="button">Join</button></div></div>
           </div>
           <div class="cluster">
-            <span class="chip">Filter<button type="button" data-lui-chip-close aria-label="Filter entfernen" onclick="this.closest('.chip').remove()">×</button></span>
-            <span class="chip">Pro<button type="button" data-lui-chip-close aria-label="Pro entfernen" onclick="this.closest('.chip').remove()">×</button></span>
+            <span class="chip">Filter<button type="button" data-lui-chip-close aria-label="Filter entfernen">×</button></span>
+            <span class="chip">Pro<button type="button" data-lui-chip-close aria-label="Pro entfernen">×</button></span>
           </div>
           <div class="table-wrap">
             <table data-stripes="true" data-hover="true">

@@ -84,6 +84,7 @@
     font-style: italic;
   }
   .code-block .tok-num {
+    /* Amber numbers follow editor convention (not a warning state). */
     color: var(--lui-warning);
   }
 
@@ -91,7 +92,7 @@
      reserved strip, so no code ever slides underneath. Tight top padding
      like plain text; the strip keeps the first line clear.
      <figure class="code-block" data-variant="bare">
-       <button class="btn" data-variant="ghost" data-size="sm" type="button" data-lui-copy="snippet-id" aria-label="Kopieren"><i class="hgi-stroke hgi-copy-01" aria-hidden="true"></i></button>
+       <button class="btn" data-variant="ghost" data-size="sm" type="button" data-lui-copy="snippet-id" aria-label="Copy"><i class="hgi-stroke hgi-copy-01" aria-hidden="true"></i></button>
        <pre><code id="snippet-id">...</code></pre>
      </figure> */
   .code-block[data-variant="bare"] {

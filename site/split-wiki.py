@@ -28,7 +28,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SITE = ROOT / "site"
 WIKI = SITE / "wiki"
-CSS_V = "79"  # bump when src/* changes
+CSS_V = "80"  # bump when src/* changes
 SITE_CSS_V = "2"  # bump when site/site.css changes
 ENHANCE_V = "12"
 DIR_START = "<!--WIKI-DIR-START-->"
@@ -42,15 +42,16 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SITE = ROOT / "site"
 WIKI = SITE / "wiki"
-CSS_V = "79"  # bump when src/* changes
+CSS_V = "80"  # bump when src/* changes
 SITE_CSS_V = "2"  # bump when site/site.css changes
 ENHANCE_V = "12"
 
 FOUC = """  <script>
     try {
-      const t = localStorage.getItem("lui-theme"), m = localStorage.getItem("lui-mode");
-      if (t) document.documentElement.dataset.theme = t;
-      if (m) document.documentElement.dataset.mode = m;
+      const q = new URLSearchParams(location.search);
+      const t = localStorage.getItem("lui-theme") || q.get("theme"), m = localStorage.getItem("lui-mode") || q.get("mode");
+      if (t && ["default", "ocean", "squishy"].includes(t)) document.documentElement.dataset.theme = t;
+      if (m && ["auto", "light", "dark"].includes(m)) document.documentElement.dataset.mode = m;
     } catch (e) {}
   </script>"""
 

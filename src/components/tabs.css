@@ -8,20 +8,21 @@
 
 @layer components {
   .tabs {
-    /* Single source for pill paint. Same neutral family as .segmented:
-       pill and hover carry no primary — visibility comes from neutral
-       depth steps, consistent in every theme. */
+    /* Single source for pill paint. Same primary-tinted family as
+       .segmented: pill is the primary-tinted surface, hover the standard
+       12% primary step (opaque rgb fallback first, like .menu). */
     --tab-pill: var(--lui-surface);
-    --tab-pill: color-mix(in oklch, var(--lui-text) 12%, var(--lui-bg));
+    --tab-pill: color-mix(in oklch, var(--lui-primary) 12%, var(--lui-surface));
     --tab-edge: var(--lui-border);
-    --tab-hover: color-mix(in oklch, var(--lui-text) 6%, var(--lui-bg));
+    --tab-hover: rgb(128 128 128 / 0.12);
+    --tab-hover: color-mix(in oklch, var(--lui-primary) 12%, transparent);
     position: relative;
     display: flex;
     flex-wrap: wrap;
     gap: 0 var(--lui-space-1);
     border-bottom: var(--lui-border-width) solid var(--lui-border);
   }
-  /* Radios teilnehmend aber unsichtbar (kein display:none → Tastatur bleibt) */
+  /* Radios stay in the flow but invisible (no display:none → keyboard works) */
   .tabs > input[type="radio"] {
     position: absolute;
     opacity: 0;
@@ -37,7 +38,9 @@
     align-items: center;
     min-height: var(--lui-control-h-md);
     padding: var(--lui-control-py) var(--lui-control-px);
+    margin: 0;
     margin-bottom: calc(-1 * var(--lui-border-width));
+    font-size: var(--lui-font-md);
     /* Permanent transparent border (see segmented): only its color toggles,
        so selecting a tab never resizes the content box. */
     border: var(--lui-border-width) solid transparent;
