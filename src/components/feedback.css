@@ -3,6 +3,7 @@
  * Markup:
  *   <div class="alert" data-tone="success|warning|danger"><span>Text</span></div>
  *   <span class="badge">New</span>
+ *   <span class="badge" data-tone="success|warning|danger|accent">7d: 85%</span>
  *   <span class="chip">Filter<button type="button" data-lui-chip-close aria-label="Remove filter">×</button></span>
  *   <span class="skeleton" aria-hidden="true"></span>
  *   <span class="spinner" role="status" aria-label="Loading"></span>
@@ -60,6 +61,25 @@
     border: var(--lui-border-width) solid var(--lui-border);
     font-size: var(--lui-font-sm);
     font-weight: 600;
+  }
+  /* Badge tones (status pills, counts): same contrast-scaled rule as
+     alerts — tinted fill + tinted edge. Accent included for highlights.
+     <span class="badge" data-tone="success">7d: 85%</span> */
+  .badge[data-tone="success"] {
+    border: var(--lui-border-width) solid color-mix(in oklch, var(--lui-success) calc(70% + var(--lui-contrast, 0.5) * 25%), var(--lui-bg));
+    background: color-mix(in oklch, var(--lui-success) calc(50% + var(--lui-contrast, 0.5) * 30%), var(--lui-bg));
+  }
+  .badge[data-tone="warning"] {
+    border: var(--lui-border-width) solid color-mix(in oklch, var(--lui-warning) calc(70% + var(--lui-contrast, 0.5) * 25%), var(--lui-bg));
+    background: color-mix(in oklch, var(--lui-warning) calc(50% + var(--lui-contrast, 0.5) * 30%), var(--lui-bg));
+  }
+  .badge[data-tone="danger"] {
+    border: var(--lui-border-width) solid color-mix(in oklch, var(--lui-danger) calc(70% + var(--lui-contrast, 0.5) * 25%), var(--lui-bg));
+    background: color-mix(in oklch, var(--lui-danger) calc(50% + var(--lui-contrast, 0.5) * 30%), var(--lui-bg));
+  }
+  .badge[data-tone="accent"] {
+    border: var(--lui-border-width) solid color-mix(in oklch, var(--lui-accent) calc(70% + var(--lui-contrast, 0.5) * 25%), var(--lui-bg));
+    background: color-mix(in oklch, var(--lui-accent) calc(50% + var(--lui-contrast, 0.5) * 30%), var(--lui-bg));
   }
 
   /* Chip: removable token (active filters, selections). Static badge look
