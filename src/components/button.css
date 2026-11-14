@@ -53,11 +53,24 @@
   .btn[data-variant="ghost"] {
     background: transparent;
     color: var(--lui-primary);
-  }
-  .btn[data-variant="ghost"]:hover {
+  }  .btn[data-variant="ghost"]:hover {
     background: rgb(128 128 128 / 0.12);
     background: color-mix(in oklch, var(--lui-primary) 12%, transparent);
   }
+  /* Plain: opt out of button styling for fully custom buttons (emoji
+     pickers, icon buttons, tab bars). Page classes take over completely.
+     <button class="btn" data-variant="plain">…</button> */
+  .btn[data-variant="plain"] {
+    background: none;
+    border-color: transparent;
+    color: inherit;
+    font-weight: inherit;
+    padding: 0;
+    height: auto;
+    min-height: 0;
+  }
+  .btn[data-variant="plain"]:hover { background: none; }
+  .btn[data-variant="plain"]:active { background: none; transform: none; }
   .btn[data-variant="ghost"]:active {
     background: rgb(128 128 128 / 0.2);
     background: color-mix(in oklch, var(--lui-primary) 22%, transparent);
