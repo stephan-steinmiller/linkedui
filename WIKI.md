@@ -50,7 +50,7 @@ try {
 
 ## 3. Components (markup reference)
 
-Buttons · Forms & input (+hints, OTP, check-chips, rating, dropzone) · Layout (card,
+Buttons · Forms & input (+hints, OTP, stepper, check-chips, rating, dropzone) · Layout (card,
 stat, toolbar, footer) · Page structure (stack, cluster, split, sidebar, stage,
 hero) · Navigation (nav, app-nav, breadcrumb, steps,
 pagination, tabs, segmented) · Overlays (popover, tooltip, dropdown,
@@ -111,6 +111,11 @@ ok/wrong states + feedback).
 <div class="input-group">
   <span aria-hidden="true">$</span><input aria-label="Amount" placeholder="0.00" />
   <button class="btn" type="button">Send</button>
+</div>
+<div class="stepper">
+  <button class="btn" type="button" aria-label="Decrease">−</button>
+  <input type="number" value="1" aria-label="Quantity" />
+  <button class="btn" type="button" aria-label="Increase">+</button>
 </div>
 <div class="form-grid">
   <label class="field"><span>First</span><input /></label>
