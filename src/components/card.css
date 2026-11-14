@@ -227,6 +227,20 @@
     outline: none;
   }
 
+  /* Inline choice row: radio/checkbox beside its label (single wrapper
+     alternative to sibling input+label pairs). The classless label stacks
+     vertically, so without this every wrapped choice renders with the
+     control on top and the text below it.
+     <label class="check"><input type="radio" name="g" /> Choice</label>
+     <label class="check"><input type="checkbox" /> Remember me</label> */
+  .check {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--lui-space-2);
+    margin: 0;
+    cursor: pointer;
+  }
+
   /* Toggle chips: multi-select pills (segmented is single-select).
      Checkbox-based like rating — Tab/Space work natively, no JS.
      Active chips fill primary (they mean ON, not just selected).
