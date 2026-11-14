@@ -120,6 +120,11 @@
   /* Desktop-only states (scoped to min-width so the mobile bar below never
      fights the :has() rules — media queries add no specificity). */
   @media (min-width: 48.01rem) {
+    .app-nav {
+      /* Tall navs must not clip on short viewports (many entries + open). */
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
     .app-nav:has(> .app-nav-toggle[open]) {
       width: var(--lui-app-nav-w);
     }
