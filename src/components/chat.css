@@ -42,14 +42,13 @@
   .bubble[data-side="right"] > small {
     color: var(--lui-on-primary);
   }
-  /* Type/status badges inside own messages (e.g. a "Quiz" tag): the plain
-     .badge assumes a surface behind it — on primary it would be unreadable
-     (field fill + inherited ink clash with the bubble). Translucent fill +
-     inherited ink stays legible in both modes. */
+  /* Badges inside own messages (e.g. a "Quiz" tag): the plain .badge
+     assumes a surface behind it, so it clashes with the primary fill.
+     Solid on-primary pill with primary ink reads in both modes. */
   .bubble[data-side="right"] .badge {
-    background: rgb(128 128 128 / 0.22);
+    background: var(--lui-on-primary);
     border-color: transparent;
-    color: inherit;
+    color: var(--lui-primary);
   }
   /* Same sender twice in a row reads as one group: halve the gap below */
   .bubble[data-side="left"]:has(+ .bubble[data-side="left"]),
