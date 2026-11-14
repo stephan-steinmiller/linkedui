@@ -73,7 +73,11 @@
   .field {
     display: grid;
     gap: var(--lui-space-1);
-    margin-block: var(--lui-space-2);
+    /* No outer margin: rhythm comes from the parent gap (stack, cluster,
+       form-grid). Classless bare <label> keeps its own margin; the .field
+       component must not double stack gaps or throw off row alignment
+       (an 8px bottom margin here once misaligned every field+button row). */
+    margin-block: 0;
   }
   .field > span { font-size: var(--lui-font-sm); font-weight: 600; }
   .field input, .field select, .field textarea { max-width: none; }
@@ -116,7 +120,10 @@
   .form-grid > .field {
     margin-block: 0;
   }
-  .form-grid > [data-span="all"] {
+  /* Stacks own their rhythm (same rule as fields above). */
+  .stack > .form-grid {
+    margin-block: 0;
+  }  .form-grid > [data-span="all"] {
     grid-column: 1 / -1;
   }
 
