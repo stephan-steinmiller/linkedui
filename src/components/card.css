@@ -4,8 +4,8 @@
  * (responsive auto-fit grid), .card (box), .empty (placeholder),
  * .field (label + control, full width — ideal for forms and range demos),
  * .form-grid (multi-column fields), .input-group (joined control +
- * addons/button), .check-chips (multi-select pills), .ticks (range stops),
- * .table-wrap (scrolling table frame + table modifiers), .toolbar
+ * addons/button), .stepper (joined −/value/+ control), .check-chips
+ * (multi-select pills), .ticks (range stops), .table-wrap (scrolling table frame + table modifiers), .toolbar
  * (title + actions row), .stat (metric block), .dropzone (file drop),
  * .footer (bottom bar).
  *
@@ -178,9 +178,52 @@
     outline: none;
   }
 
+  /* Stepper: joined − / value / + control for quantities — the
+     mobile-friendly number entry (no fiddly spinners). Edge-flush buttons,
+     centered numeric value, single group focus ring.
+     <div class="stepper">
+       <button type="button" class="btn" aria-label="Decrease">−</button>
+       <input type="number" value="1" aria-label="Quantity" />
+       <button type="button" class="btn" aria-label="Increase">+</button>
+     </div> */
+  .stepper {
+    display: inline-flex;
+    align-items: stretch;
+    height: var(--lui-control-h-md);
+    background: var(--lui-field);
+    border: var(--lui-border-width) solid var(--lui-border);
+    border-radius: var(--lui-radius-control);
+    corner-shape: var(--lui-corner-shape);
+    overflow: hidden;
+  }
+  .stepper > input {
+    width: 3.5rem;
+    min-width: 0;
+    text-align: center;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+  }
+  .stepper > .btn {
+    flex: none;
+    height: auto;
+    min-height: 0;
+    border: 0;
+    border-radius: 0;
+    padding-inline: var(--lui-control-px);
+  }
+  .stepper:focus-within {
+    outline: 2px solid var(--lui-ring);
+    outline-offset: 2px;
+  }
+  .stepper > :focus-visible {
+    outline: none;
+  }
+
   /* Toggle chips: multi-select pills (segmented is single-select).
      Checkbox-based like rating — Tab/Space work natively, no JS.
      Active chips fill primary (they mean ON, not just selected).
+     Hue follows data-variant="secondary|accent" like buttons.
      <div class="check-chips" role="group" aria-label="Filters">
        <input type="checkbox" id="f-photo" checked /><label for="f-photo">Photo</label>
        <input type="checkbox" id="f-video" /><label for="f-video">Video</label>
@@ -201,7 +244,9 @@
   .check-chips > label {
     display: inline-flex;
     align-items: center;
-    min-height: 2.75rem;
+    /* Control height like buttons (density-scaled); coarse pointers keep
+       the 44px touch floor. */
+    min-height: var(--lui-control-h-md);
     margin: 0;
     padding: var(--lui-control-py) var(--lui-control-px);
     border: var(--lui-border-width) solid var(--lui-border);
@@ -223,7 +268,22 @@
     background: var(--lui-primary);
     border-color: transparent;
     color: var(--lui-on-primary);
-    box-shadow: var(--lui-shadow-sm);
+  }
+  .check-chips[data-variant="secondary"] > label:hover {
+    background: rgb(128 128 128 / 0.12);
+    background: color-mix(in oklch, var(--lui-secondary) 12%, var(--lui-field));
+  }
+  .check-chips[data-variant="secondary"] > input:checked + label {
+    background: var(--lui-secondary);
+    color: var(--lui-on-secondary);
+  }
+  .check-chips[data-variant="accent"] > label:hover {
+    background: rgb(128 128 128 / 0.12);
+    background: color-mix(in oklch, var(--lui-accent) 12%, var(--lui-field));
+  }
+  .check-chips[data-variant="accent"] > input:checked + label {
+    background: var(--lui-accent);
+    color: var(--lui-on-accent);
   }
   .check-chips > input:focus-visible + label {
     outline: 2px solid var(--lui-ring);
@@ -232,6 +292,9 @@
   .check-chips > input:disabled + label {
     opacity: 0.5;
     cursor: not-allowed;
+  }
+  @media (pointer: coarse) {
+    .check-chips > label { min-height: 2.75rem; }
   }
 
   /* Step ticks under a range input: one repeating tile per stop, count set
@@ -242,6 +305,8 @@
        <div class="ticks" style="--lui-ticks: 5" aria-hidden="true"></div>
      </div> */
   .ticks {
+    /* Decorative scale marks under the range track: intentionally thin
+       (not a control or gauge), density-independent. */
     height: 0.375rem;
     background-image: linear-gradient(to right, var(--lui-muted) var(--lui-border-width), transparent var(--lui-border-width));
     background-size: calc(100% / (var(--lui-ticks, 5) - 1)) 100%;
