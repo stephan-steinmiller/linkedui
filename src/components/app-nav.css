@@ -57,6 +57,11 @@
     font-size: 1.25em;
     line-height: 1;
     text-align: center;
+    /* Center SVG icons as well as text glyphs (inline-flex keeps the slot
+       shrink-wrapped; anonymous text stays centered too). */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
   .app-nav > a:hover {
     color: var(--lui-text);
