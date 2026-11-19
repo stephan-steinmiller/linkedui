@@ -1,0 +1,189 @@
+/* linkedui — components/ai-chat.css — AI chat interfaces (needs JS for streaming,
+ * like Open WebUI: bubbles + reasoning + receipts + composer).
+ * Composes existing primitives: .bubble (chat.css) for message bodies,
+ * .avatar (avatar.css), .chip (feedback.css), .btn (button.css),
+ * .code-block (code.css), native <details> for collapsibles.
+ * <div class="ai-log" role="log" aria-label="Chat">
+ *   <div class="ai-msg" data-side="right">
+ *     <span class="avatar">Y</span>
+ *     <div class="ai-body">
+ *       <div class="bubble" data-side="right"><p>Hello?</p></div>
+ *       <div class="ai-acts"><button class="ai-act">copy</button></div>
+ *     </div>
+ *   </div>
+ *   <div class="ai-msg" data-side="left">
+ *     <span class="avatar" data-tone="ai">✦</span>
+ *     <div class="ai-body">
+ *       <div class="bubble" data-side="left">
+ *         <details class="ai-think"><summary>Thinking</summary><div>…</div></details>
+ *         <div class="ai-answer"><p>Hi!</p></div>
+ *         <details class="ai-trace"><summary>generated in 1.2s</summary><div>…</div></details>
+ *       </div>
+ *       <div class="ai-acts"><button class="ai-act">copy</button><button class="ai-act">regenerate</button></div>
+ *     </div>
+ *   </div>
+ * </div>
+ * <p class="ai-status">Generating…</p>
+ * <div class="ai-hero"><h2>Good evening</h2><p>…</p><div class="ai-chips">…</div></div>
+ * <div class="ai-composer"><textarea data-lui-autogrow rows="1"></textarea><button class="btn">Send</button></div>
+ * States: .ai-msg[data-state="error"] (danger bubble), .ai-caret (streaming caret),
+ * .ai-nav (sibling ‹ 1/2 › switcher inside .ai-acts). */
+@layer components {
+  .ai-log {
+    display: flex;
+    flex-direction: column;
+    gap: var(--lui-space-2);
+  }
+  .ai-msg {
+    display: flex;
+    gap: var(--lui-space-2);
+    align-items: flex-start;
+    max-width: min(88%, 52rem);
+  }
+  .ai-msg[data-side="right"] {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+  }
+  .ai-msg[data-side="left"] {
+    align-self: flex-start;
+  }
+  .ai-msg .avatar {
+    flex: none;
+    margin-top: var(--lui-space-1);
+  }
+  .ai-body {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .ai-msg[data-side="right"] .ai-body {
+    align-items: flex-end;
+  }
+  /* Error state: danger-tinted bubble, keeps layout */
+  .ai-msg[data-state="error"] .bubble {
+    background: color-mix(in oklch, var(--lui-danger) 12%, var(--lui-bg));
+    border-color: var(--lui-danger);
+    color: var(--lui-text);
+  }
+  /* Action row under a message (copy / regenerate / edit) */
+  .ai-acts {
+    display: flex;
+    gap: var(--lui-space-1);
+    align-items: center;
+    margin: var(--lui-space-1) var(--lui-space-2) var(--lui-space-2);
+  }
+  .ai-act {
+    background: none;
+    border: 0;
+    color: var(--lui-muted);
+    cursor: pointer;
+    font: inherit;
+    font-size: var(--lui-font-sm);
+    padding: var(--lui-space-1) var(--lui-space-2);
+    border-radius: var(--lui-radius-md);
+  }
+  .ai-act:hover {
+    background: var(--lui-surface);
+    color: var(--lui-text);
+  }
+  /* Sibling navigator ‹ 1/2 › for regenerated variants */
+  .ai-nav {
+    font-size: var(--lui-font-sm);
+    color: var(--lui-muted);
+    display: inline-flex;
+    gap: var(--lui-space-1);
+    align-items: center;
+  }
+  .ai-nav button {
+    background: none;
+    border: 0;
+    color: inherit;
+    cursor: pointer;
+    font: inherit;
+    padding: var(--lui-space-1);
+  }
+  .ai-nav button:hover {
+    color: var(--lui-text);
+  }
+  /* Reasoning block: accent summary, dim italic body */
+  details.ai-think {
+    margin-bottom: var(--lui-space-2);
+  }
+  details.ai-think > summary {
+    font-size: var(--lui-font-sm);
+    color: var(--lui-accent);
+    cursor: pointer;
+  }
+  details.ai-think > div {
+    font-size: var(--lui-font-sm);
+    color: var(--lui-muted);
+    font-style: italic;
+    white-space: pre-wrap;
+    margin-top: var(--lui-space-1);
+  }
+  /* Pipeline receipt: muted, monospace-ish meta */
+  details.ai-trace {
+    font-size: var(--lui-font-sm);
+    color: var(--lui-muted);
+    margin-top: var(--lui-space-2);
+  }
+  details.ai-trace > summary {
+    cursor: pointer;
+  }
+  details.ai-trace > div {
+    white-space: pre-wrap;
+    margin-top: var(--lui-space-1);
+  }
+  /* Phase line under the log (Retrieving… / Generating…) */
+  .ai-status {
+    font-size: var(--lui-font-sm);
+    color: var(--lui-muted);
+    min-height: 1.5em;
+    margin: 0;
+  }
+  /* Blinking caret while streaming */
+  .ai-caret::after {
+    content: "▍";
+    color: var(--lui-accent);
+    animation: lui-blink 1s steps(2) infinite;
+  }
+  @keyframes lui-blink {
+    50% { opacity: 0; }
+  }
+  /* Empty state: greeting + model line + suggestion chips */
+  .ai-hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--lui-space-3);
+    padding: var(--lui-space-4) 0;
+    text-align: center;
+  }
+  .ai-hero h2 {
+    font-size: var(--lui-font-2xl);
+    margin: 0;
+  }
+  .ai-hero p {
+    color: var(--lui-muted);
+    margin: 0;
+  }
+  .ai-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--lui-space-2);
+    justify-content: center;
+  }
+  /* Composer: sticky bottom bar, autogrowing field + actions */
+  .ai-composer {
+    display: flex;
+    gap: var(--lui-space-2);
+    padding: var(--lui-space-3) 0;
+  }
+  .ai-composer textarea {
+    flex: 1;
+    resize: none;
+    field-sizing: content;
+    max-height: 12rem;
+  }
+}

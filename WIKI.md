@@ -498,6 +498,34 @@ same-side messages group tighter automatically (`:has()`).
 </div>
 ```
 
+### AI chat — `src/components/ai-chat.css`
+
+Message list + reasoning + receipts + composer for AI interfaces
+(streaming needs app JS; everything else is classes + `<details>`).
+Builds on `.bubble` (chat.css), `.avatar`, `.chip`, `.btn`,
+`.code-block`, `data-lui-copy` / `data-lui-autogrow` (enhance.js).
+
+```html
+<div class="ai-log" role="log" aria-label="Chat">
+  <div class="ai-msg" data-side="left">
+    <span class="avatar">AI</span>
+    <div class="ai-body">
+      <div class="bubble" data-side="left">
+        <details class="ai-think"><summary>Thinking</summary><div>…reasoning…</div></details>
+        <p>Answer…</p>
+        <details class="ai-trace"><summary>generated in 1.2s</summary><div>…receipt…</div></details>
+      </div>
+      <div class="ai-acts"><button class="ai-act">copy</button><button class="ai-act">regenerate</button></div>
+    </div>
+  </div>
+</div>
+<p class="ai-status">Generating…</p>
+<div class="ai-hero"><h2>Good evening</h2><p>…</p><div class="ai-chips"><button class="chip">…</button></div></div>
+<div class="ai-composer"><textarea data-lui-autogrow rows="1"></textarea><button class="btn">Send</button></div>
+```
+
+Error state: `.ai-msg[data-state="error"]`. Regenerated variants:
+`.ai-nav` (`‹ 1/2 ›`) inside `.ai-acts`. Streaming caret: `.ai-caret`.
 ### Feedback — `src/components/feedback.css`
 
 ```html
@@ -661,6 +689,7 @@ src/components/steps.css      stepper (CSS counters)
 src/components/quiz.css       single-choice quiz cards
 src/components/feedback.css   alert, badge, skeleton
 src/components/chat.css       chat bubbles (static, no JS)
+src/components/ai-chat.css    AI chat: log, reasoning, receipts, status, hero, composer (+ autogrow JS)
 src/components/avatar.css     avatar (initials/photo, status)
 src/components/nav-overlays.css nav, tooltip, dropdown, pagination, toasts
 src/components/app-nav.css     app nav (adaptive sidebar ↔ bottom bar, CSS-only)

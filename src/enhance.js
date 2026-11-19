@@ -18,6 +18,8 @@
  * 8. {@link highlightCodeBlocks} - VBA highlighting for `.code-block` (line numbers, token colors)
  * 9. {@link bindActivationGuards} - `aria-disabled` widgets never activate
  * 10. {@link bindChipClose} - `data-lui-chip-close` removes its `.chip`
+ * 11. {@link bindAutogrow} - `textarea[data-lui-autogrow]` grows with content
+ *     (fallback for browsers without CSS `field-sizing: content`)
  *
  * Static DOM only (binds once at load): controls injected later are not
  * enhanced, except toasts/copy/activation-guards which use delegation.
@@ -489,6 +491,25 @@
   }
 
   /**
+   * Autogrowing textareas (composer fields). CSS `field-sizing: content`
+   * handles it where supported — this keeps older browsers in sync and
+   * re-fits after programmatic value changes (event delegation, so it
+   * also covers textareas injected later, e.g. streamed chat apps).
+   * `<textarea data-lui-autogrow rows="1">`
+   */
+  function bindAutogrow() {
+    const fit = (el) => {
+      el.style.height = "auto";
+      el.style.height = Math.min(el.scrollHeight, 192) + "px";
+    };
+    document.addEventListener("input", (e) => {
+      const el = e.target.closest?.("textarea[data-lui-autogrow]");
+      if (el) fit(el);
+    });
+    document.querySelectorAll("textarea[data-lui-autogrow]").forEach(fit);
+  }
+
+  /**
    * Activation guard: widgets marked `aria-disabled="true"` (e.g. loading
    * buttons, `<a class="btn">` that must not navigate) never activate via
    * mouse, touch, or keyboard. Native `disabled` needs no guard.
@@ -550,5 +571,6 @@
   bindCopyButtons();
   bindActivationGuards();
   bindChipClose();
+  bindAutogrow();
   highlightCodeBlocks();
 })();
