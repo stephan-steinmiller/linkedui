@@ -28,11 +28,20 @@
     background: var(--lui-bg);
     color: var(--lui-text);
     -webkit-font-smoothing: antialiased;
+    /* Notch/home-bar clearance for full-bleed pages (fixed nav/toasts are
+       viewport-positioned, so this only moves flow content). */
+    padding-left: env(safe-area-inset-left, 0rem);
+    padding-right: env(safe-area-inset-right, 0rem);
   }
 
   img, svg, video {
     display: block;
     max-width: 100%;
+  }
+  /* Sized media (width/height attrs) must scale proportionally inside
+     narrow containers — max-width alone keeps the width but not the ratio. */
+  img, video {
+    height: auto;
   }
 
   input, button, select, textarea {

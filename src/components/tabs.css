@@ -16,11 +16,26 @@
     --tab-edge: var(--lui-border);
     --tab-hover: rgb(128 128 128 / 0.12);
     --tab-hover: color-mix(in oklch, var(--lui-primary) 12%, transparent);
+    --tab-accent: var(--lui-primary);
     position: relative;
     display: flex;
     flex-wrap: wrap;
     gap: 0 var(--lui-space-1);
     border-bottom: var(--lui-border-width) solid var(--lui-border);
+  }
+  .tabs[data-variant="secondary"] {
+    --tab-pill: var(--lui-surface);
+    --tab-pill: color-mix(in oklch, var(--lui-secondary) 12%, var(--lui-surface));
+    --tab-hover: rgb(128 128 128 / 0.12);
+    --tab-hover: color-mix(in oklch, var(--lui-secondary) 12%, transparent);
+    --tab-accent: var(--lui-secondary);
+  }
+  .tabs[data-variant="accent"] {
+    --tab-pill: var(--lui-surface);
+    --tab-pill: color-mix(in oklch, var(--lui-accent) 12%, var(--lui-surface));
+    --tab-hover: rgb(128 128 128 / 0.12);
+    --tab-hover: color-mix(in oklch, var(--lui-accent) 12%, transparent);
+    --tab-accent: var(--lui-accent);
   }
   /* Radios stay in the flow but invisible (no display:none → keyboard works) */
   .tabs > input[type="radio"] {
@@ -60,8 +75,7 @@
        the ::before slider takes over and this goes transparent. */
     background: var(--tab-pill);
     border-color: var(--tab-edge);
-    color: var(--lui-primary);
-    box-shadow: var(--lui-shadow-sm);
+    color: var(--tab-accent);
   }
   .tabs > input:focus-visible + label {
     outline: 2px solid var(--lui-ring);
@@ -110,7 +124,6 @@
       border: var(--lui-border-width) solid var(--tab-edge);
       border-radius: var(--lui-radius-control);
       corner-shape: var(--lui-corner-shape);
-      box-shadow: var(--lui-shadow-sm);
       transition:
         top 0.25s ease,
         left 0.25s ease,

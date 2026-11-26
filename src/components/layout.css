@@ -5,12 +5,19 @@
  * (halves, or thirds via data-columns="3", that stack on mobile),
  * .with-sidebar (sticky side nav on desktop, stacked on mobile),
  * .shell (full-height app rail), .stage (framed demo box),
- * .hero (page title + lead), .pad (padded section), .spacer (flex fill).
+ * .hero (page title + lead), .pad (padded section), .spacer (flex fill),
+ * plus the breakpoint-free half: .switcher (row↔stack, container-aware),
+ * .center (measured, horizontally centered), .cover (full-height centering
+ * for auth/empty states). The auto-fit card grid lives in card.css as
+ * .lui-grid; form rhythm (.field + .hint, .form-grid) lives there too.
  *
  * Markup:
  *   <div class="stack"><section>…</section><section>…</section></div>
  *   <div class="cluster"><button class="btn">…</button><a …>…</a></div>
  *   <div class="split"><article>…</article><article>…</article></div>
+ *   <div class="switcher"><article>…</article><article>…</article></div>
+ *   <div class="center"><p>…</p></div>
+ *   <div class="cover"><div class="card">…sign in…</div></div>
  *   <div class="with-sidebar">
  *     <aside><nav class="menu" aria-label="Docs">…</nav></aside>
  *     <main>…</main>
@@ -29,13 +36,15 @@
   /* Vertical rhythm: gap instead of stacked margins (no collapsing,
      no first/last-child margin hacks). data-gap: sm | (md) | lg.
      min-width: 0 keeps wide descendants (pre, tables) from blowing out
-     the single auto track — scroll containers handle themselves. */
+     the single auto track — scroll containers handle themselves.
+     <dialog> children are excluded from the margin reset: a modal placed
+     next to its trigger inside a stack must keep margin:auto centering. */
   .stack {
     display: grid;
     gap: var(--lui-space-3);
     align-content: start;
   }
-  .stack > * {
+  .stack > :not(dialog) {
     margin-block: 0;
     min-width: 0;
   }
@@ -93,8 +102,34 @@
      Replaces ad-hoc <span style="flex:1"> shims. */
   .spacer { flex: 1 1 auto; min-width: 0; }
 
-  /* Docs/app shell: fixed side nav + fluid content. Sidebar is sticky
-     with its own scroll on desktop, plain stacked block on mobile. */
+  /* Switcher: row on wide, stack on narrow — container-aware, no breakpoint.
+     Children share the row while they fit, wrap when they don't. The flip
+     point is --lui-switcher (default 30rem ≈ two cards); override per use
+     via inline style. min-width: 0 keeps wide descendants (pre, tables)
+     from blowing out the track.
+     <div class="switcher"><article>…</article><article>…</article></div> */
+  .switcher {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--lui-space-3);
+  }
+  .switcher > * {
+    /* Longhands on purpose: when the container is wide the basis calc
+       goes negative (invalid → declaration dropped) but grow/shrink must
+       survive so columns share the row equally. A `flex` shorthand would
+       drop all three together and columns would huddle at content width.
+       max() clamps the basis at 0 when wide (equal columns) while the
+       huge positive basis still forces the wrap when narrow. */
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: max(0px, calc((var(--lui-switcher, 30rem) - 100%) * 999));
+    min-width: 0;
+  }
+
+  /* Docs/app shell: fixed side nav + fluid content. Sidebar is sticky;
+     the menu card keeps its rounded top/bottom while its links scroll
+     inside (overflow clips to the border-radius). Plain stacked block
+     on mobile. */
   .with-sidebar {
     display: grid;
     gap: var(--lui-space-3);
@@ -105,12 +140,22 @@
   @media (max-width: 48rem) {
     .with-sidebar { grid-template-columns: 1fr; }
   }
+  /* Main fills its track: the base `main` centering (margin-inline: auto
+     for standalone pages) would otherwise shrink-wrap narrow content and
+     center it, so short pages would sit differently from full ones. */
+  .with-sidebar > main {
+    margin-inline: 0;
+  }
   @media (min-width: 48.01rem) {
     .with-sidebar > aside {
       position: sticky;
       top: var(--lui-space-3);
       max-height: calc(100vh - var(--lui-space-3) * 2);
       max-height: calc(100dvh - var(--lui-space-3) * 2);
+      overflow-y: auto;
+    }
+    .with-sidebar > aside > .menu {
+      max-height: inherit;
       overflow-y: auto;
     }
   }
@@ -155,8 +200,7 @@
 
   /* Demo frame: surface box around live examples (replaces ad-hoc
      inline borders on doc pages). */
-  .stage {
-    background: var(--lui-surface);
+  .stage {    background: var(--lui-surface);
     border: var(--lui-border-width) solid var(--lui-border);
     border-radius: var(--lui-radius-lg);
     corner-shape: var(--lui-corner-shape);
@@ -164,6 +208,43 @@
     display: grid;
     gap: var(--lui-space-2);
     align-content: start;
+  }
+
+  /* Center: measured, horizontally centered content (prose, auth cards,
+     narrow forms). The measure is --lui-measure (60ch ≈ 30rem at default
+     type); override per use via inline style.
+     <div class="center"><p>…</p></div> */
+  .center {
+    box-sizing: content-box;
+    margin-inline: auto;
+    max-width: var(--lui-measure, 60ch);
+    padding-inline: var(--lui-space-3);
+    display: grid;
+    gap: var(--lui-space-3);
+    align-content: start;
+  }
+  .center > :not(dialog) {
+    margin-block: 0;
+    min-width: 0;
+  }
+
+  /* Cover: full-height centering for auth screens and empty states.
+     Single child (or a .stack) is centered both ways; the 60dvh default
+     centers without hijacking the page — set min-height: 100dvh inline
+     for a full takeover screen.
+     <div class="cover"><div class="card">…sign in…</div></div> */
+  .cover {
+    display: grid;
+    place-items: center;
+    gap: var(--lui-space-3);
+    padding: var(--lui-space-4) var(--lui-space-3);
+    padding-bottom: calc(var(--lui-space-4) + env(safe-area-inset-bottom, 0rem));
+    min-height: 60vh;
+    min-height: 60dvh;
+  }
+  .cover > :not(dialog) {
+    min-width: 0;
+    max-width: 100%;
   }
 
   /* Page title: fluid display type + muted lead, centered container

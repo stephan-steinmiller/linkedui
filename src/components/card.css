@@ -196,6 +196,10 @@
   .stepper {
     display: inline-flex;
     align-items: stretch;
+    /* Fixed-size control (buttons + 3.5rem value): shrink-wrap everywhere —
+       grid parents (stack, form-grid) would otherwise stretch it full width. */
+    width: max-content;
+    max-width: 100%;
     height: var(--lui-control-h-md);
     background: var(--lui-field);
     border: var(--lui-border-width) solid var(--lui-border);

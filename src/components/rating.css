@@ -27,8 +27,10 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 2.75rem;
-    min-height: 2.75rem;
+    /* Control-height hit box like buttons (density-scaled); coarse
+       pointers keep the 44px touch floor. */
+    min-width: var(--lui-control-h-md);
+    min-height: var(--lui-control-h-md);
     margin: 0;
     font-size: var(--lui-font-2xl);
     line-height: 1;
@@ -53,5 +55,11 @@
   .rating > input:disabled + label {
     opacity: 0.45;
     cursor: not-allowed;
+  }
+  @media (pointer: coarse) {
+    .rating > label {
+      min-width: 2.75rem;
+      min-height: 2.75rem;
+    }
   }
 }

@@ -1,12 +1,16 @@
 /* linkedui - components/code.css - code blocks (static, no JS).
  *
  * Markup:
- *   <figure class="code-block">
- *     <figcaption><span>VBA</span><button class="btn" data-variant="ghost" data-size="sm" type="button" data-lui-copy="snippet-id">Kopieren</button></figcaption>
+ *   <figure class="code-block" data-lang="html">
+ *     <figcaption><span>HTML</span><button class="btn" data-variant="ghost" data-size="sm" type="button" data-lui-copy="snippet-id">Copy</button></figcaption>
  *     <pre><code id="snippet-id">…</code></pre>
  *   </figure>
  * Caption is optional; without it the block is just the framed <pre>.
- * Copy uses the global [data-lui-copy] behavior (enhance.js + toast).
+ * data-lang selects highlighting (html | vba — enhance.js highlightCodeBlocks;
+ * anything else gets line numbers only). Copy uses the global
+ * [data-lui-copy] behavior (enhance.js + toast).
+ * Code wraps by default (pre-wrap + anywhere) so samples never force
+ * horizontal scrolling; numbers stay in their gutter via the .ln blocks.
  */
 @layer components {
   .code-block {
@@ -38,6 +42,9 @@
     background: transparent;
     padding: var(--lui-space-3);
     overflow-x: auto;
+    /* Wrap by default: samples never force horizontal scrolling. */
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
   }
   /* Block code is plain text: undo the inline-code pill. */
   .code-block > pre > code {

@@ -12,6 +12,8 @@
    Falls back to a static pill background where anchors are unsupported.
    All pill paint comes from --seg-* vars (one place): --seg-pill (fill),
    --seg-edge (edge), --seg-hover (inactive hover step toward the pill).
+   Hue follows data-variant="secondary|accent" (like buttons/switch/range);
+   --seg-accent carries the active hue, --seg-on-accent its label ink.
    Hover uses an opaque color-mix, never transparency.
    <div class="segmented" role="group" aria-label="Range">
      <input type="radio" name="range" id="range-7d" checked />
@@ -32,6 +34,8 @@
     --seg-edge: var(--lui-border);
     --seg-hover: var(--lui-surface);
     --seg-hover: color-mix(in oklch, var(--lui-primary) 12%, var(--lui-field));
+    --seg-accent: var(--lui-primary);
+    --seg-on-accent: var(--lui-on-primary);
     display: inline-flex;
     align-items: stretch;
     gap: var(--lui-space-1);
@@ -87,13 +91,31 @@
     background: var(--seg-hover);
   }
   .segmented > input:checked + label {
-    /* Fallback pill (no anchor support): fill + edge + lift.
+    /* Fallback pill (no anchor support): fill + edge.
        Where anchors work, the ::before slider takes over and this goes
        transparent (see @supports block below). */
     background: var(--seg-pill);
     border-color: var(--seg-edge);
-    color: var(--lui-primary);
-    box-shadow: var(--lui-shadow-sm);
+    color: var(--seg-accent);
+  }
+  /* Hue variants — same vocabulary as buttons/switch/range/progress:
+     <div class="segmented" data-variant="secondary"> /
+     <div class="segmented" data-variant="accent">. */
+  .segmented[data-variant="secondary"] {
+    --seg-pill: var(--lui-surface);
+    --seg-pill: color-mix(in oklch, var(--lui-secondary) 12%, var(--lui-surface));
+    --seg-hover: var(--lui-surface);
+    --seg-hover: color-mix(in oklch, var(--lui-secondary) 12%, var(--lui-field));
+    --seg-accent: var(--lui-secondary);
+    --seg-on-accent: var(--lui-on-secondary);
+  }
+  .segmented[data-variant="accent"] {
+    --seg-pill: var(--lui-surface);
+    --seg-pill: color-mix(in oklch, var(--lui-accent) 12%, var(--lui-surface));
+    --seg-hover: var(--lui-surface);
+    --seg-hover: color-mix(in oklch, var(--lui-accent) 12%, var(--lui-field));
+    --seg-accent: var(--lui-accent);
+    --seg-on-accent: var(--lui-on-accent);
   }
   .segmented > input:focus-visible + label {
     outline: 2px solid var(--lui-ring);
@@ -140,7 +162,6 @@
       border: var(--lui-border-width) solid var(--seg-edge);
       border-radius: var(--lui-radius-control);
       corner-shape: var(--lui-corner-shape);
-      box-shadow: var(--lui-shadow-sm);
       transition:
         top 0.25s ease,
         left 0.25s ease,

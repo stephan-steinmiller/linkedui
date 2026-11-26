@@ -13,8 +13,11 @@
 
 @layer base-classless {
   /* Skip link: first link to the #main landmark, revealed on focus.
-     <body><a href="#main">Skip to content</a><main id="main">… */
-  :where(body) > :where(a[href^="#"]:first-child) {
+     <body><a href="#main">Skip to content</a><main id="main">…
+     Apps that wrap page content (e.g. SvelteKit's body div) break the
+     first-child position — add class="skip-link" there instead. */
+  :where(body) > :where(a[href^="#"]:first-child),
+  :where(a.skip-link) {
     position: absolute;
     top: -100%;
     left: var(--lui-space-3);
@@ -27,14 +30,16 @@
     font-weight: 600;
     text-decoration: none;
   }
-  :where(body) > :where(a[href^="#"]:first-child:focus-visible) {
+  :where(body) > :where(a[href^="#"]:first-child:focus-visible),
+  :where(a.skip-link:focus-visible) {
     top: var(--lui-space-2);
   }
 
   main, .lui-container {
     max-width: var(--lui-maxw);
     margin-inline: auto;
-    padding: var(--lui-space-4) var(--lui-space-3);
+    /* Side insets never drop below the notch; bottom clears the home bar. */
+    padding: var(--lui-space-4) max(var(--lui-space-3), env(safe-area-inset-right, 0rem)) calc(var(--lui-space-4) + env(safe-area-inset-bottom, 0rem)) max(var(--lui-space-3), env(safe-area-inset-left, 0rem));
   }
 
   :where(h1, h2, h3, h4) {
@@ -250,27 +255,40 @@
   :where(input[type="color"]::-webkit-color-swatch) { border: 0; border-radius: var(--lui-radius-sm); }
   :where(input[type="color"]::-moz-color-swatch) { border: 0; border-radius: var(--lui-radius-sm); }
 
-  /* Picker indicator as a big docked button (like the input-group action):
-     fills the input height with only a 0.25rem inset, rounded + tinted.
+  /* Date/time inputs: no extra box (see the glyph rule below) — they
+     inherit the text-input look, with tighter block padding so the
+     glyph row matches control height.
      (The calendar/color popup panels themselves are browser UI and cannot
      be styled — color-scheme keeps them in the right mode.) */
   :where(input[type="date"], input[type="time"], input[type="datetime-local"], input[type="month"], input[type="week"]) {
     padding-block: var(--lui-space-1);
   }
-  :where(input[type="date"], input[type="time"], input[type="datetime-local"], input[type="month"], input[type="week"])::-webkit-calendar-picker-indicator {
-    cursor: pointer;
-    /* Intrinsic sizing, same reason as the file button: explicit height is
-       ignored by some engines. min-height is honored where height is not —
-       screenshot-verified to nearly fill the content height. */
-    height: auto;
-    min-height: 2.375rem;
-    padding-block: var(--lui-space-1);
-    padding-inline: var(--lui-control-px);
-    border: var(--lui-border-width) solid var(--lui-border);
-    border-radius: var(--lui-radius-control);
-    corner-shape: var(--lui-corner-shape);
-    background-color: var(--lui-surface);
-    background-color: color-mix(in oklch, var(--lui-primary) 12%, var(--lui-surface));
+  /* Date/time glyph: drawn on the INPUT in both modes (like select's
+     chevron — same tokens, same metrics). The native indicator is kept
+     as a neutral full-height click tile: with transparent paint the
+     native glyph never renders, so exactly one icon shows. Guarded by
+     @supports selector(): engines without this pseudo keep 100% native
+     rendering in both modes. */
+  @supports selector(input[type="date"]::-webkit-calendar-picker-indicator) {
+    :where(input[type="date"], input[type="time"], input[type="datetime-local"], input[type="month"], input[type="week"]) {
+      background-image: var(--lui-calendar);
+      background-repeat: no-repeat;
+      background-position: right var(--lui-control-px) center;
+      background-size: 0.9em auto;
+      padding-right: calc(var(--lui-control-px) * 2 + 1em);
+    }
+    :where(input[type="date"], input[type="time"], input[type="datetime-local"], input[type="month"], input[type="week"])::-webkit-calendar-picker-indicator {
+      cursor: pointer;
+      /* Full-height click tile, paint neutralized (transparent, borderless,
+         no padding): the native glyph doesn't render on a neutral tile,
+         so only the input's glyph shows. A tinted/bordered "docked pill"
+         was tried — the native glyph painting proved flaky there. */
+      height: 100%;
+      min-height: 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+    }
   }
   /* Range: the input IS the track (pill + overflow hidden), fill = huge
      primary shadow left of the thumb — structurally exact, zero JS.
@@ -386,7 +404,9 @@
     appearance: none;
     width: 100%;
     max-width: 28rem;
-    height: calc(var(--lui-check) * 0.5);
+    /* Gauge scale: three-quarters of --lui-check (thinner than controls,
+       but on the same token so coarse pointers scale it too). */
+    height: calc(var(--lui-check) * 0.75);
     border-radius: var(--lui-radius-full);
     corner-shape: var(--lui-corner-shape);
     background: var(--lui-field);
@@ -440,10 +460,12 @@
     appearance: none;
     width: 100%;
     max-width: 28rem;
-    /* Uniform inset around the fill: same padding on all sides, so the
-       track ring reads evenly (height budgets 2 × inset + fill + borders). */
-    height: calc(var(--lui-check) * 0.5 + 0.75rem + (2 * var(--lui-border-width)));
-    padding: 0.375rem;
+    /* Same gauge scale as progress. Padding is uniform on all sides
+       (space-1): the engine-fixed fill (~0.5rem tall in WebKit) sits
+       centered with an even ring — a taller box would only add air,
+       since the fill never stretches to it. */
+    height: calc(var(--lui-check) * 0.75);
+    padding: var(--lui-space-1);
     border-radius: var(--lui-radius-full);
     corner-shape: var(--lui-corner-shape);
     background: var(--lui-field);
@@ -494,9 +516,12 @@
   :where(input[type="file"])::-webkit-file-upload-button {
     height: auto;
     margin: 0;
-    padding: calc((var(--lui-control-h-md) - (2 * var(--lui-border-width)) - 1.2rem - (2 * var(--lui-border-width))) / 2) var(--lui-control-px);
+    padding: calc((var(--lui-control-h-md) - (2 * var(--lui-border-width)) - 1.2rem) / 2) var(--lui-control-px);
     vertical-align: middle;
-    border: var(--lui-border-width) solid var(--lui-border);
+    /* Borderless: the input frame is the only edge (a button border would
+       double it). The tinted fill + label carry the button; the date
+       indicator keeps its border because an icon-only button needs one. */
+    border: 0;
     border-radius: var(--lui-radius-control);
     corner-shape: var(--lui-corner-shape);
     background: var(--lui-surface);
@@ -584,7 +609,6 @@
        track — on tinted surfaces the seam shows the field hue). */
     background-color: var(--lui-text);
     border: 3px solid var(--lui-field);
-    box-shadow: var(--lui-shadow-sm);
     /* Narrow transition props (not `all`): fewer interpolations → fewer glitch frames */
     transition: margin-left 0.1s ease-in-out, width 0.1s ease-in-out, border-width 0.1s ease-in-out, border-color 0.1s ease;
   }
@@ -679,12 +703,18 @@
 
   :where(table) {
     width: 100%;
+    /* Scroll container by default: wide tables scroll inside their parent
+       instead of blowing out the viewport. The anonymous inner table keeps
+       column alignment (thead still lines up with tbody); .table-wrap
+       remains the opt-in framed variant. */
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
     border-collapse: collapse;
     font-size: var(--lui-font-sm);
     background: var(--lui-surface);
     border: var(--lui-border-width) solid var(--lui-border);
     border-radius: var(--lui-radius-lg);
-    overflow: hidden;
   }
   :where(th, td) {
     padding: var(--lui-space-2) var(--lui-space-3);
@@ -740,6 +770,33 @@
     background: rgb(0 0 0 / 0.6); /* --lui-scrim deliberately not tokenized: single use, intentionally constant in both modes */
     -webkit-backdrop-filter: blur(4px);
     backdrop-filter: blur(4px);
+  }
+  /* Adaptive modal: the same <dialog> is a centered card on desktop and a
+     bottom sheet on mobile (width-only breakpoint — pointer never switches
+     layout). dvh + safe-area included so the sheet clears the home bar. */
+  @media (max-width: 48rem) {
+    :where(dialog:not(.drawer):not(.sheet)) {
+      margin: auto auto 0 auto;
+      width: 100%;
+      max-width: none;
+      max-height: min(92vh, 40rem);
+      max-height: min(92dvh, 40rem);
+      border: 0;
+      border-top: var(--lui-border-width) solid var(--lui-border);
+      border-top-left-radius: var(--lui-radius-lg);
+      border-top-right-radius: var(--lui-radius-lg);
+      corner-shape: var(--lui-corner-shape);
+      padding-bottom: calc(var(--lui-space-4) + env(safe-area-inset-bottom, 0rem));
+    }
+    :where(dialog:not(.drawer):not(.sheet))::before {
+      content: "";
+      display: block;
+      width: 2.5rem;
+      height: var(--lui-space-1);
+      margin: 0 auto var(--lui-space-3);
+      border-radius: var(--lui-radius-full);
+      background: var(--lui-border);
+    }
   }
   /* Fallback path (no JS / no showModal): a non-modal dialog[open] gets no
      ::backdrop from the browser, so dim + blur the page behind it instead.

@@ -69,29 +69,89 @@ TOKEN_RE = re.compile(
 )
 
 
+# Matches a math function call start (calc/min/max/clamp) — balanced
+# parens are walked manually in _split_math() below.
+MATH_RE = re.compile(r"(?<![\w-])(calc|min|max|clamp)\s*\(")
+
+
+def _split_math(code):
+    """Split code into (is_math, chunk) pieces.
+
+    Math function contents keep their inner whitespace (collapsed to single
+    spaces only): binary + and - inside calc()/min()/max()/clamp() REQUIRE
+    surrounding spaces, so the generic token-strip must never run there.
+    """
+    parts = []
+    i, n = 0, len(code)
+    while i < n:
+        m = MATH_RE.search(code, i)
+        if not m:
+            parts.append((False, code[i:]))
+            break
+        if m.start() > i:
+            parts.append((False, code[i:m.start()]))
+        start = m.start()
+        depth, j = 0, m.end() - 1
+        while j < n:
+            if code[j] == "(":
+                depth += 1
+            elif code[j] == ")":
+                depth -= 1
+                if depth == 0:
+                    break
+            j += 1
+        j = min(j + 1, n)  # include ")" (or EOL on unbalanced)
+        parts.append((True, code[start:j]))
+        i = j
+    return parts
+
+
+def _squeeze(chunk):
+    """Whitespace squeeze for non-math, non-string CSS code.
+
+    Only drops spaces where they are never significant. Kept on purpose:
+      - before "(" and after ")": `@media screen and (x)`, `:is(a) :hover`
+        (a space is a word separator / descendant combinator there)
+      - before "[" and after "]": `.a [hidden]`, `[x] :hover` (descendant)
+      - before ":": `.a :hover` is a descendant selector, not `.a:hover`
+    Everything else around { } ; , > + ~ = is safe to remove.
+    """
+    chunk = re.sub(r"\s+", " ", chunk)
+    chunk = re.sub(r"\s*([{};,>+~=])\s*", r"\1", chunk)
+    chunk = re.sub(r"\s+\)", ")", chunk)
+    chunk = re.sub(r"\s+\]", "]", chunk)
+    chunk = re.sub(r"([({\[:])\s+", r"\1", chunk)
+    return chunk
+
+
 def minify_css(text):
     """Strip comments, collapse whitespace. Strings/urls pass through untouched.
 
-    Constraint: safe for calc()/min()/clamp() only because bare + and -
-    (spaced operators) are never in the strip class - do not add them."""
+    Constraint: safe for calc()/min()/max()/clamp() because their contents
+    are split out by _split_math() and only get whitespace runs collapsed
+    to a single space — the token-strip (which would eat the spaces around
+    binary + and -) never runs inside them. Do not extend the strip class
+    with + or - either."""
     out = []
     pos = 0
     for m in TOKEN_RE.finditer(text):
-        code = text[pos:m.start()]
-        # collapse whitespace runs to one space, drop space around tokens
-        code = re.sub(r"\s+", " ", code)
-        code = re.sub(r"\s*([{}:;,>+~()\[\]=])\s*", r"\1", code)
-        out.append(code)
+        for is_math, chunk in _split_math(text[pos:m.start()]):
+            if is_math:
+                out.append(re.sub(r"\s+", " ", chunk))
+            else:
+                # collapse whitespace runs to one space, drop space around tokens
+                out.append(_squeeze(chunk))
         kind = m.lastgroup
         if kind == "comment":
             pass  # drop
         else:
             out.append(m.group(0))  # string | url(): verbatim
         pos = m.end()
-    tail = text[pos:]
-    tail = re.sub(r"\s+", " ", tail)
-    tail = re.sub(r"\s*([{}:;,>+~()\[\]=])\s*", r"\1", tail)
-    out.append(tail)
+    for is_math, chunk in _split_math(text[pos:]):
+        if is_math:
+            out.append(re.sub(r"\s+", " ", chunk))
+        else:
+            out.append(_squeeze(chunk))
     result = "".join(out).strip()
     # no leading/trailing semicolons inside blocks: ";}" -> "}"
     result = result.replace(";}", "}")

@@ -262,7 +262,8 @@
     justify-content: flex-start;
     gap: var(--lui-space-2);
     width: 100%;
-    min-height: max(2.75rem, var(--lui-control-h-md));
+    /* Control height like .menu rows (coarse pointers keep the 44px floor). */
+    min-height: var(--lui-control-h-md);
     padding: var(--lui-control-py) var(--lui-control-px);
     border: 0;
     border-radius: var(--lui-radius-control);
@@ -288,6 +289,33 @@
     outline: 2px solid var(--lui-ring);
     outline-offset: 2px;
   }
+  @media (pointer: coarse) {
+    details.dropdown[open] > div > a,
+    details.dropdown[open] > div > button { min-height: 2.75rem; }
+  }
+  /* Mobile: anchored panel becomes a bottom sheet (width-only switch;
+     coarse pointer only sizes targets, never layout). Same sheet language
+     as dialog/drawer: full-width, top radius only, dvh cap, safe-area. */
+  @media (max-width: 48rem) {
+    details.dropdown[open] > div {
+      position: fixed;
+      top: auto;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      min-width: 0;
+      max-width: none;
+      max-height: min(70vh, 30rem);
+      max-height: min(70dvh, 30rem);
+      overflow-y: auto;
+      border: 0;
+      border-top: var(--lui-border-width) solid var(--lui-border);
+      border-radius: var(--lui-radius-lg) var(--lui-radius-lg) 0 0;
+      corner-shape: var(--lui-corner-shape);
+      padding: var(--lui-space-2) var(--lui-space-3) calc(var(--lui-space-3) + env(safe-area-inset-bottom, 0rem));
+      z-index: 60;
+    }
+  }
 
   /* Toasts: tinted cards with icon + title + message.
      Static in flow, or live stacked via .toasts container
@@ -307,8 +335,8 @@
      Tones: info (default, always blue) | success | warning | danger */
   .toasts {
     position: fixed;
-    bottom: var(--lui-space-3);
-    right: var(--lui-space-3);
+    bottom: calc(var(--lui-space-3) + env(safe-area-inset-bottom, 0rem));
+    right: calc(var(--lui-space-3) + env(safe-area-inset-right, 0rem));
     display: flex;
     flex-direction: column;
     gap: var(--lui-space-2);
@@ -316,42 +344,56 @@
     max-width: min(24rem, calc(100vw - 2rem));
   }
   .toasts[data-placement="top-left"] {
-    top: var(--lui-space-3);
+    top: calc(var(--lui-space-3) + env(safe-area-inset-top, 0rem));
     bottom: auto;
-    left: var(--lui-space-3);
+    left: calc(var(--lui-space-3) + env(safe-area-inset-left, 0rem));
     right: auto;
   }
   .toasts[data-placement="top-center"] {
-    top: var(--lui-space-3);
+    top: calc(var(--lui-space-3) + env(safe-area-inset-top, 0rem));
     bottom: auto;
     left: 50%;
     right: auto;
     transform: translateX(-50%);
   }
   .toasts[data-placement="top-right"] {
-    top: var(--lui-space-3);
+    top: calc(var(--lui-space-3) + env(safe-area-inset-top, 0rem));
     bottom: auto;
     left: auto;
-    right: var(--lui-space-3);
+    right: calc(var(--lui-space-3) + env(safe-area-inset-right, 0rem));
   }
   .toasts[data-placement="bottom-left"] {
     top: auto;
-    bottom: var(--lui-space-3);
-    left: var(--lui-space-3);
+    bottom: calc(var(--lui-space-3) + env(safe-area-inset-bottom, 0rem));
+    left: calc(var(--lui-space-3) + env(safe-area-inset-left, 0rem));
     right: auto;
   }
   .toasts[data-placement="bottom-center"] {
     top: auto;
-    bottom: var(--lui-space-3);
+    bottom: calc(var(--lui-space-3) + env(safe-area-inset-bottom, 0rem));
     left: 50%;
     right: auto;
     transform: translateX(-50%);
   }
   .toasts[data-placement="bottom-right"] {
     top: auto;
-    bottom: var(--lui-space-3);
+    bottom: calc(var(--lui-space-3) + env(safe-area-inset-bottom, 0rem));
     left: auto;
-    right: var(--lui-space-3);
+    right: calc(var(--lui-space-3) + env(safe-area-inset-right, 0rem));
+  }
+  /* Mobile: bottom toasts clear the app-nav tab bar (width-only switch).
+     Left/right insets keep them off the screen edge + notch. */
+  @media (max-width: 48rem) {
+    .toasts,
+    .toasts[data-placement="bottom-left"],
+    .toasts[data-placement="bottom-center"],
+    .toasts[data-placement="bottom-right"] {
+      bottom: calc(4.5rem + env(safe-area-inset-bottom, 0rem));
+      max-width: none;
+      left: calc(var(--lui-space-2) + env(safe-area-inset-left, 0rem));
+      right: calc(var(--lui-space-2) + env(safe-area-inset-right, 0rem));
+      transform: none;
+    }
   }
   .toast {
     --lui-toast-tone: var(--lui-info);
@@ -382,11 +424,7 @@
   }
   .toast[data-tone="info"]::before { content: "ⓘ"; }
   .toast[data-tone="success"] { --lui-toast-tone: var(--lui-success); }
-  .toast[data-tone="success"]::before {
-    content: "\f1971";
-    font-family: "hugeicons-stroke-rounded";
-    font-weight: 400;
-  }
+  .toast[data-tone="success"]::before { content: "✓"; }
   .toast[data-tone="warning"] { --lui-toast-tone: var(--lui-warning); }
   .toast[data-tone="warning"]::before { content: "⚠"; }
   .toast[data-tone="danger"] { --lui-toast-tone: var(--lui-danger); }
@@ -436,7 +474,9 @@
     align-items: center;
     justify-content: center;
     min-width: 2.75rem;
-    height: 2.75rem;
+    /* Control height like buttons (density-scaled); width keeps the
+       44px touch target. Coarse pointers keep full 44px height. */
+    height: var(--lui-control-h-md);
     padding-inline: var(--lui-space-2);
     border-radius: var(--lui-radius-control);
     corner-shape: var(--lui-corner-shape);
@@ -461,6 +501,10 @@
     background: var(--lui-primary);
     border-color: transparent;
     color: var(--lui-on-primary);
+  }
+  @media (pointer: coarse) {
+    .pagination a,
+    .pagination [aria-current="page"] { min-height: 2.75rem; }
   }
 
   /* Breadcrumb: plain nav + ordered list, separators via CSS.

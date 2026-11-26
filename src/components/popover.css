@@ -80,10 +80,10 @@
     gap: var(--lui-space-2);
     width: 100%;
     /* Override the fixed base-button height — links and buttons share
-       min-height so every row measures the same. 44px floor holds the
-       touch target even at compact densities. */
+       min-height so every row measures the same: control height like
+       .menu rows (coarse pointers keep the 44px floor). */
     height: auto;
-    min-height: max(2.75rem, var(--lui-control-h-md));
+    min-height: var(--lui-control-h-md);
     padding: var(--lui-space-1) var(--lui-space-2);
     border: 0;
     border-radius: var(--lui-radius-sm);
@@ -102,6 +102,31 @@
   .popover [role="menuitem"]:focus-visible {
     outline: 2px solid var(--lui-ring);
     outline-offset: -2px;
+  }
+  @media (pointer: coarse) {
+    .popover [role="menuitem"] { min-height: 2.75rem; }
+  }
+  /* Mobile: anchored panel becomes a bottom sheet (width-only switch).
+     Same sheet language as dialog/drawer/dropdown. */
+  @media (max-width: 48rem) {
+    .popover[open] > div {
+      position: fixed;
+      top: auto;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      min-width: 0;
+      max-width: none;
+      max-height: min(70vh, 30rem);
+      max-height: min(70dvh, 30rem);
+      overflow-y: auto;
+      border: 0;
+      border-top: var(--lui-border-width) solid var(--lui-border);
+      border-radius: var(--lui-radius-lg) var(--lui-radius-lg) 0 0;
+      corner-shape: var(--lui-corner-shape);
+      padding: var(--lui-space-2) var(--lui-space-3) calc(var(--lui-space-3) + env(safe-area-inset-bottom, 0rem));
+      z-index: 60;
+    }
   }
   /* First/last item follow the panel's inner curve (radius − padding),
      otherwise their smaller hover radius gets cut off by the panel edge. */

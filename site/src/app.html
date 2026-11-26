@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en" data-theme="default" data-mode="auto">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='4' fill='%232272ce'/%3E%3C/svg%3E" />
+    <script>
+      // Before paint: apply the stored choice (avoid FOUC). Without JS, data-mode="auto" → system.
+      // ?theme=/ ?mode= links also work (validated, storage wins).
+      try {
+        const q = new URLSearchParams(location.search);
+        const t = localStorage.getItem("lui-theme") || q.get("theme"), m = localStorage.getItem("lui-mode") || q.get("mode");
+        if (t && ["default", "ocean", "squishy"].includes(t)) document.documentElement.dataset.theme = t;
+        if (m && ["auto", "light", "dark"].includes(m)) document.documentElement.dataset.mode = m;
+      } catch (e) {}
+    </script>
+    %sveltekit.head%
+  </head>
+  <body data-sveltekit-preload-data="hover">
+    <div style="display: contents">%sveltekit.body%</div>
+  </body>
+</html>

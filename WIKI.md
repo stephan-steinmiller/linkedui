@@ -3,14 +3,14 @@
 CSS-first UI library: classless base, variants via classes, theming via CSS variables.
 Usable without JS, better with JS (progressive enhancement). No build, no dependencies.
 
-- **Live docs (built with the lib itself):** `site/wiki.html` (English home),
-  `site/wiki-de.html` (Deutsch home), one page per component under
-  `site/wiki/` (`buttons.html` … + `-de.html` twins, sidebar included on every
-  page). Bodies are generated from `site/wiki-src.html` /
-  `site/wiki-src-de.html` — edit those (or the chrome in
-  `site/split-wiki.py`), then re-run `python3 site/split-wiki.py`.
-  Never hand-edit `site/wiki/*` bodies.
-- **Theme builder:** `site/index.html` (English), `site/index-de.html` (Deutsch)
+- **Live docs (built with the lib itself):** SvelteKit app in `site/` (static
+  export to `site/build/`), prerendered — no-JS still gets full content.
+  Wiki routes `/wiki`, `/wiki-de`, `/wiki/[slug]` (`-de` suffix twins) render
+  from `site/src/lib/content/wiki-src.html` / `wiki-src-de.html` — edit those
+  single sources; bodies, sidebar, prev/next and code samples regenerate at
+  build time. Never hand-edit `site/build/` (generated).
+- **Theme builder:** SvelteKit routes `/` (English) + `/de` (Deutsch),
+  logic in `site/src/lib/theme.ts`, UI in `site/src/lib/Builder.svelte`.
 - **Entry point:** `src/linkedui.css`
 
 ## 1. Quick start
@@ -20,6 +20,8 @@ Usable without JS, better with JS (progressive enhancement). No build, no depend
 <html data-theme="default" data-mode="auto">
 <body>
   <a href="#main">Skip to content</a><!-- revealed on focus, no classes needed -->
+  <!-- If your framework wraps page content (SvelteKit, React root …),
+       the first-child position breaks: use <a class="skip-link" href="#main"> -->
   <main class="lui-container" id="main">
     <button class="btn">Primary</button>
   </main>
@@ -83,6 +85,9 @@ ok/wrong states + feedback).
 <select><option>…</option></select><!-- custom chevron, follows the theme -->
 <textarea></textarea>
 <input type="checkbox" checked /> <input type="radio" name="g" checked />
+<label class="check"><input type="checkbox" checked /> Remember me</label>
+<!-- .check: single-wrapper inline row (control beside label);
+     sibling input + label[for] pairs work too -->
 <label class="switch">
   <input type="checkbox" role="switch" checked /><span aria-hidden="true"></span> Wi-Fi
 </label><!-- data-variant="secondary" tints switch, range, checkbox, radio, progress -->
@@ -116,7 +121,7 @@ ok/wrong states + feedback).
   <button class="btn" type="button" aria-label="Decrease">−</button>
   <input type="number" value="1" aria-label="Quantity" />
   <button class="btn" type="button" aria-label="Increase">+</button>
-</div>
+</div><!-- joined −/value/+ quantity entry; button behavior is app JS -->
 <div class="form-grid">
   <label class="field"><span>First</span><input /></label>
   <label class="field"><span>Last</span><input /></label>
@@ -315,6 +320,9 @@ it only selects a value.
   <input type="radio" name="range" id="r-7d" checked /><label for="r-7d">7D</label>
   <input type="radio" name="range" id="r-1m" /><label for="r-1m">1M</label>
 </div>
+<!-- hue variants, same as buttons: -->
+<div class="segmented" data-variant="secondary" …>…</div>
+<div class="segmented" data-variant="accent" …>…</div>
 ```
 
 ### Popover menu — `src/components/popover.css` + `enhance.js`
@@ -526,12 +534,15 @@ Builds on `.bubble` (chat.css), `.avatar`, `.chip`, `.btn`,
 
 Error state: `.ai-msg[data-state="error"]`. Regenerated variants:
 `.ai-nav` (`‹ 1/2 ›`) inside `.ai-acts`. Streaming caret: `.ai-caret`.
+
 ### Feedback — `src/components/feedback.css`
 
 ```html
 <div class="alert" data-tone="success"><span>Done!</span></div>
 <!-- data-tone: success | warning | danger (none: neutral) -->
 <span class="badge">New</span>
+<span class="badge" data-tone="accent">Pro</span>
+<!-- badge data-tone: success | warning | danger | accent -->
 <span class="chip">Photo<button type="button" data-lui-chip-close aria-label="Remove photo filter">×</button></span>
 <!-- data-lui-chip-close is a docs naming convention (no lib handler);
      chip removal is app JS (el.remove()); everything else here is CSS-only -->
@@ -583,7 +594,7 @@ stored choice wins) — handy for sharing a theme view.
 ### Custom themes
 
 Pattern in `src/themes.css` (header comment), easiest via the builder
-(`site/index.html`): colors → radius/density/shape → copy the export or
+(`site/src/routes/+page.svelte` + `site/src/lib/Builder.svelte`): colors → radius/density/shape → copy the export or
 download `themes.css`. Shape rules: `--lui-radius` = boxes,
 `--lui-radius-control` = controls (`999px` = pill for controls only),
 `--lui-corner-shape: round | superellipse(K)`. Compensate squircle radius
@@ -632,9 +643,9 @@ segmented and toasts), `--lui-density` (master) or `--lui-density-x`/`-y`,
 | `bindChipClose()` | `data-lui-chip-close` removes its `.chip` |
 | `bindActivationGuards()` | `aria-disabled` widgets never activate |
 
-Builder (`site/app.js`, JSDoc everywhere): `derived()` (derive theme),
-`snippet()` / `fullFile()` (export), `render()` (live; density applies on release),
-`loadThemeIntoBuilder()` (theme → inputs), `applyUrlState()` / `pushUrlState()`
+Builder (`site/src/lib/theme.ts`, pure functions + `Builder.svelte` UI): `deriveTheme()`,
+`themeSnippet()` / `fullFile()` (export), live preview (density applies on release),
+`loadThemeIntoBuilder()` (theme → inputs), `applyUrlState()` / `stateToQuery()`
 (shareable links), `cssToHex()`, `squirFactor()`.
 
 ## 7. Build (`tools/minify.py`, stdlib only, no dependencies)
@@ -647,12 +658,13 @@ python3 tools/minify.py                    # full build -> dist/
 python3 tools/minify.py --check            # CI/manual check: is dist current?
 python3 tools/minify.py --entry slim.css   # only the listed @imports (pruning)
 python3 tools/minify.py --theme default    # only this theme (+ generics)
+python3 tools/test_minify.py               # minifier regression tests (stdlib)
 ```
 
-- Full minified: CSS ~11 KB gzip, JS ~2.4 KB gzip (measured at the repo).
+- Full minified: CSS ~13 KB gzip, JS ~4.2 KB gzip (measured at the repo).
 - Custom entry: your own `@import` list (see `src/linkedui.css`), e.g. only
   the components you use — example: tokens+reset+base+button+card, default theme
-  ≈ 6 KB CSS gzip + 2.4 KB JS.
+  ≈ 6 KB CSS gzip + 4.2 KB JS.
 - `--theme` filters `[data-theme="…"]` blocks; theme-free rules (fallbacks,
   dark generics, `@supports`) always survive — correctness over max size.
 - After `src/` changes: run the script, check `git diff --stat dist/`
@@ -683,11 +695,11 @@ src/tokens.css                design tokens
 src/reset.css                 mini reset
 src/base.css                  classless base (buttons, forms, switch, slider, dialog …)
 src/components/button.css     .btn + variants/states/sizes
-src/components/card.css       container, grid, card, field, hints, empty state
+src/components/card.css       container, grid, card, field, hints, empty state, check-chips, stepper, check
 src/components/layout.css     page structure: stack, cluster, split, sidebar shell, stage, hero
 src/components/steps.css      stepper (CSS counters)
 src/components/quiz.css       single-choice quiz cards
-src/components/feedback.css   alert, badge, skeleton
+src/components/feedback.css   alert, badge (+tones), chip, skeleton, spinner
 src/components/chat.css       chat bubbles (static, no JS)
 src/components/ai-chat.css    AI chat: log, reasoning, receipts, status, hero, composer (+ autogrow JS)
 src/components/avatar.css     avatar (initials/photo, status)
@@ -695,8 +707,8 @@ src/components/nav-overlays.css nav, tooltip, dropdown, pagination, toasts
 src/components/app-nav.css     app nav (adaptive sidebar ↔ bottom bar, CSS-only)
 src/components/popover.css   popover menu (details-first)
 src/components/drawer.css    drawer + modal sheet via dialog
-src/components/tabs.css       tabs (CSS-only)
-src/components/segmented.css  segmented control (CSS-only)
+src/components/tabs.css       tabs (CSS-only, data-variant secondary/accent)
+src/components/segmented.css  segmented control (CSS-only, data-variant secondary/accent)
 src/components/rating.css     star rating (CSS-only)
 src/components/timeline.css   activity feed (CSS-only)
 src/components/carousel.css   scroll-snap slider (CSS-only)
@@ -706,13 +718,20 @@ src/enhance.js                progressive enhancement (JSDoc)
 tools/minify.py               stdlib-only minifier (-> dist/, --entry/--theme/--check)
 dist/linkedui.min.css         generated (checked in, vgl. ## 7)
 dist/enhance.min.js           generated (checked in, vgl. ## 7)
-site/index.html               theme builder, English (dogfoods the lib)
-site/index-de.html            theme builder, German
-site/app.js                   builder logic (JSDoc)
-site/site.css                 site-only chrome (builder panels, NOT lib)
-site/split-wiki.py            one-shot wiki splitter (see docstring)
-site/wiki.html                docs home, English
-site/wiki-de.html             docs home, German
-site/wiki/*.html              one page per component, EN + -de twins
+site/svelte.config.js         adapter-static (pages/assets -> site/build/, prerendered)
+site/src/app.css              site-only chrome (builder panels, NOT lib)
+site/src/app.html             html shell (+ anti-FOUC theme restore)
+site/src/routes/+page.svelte  theme builder, English (dogfoods the lib)
+site/src/routes/de/+page.svelte theme builder, German
+site/src/routes/wiki/+page.svelte wiki home, English
+site/src/routes/wiki-de/+page.svelte wiki home, German
+site/src/routes/wiki/[slug]/+page.js entries + load (EN + -de twins)
+site/src/lib/theme.ts         builder math (derive/export/URL, pure functions)
+site/src/lib/Builder.svelte   builder UI (live preview, copy/download/share)
+site/src/lib/Demo.svelte      builder preview demos (all variants incl. segmented)
+site/src/lib/wiki.ts          wiki splitter (parse/processBody/rewriteHrefs, ported)
+site/src/lib/content/wiki-src.html wiki single source, English
+site/src/lib/content/wiki-src-de.html wiki single source, German
+site/build/                   static export (generated, git-ignored)
 WIKI.md                       this file
 ```

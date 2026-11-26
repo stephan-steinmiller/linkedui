@@ -1,0 +1,61 @@
+/* linkedui site chrome — docs + builder pages ONLY, not part of the lib.
+ * Anything reusable belongs in src/components/*.css instead. */
+
+.builder {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 20rem minmax(0, 1fr);
+  align-items: start;
+}
+/* min-width: 0 — same grid-blowout guard as the lib .stack */
+.builder > * {
+  min-width: 0;
+}
+@media (max-width: 56.25rem) {
+  .builder { grid-template-columns: minmax(0, 1fr); }
+}
+/* Left panel scrolls independently from the preview on the right */
+@media (min-width: 56.26rem) {
+  .controls {
+    position: sticky;
+    top: 1rem;
+    max-height: calc(100dvh - 2rem);
+    overflow-y: auto;
+  }
+}
+.panel {
+  background: var(--lui-surface);
+  border: var(--lui-border-width) solid var(--lui-border);
+  border-radius: var(--lui-radius-lg);
+  padding: 1rem;
+  display: grid;
+  gap: .75rem;
+}
+.preview {
+  background: var(--lui-bg);
+  border: var(--lui-border-width) dashed var(--lui-border);
+  border-radius: var(--lui-radius-lg);
+  padding: 1rem;
+  display: grid;
+  gap: 1rem;
+}
+/* same grid-blowout guard as .builder above */
+.panel > *,
+.preview > * {
+  min-width: 0;
+}
+.controls label { display: grid; gap: .25rem; }
+.controls input[type="range"] { max-width: none; }
+.pair { display: flex; gap: .5rem; align-items: center; }
+.pair input[type="range"] { flex: 1; min-width: 0; }
+.pair input[type="number"] { width: 5.5rem; flex: none; }
+/* Component directory: link lists as full-width ghost buttons (no bullets). */
+.dir-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--lui-space-1);
+}
+.dir-list > li { margin: 0; }
+.dir-list .btn { width: 100%; justify-content: flex-start; }

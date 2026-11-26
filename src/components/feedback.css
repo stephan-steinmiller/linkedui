@@ -95,6 +95,7 @@
     corner-shape: var(--lui-corner-shape);
     background: var(--lui-field);
     border: var(--lui-border-width) solid var(--lui-border);
+    color: var(--lui-text); /* chips sit on surfaces, not on primary: base button sets on-primary ink, which is dark-on-dark in dark themes */
     font-size: var(--lui-font-sm);
     font-weight: 600;
   }
