@@ -35,7 +35,7 @@ Run `python tools/minify.py` after any change in `src/` to regenerate `dist/`.
   your own themes work with the site's switcher. Other values are still ignored.
 - `--theme` builds keep the `:root` base rules. Before, a single-theme build could lose base values
   such as `--lui-density-y`.
-- The minified CSS is 94.2 KB (14.3 KB gzip), down from 100.8 KB (14.4 KB gzip): the six dark blocks
+- The minified CSS is 94.6 KB (14.3 KB gzip), down from 100.8 KB (14.4 KB gzip): the six dark blocks
   are now one mapping.
 - Dialog: a click on the dialog's own padding no longer closes it; only the backdrop does.
 - Popover: ArrowDown and ArrowUp on the trigger open the menu and focus the first or last item;
