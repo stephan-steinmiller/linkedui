@@ -117,7 +117,7 @@
     line-height: 1.2;
     padding: var(--lui-control-py) var(--lui-control-px);
     background: var(--lui-field);
-    border: var(--lui-border-width) solid var(--lui-border);
+    border: var(--lui-border-width) solid var(--lui-control-border);
     color: var(--lui-text);
     width: 100%;
     max-width: var(--lui-field-maxw);
@@ -127,7 +127,7 @@
     line-height: 1.5;
     padding: var(--lui-control-py) var(--lui-control-px);
     background: var(--lui-field);
-    border: var(--lui-border-width) solid var(--lui-border);
+    border: var(--lui-border-width) solid var(--lui-control-border);
     color: var(--lui-text);
     width: 100%;
     max-width: var(--lui-field-maxw);

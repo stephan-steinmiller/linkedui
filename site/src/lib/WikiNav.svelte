@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { WikiLang } from '$lib/wiki';
+  import { THEME_OPTIONS } from '$lib/theme-options';
 
   let {
     L,
@@ -18,9 +19,9 @@
   <span style="flex:1"></span>
   <label class="visually-hidden" for="wiki-theme">{L.theme}</label>
   <select id="wiki-theme" data-lui-theme>
-    <option value="default">default</option>
-    <option value="ocean">ocean</option>
-    <option value="squishy">squishy + squircle</option>
+    {#each THEME_OPTIONS as opt}
+      <option value={opt.value}>{opt.label}</option>
+    {/each}
   </select>
   <label class="visually-hidden" for="wiki-mode">{L.mode}</label>
   <select id="wiki-mode" data-lui-mode>

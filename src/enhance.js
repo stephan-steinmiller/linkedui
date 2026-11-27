@@ -56,8 +56,9 @@
   /** @constant {string} localStorage key for the mode (`auto|light|dark`). */
   const LS_MODE = "lui-mode";
 
-  /** Known themes/modes - anything else in storage is ignored. */
-  const KNOWN_THEMES = ["default", "ocean", "squishy"];
+  /** Themes: any lowercase name (letters, digits, hyphens) - built-in or your own.
+   *  Modes are fixed. Anything else in storage or the URL is ignored. */
+  const THEME_NAME = /^[a-z][a-z0-9-]{0,39}$/;
   const KNOWN_MODES = ["auto", "light", "dark"];
   /**
    * Apply the stored theme choice early.
@@ -69,7 +70,7 @@
       const q = new URLSearchParams(location.search);
       const t = localStorage.getItem(LS_THEME) || q.get("theme");
       const m = localStorage.getItem(LS_MODE) || q.get("mode");
-      if (t && KNOWN_THEMES.includes(t)) root.dataset.theme = t;
+      if (t && THEME_NAME.test(t)) root.dataset.theme = t;
       if (m && KNOWN_MODES.includes(m)) root.dataset.mode = m;
     } catch { /* private mode - doesn't matter, system auto applies */ }
   }
@@ -97,7 +98,8 @@
    */
   function bindThemeSwitchers() {
     document.querySelectorAll("[data-lui-theme]").forEach((el) => {
-      el.value = root.dataset.theme || "default";
+      // A theme this menu does not list (a custom name) shows the first option, not a blank menu.
+      el.value = [...el.options].some((o) => o.value === root.dataset.theme) ? root.dataset.theme : "default";
       el.addEventListener("change", () => {
         root.dataset.theme = el.value;
         try { localStorage.setItem(LS_THEME, el.value); } catch {}

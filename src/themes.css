@@ -2,34 +2,55 @@
    Switch: <html data-theme="default|ocean|squishy" data-mode="auto|light|dark">
    Default data-mode="auto" → system decides, pure CSS, no JS needed.
  *
- * ADDING YOUR OWN THEME (pattern, light + dark):
+ * How dark mode works: each theme sets its LIGHT values and a DARK PALETTE
+ * (--lui-dark-*, plain values). The mapping blocks below turn that palette into
+ * the --lui-* tokens. The mapping exists twice on purpose: for data-mode="dark",
+ * and for auto under prefers-color-scheme: dark (a page without data-mode counts
+ * as auto). Both copies must stay identical; the browser checks compare them.
+ *
+ * ADDING YOUR OWN THEME (light values + dark palette):
  *   [data-theme="my-theme"] {
  *     color-scheme: light;
-  *     --lui-primary: oklch(0.555 0.16 255);
-  *     --lui-on-primary: oklch(0.99 0 0);
-  *     --lui-accent: oklch(0.555 0.16 255);
-  *     --lui-on-accent: oklch(0.99 0 0);
-  *     --lui-bg: oklch(0.99 0.005 95);
-  *     --lui-surface: #edf1f7; (fallback if no color-mix)
+ *     --lui-primary: oklch(0.555 0.16 255);
+ *     --lui-on-primary: oklch(0.99 0 0);
+ *     --lui-accent: oklch(0.555 0.16 255);
+ *     --lui-on-accent: oklch(0.99 0 0);
+ *     --lui-bg: oklch(0.99 0.005 95);
  *     --lui-surface: color-mix(in oklch, var(--lui-accent) 7%, var(--lui-bg));
  *     --lui-text: oklch(0.27 0.03 260);
  *     --lui-radius: 12px;            (boxes)
  *     --lui-radius-control: 12px;    (buttons/inputs; 999px = pill)
  *     --lui-density-x: 1; --lui-density-y: 1;
  *     --lui-corner-shape: round;     (or superellipse(1.3) + @supports compensation!)
+ *     --lui-dark-bg: oklch(0.22 0.02 260);    (dark palette: the same names as in the
+ *     --lui-dark-text: oklch(0.95 0.01 95);    default block below, with your values)
+ *     …
  *   }
- *   [data-mode="dark"][data-theme="my-theme"] { color-scheme: dark; …dark values… }
- *   @media (prefers-color-scheme: dark) {
- *     [data-mode="auto"][data-theme="my-theme"] { …dark values… }
- *   }
- * Easier: site/index.html (theme builder) → copy the export.
+ * One dark token can still be overridden (it wins over the mapping):
+ *   [data-mode="dark"][data-theme="my-theme"] { --lui-primary: oklch(0.7 0.15 255); }
+ * Easier: the theme builder on the docs site → copy the export.
  * Squircle rule: compensate radius (base × (0.5 + 0.5 × K)) ONLY inside
  * @supports — otherwise it gets too round where shapes are unsupported.
  * See squishy block below.
  */
 
 @layer themes {
-  /* ---------- Light: Default ---------- */
+  /* ---------- Dark: shared palette (identical for every theme; themes may override) ---------- */
+  :root {
+    --lui-dark-success: oklch(0.78 0.14 150);
+    --lui-dark-warning: oklch(0.84 0.13 80);
+    --lui-dark-danger: oklch(0.74 0.17 25);
+    --lui-dark-info: oklch(0.8 0.13 250);
+    --lui-dark-tone-base: #000000;
+    --lui-dark-tone-pct: 36%;
+    --lui-dark-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+    --lui-dark-shadow-md: 0 4px 16px rgb(0 0 0 / 0.5);
+    /* Select chevron and date glyph: light stroke in dark mode. */
+    --lui-dark-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23e8eaf0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    --lui-dark-calendar: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23e8eaf0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2'/%3E%3Cpath d='M16 2v4M8 2v4M3 10h18'/%3E%3C/svg%3E");
+  }
+
+  /* ---------- Light: Default (+ dark palette) ---------- */
   :root, [data-theme="default"] {
     color-scheme: light;
     --lui-bg: oklch(0.99 0.005 95);
@@ -39,6 +60,7 @@
     --lui-muted: oklch(0.51 0.03 260);
     --lui-border: #e2e5ea;
     --lui-border: color-mix(in oklch, var(--lui-text) calc(8% + var(--lui-contrast, 0.5) * 20%), var(--lui-bg));
+    --lui-control-border: color-mix(in oklch, var(--lui-text) 55%, var(--lui-bg));
     --lui-primary: oklch(0.555 0.16 255);
     --lui-primary-hover: #1b5fad;
     --lui-primary-hover: color-mix(in oklch, var(--lui-primary) 88%, black);
@@ -59,9 +81,20 @@
        via coarse-pointer rules on the components that need them. */
     --lui-density-y: 0.75;
     --lui-corner-shape: round;
+    /* Dark palette (values only; the mapping below applies them in dark mode). */
+    --lui-dark-bg: oklch(0.22 0.02 260);
+    --lui-dark-text: oklch(0.95 0.01 95);
+    --lui-dark-muted: oklch(0.7 0.03 260);
+    --lui-dark-primary: oklch(0.7 0.15 255);
+    --lui-dark-on-primary: oklch(0.2 0.03 260);
+    --lui-dark-secondary: oklch(0.74 0.06 260);
+    --lui-dark-on-secondary: oklch(0.2 0.03 260);
+    --lui-dark-accent: oklch(0.7 0.15 255);
+    --lui-dark-on-accent: oklch(0.2 0.03 260);
+    --lui-dark-on-danger: oklch(0.2 0.03 260);
   }
 
-  /* ---------- Light: Ocean ---------- */
+  /* ---------- Light: Ocean (+ dark palette) ---------- */
   [data-theme="ocean"] {
     color-scheme: light;
     --lui-bg: oklch(0.985 0.01 210);
@@ -71,6 +104,7 @@
     --lui-muted: oklch(0.505 0.04 220);
     --lui-border: #c5d2d6;
     --lui-border: color-mix(in oklch, var(--lui-text) calc(8% + var(--lui-contrast, 0.5) * 20%), var(--lui-bg));
+    --lui-control-border: color-mix(in oklch, var(--lui-text) 55%, var(--lui-bg));
     --lui-primary: oklch(0.52 0.14 200);
     --lui-primary-hover: #006a72;
     --lui-primary-hover: color-mix(in oklch, var(--lui-primary) 88%, black);
@@ -92,9 +126,19 @@
     --lui-radius: 10px;
     --lui-density: 1;
     --lui-corner-shape: round;
+    --lui-dark-bg: oklch(0.22 0.03 220);
+    --lui-dark-text: oklch(0.95 0.01 210);
+    --lui-dark-muted: oklch(0.7 0.04 220);
+    --lui-dark-primary: oklch(0.75 0.13 200);
+    --lui-dark-on-primary: oklch(0.2 0.03 220);
+    --lui-dark-secondary: oklch(0.74 0.07 210);
+    --lui-dark-on-secondary: oklch(0.2 0.03 230);
+    --lui-dark-accent: oklch(0.75 0.13 200);
+    --lui-dark-on-accent: oklch(0.2 0.03 220);
+    --lui-dark-on-danger: oklch(0.2 0.03 220);
   }
 
-  /* ---------- Light: Squishy (Squircle optional) ---------- */
+  /* ---------- Light: Squishy (Squircle optional) (+ dark palette) ---------- */
   [data-theme="squishy"] {
     color-scheme: light;
     --lui-bg: oklch(0.99 0.01 350);
@@ -104,6 +148,7 @@
     --lui-muted: oklch(0.515 0.05 350);
     --lui-border: #dbcdd3;
     --lui-border: color-mix(in oklch, var(--lui-text) calc(8% + var(--lui-contrast, 0.5) * 20%), var(--lui-bg));
+    --lui-control-border: color-mix(in oklch, var(--lui-text) 55%, var(--lui-bg));
     --lui-primary: oklch(0.58 0.2 10);
     --lui-primary-hover: #b3274f;
     --lui-primary-hover: color-mix(in oklch, var(--lui-primary) 88%, black);
@@ -125,300 +170,96 @@
     --lui-radius: 18px;
     --lui-density: 1.15;
     --lui-corner-shape: superellipse(1.3);
+    --lui-dark-bg: oklch(0.23 0.03 350);
+    --lui-dark-text: oklch(0.95 0.015 350);
+    --lui-dark-muted: oklch(0.72 0.04 350);
+    --lui-dark-primary: oklch(0.72 0.18 10);
+    --lui-dark-on-primary: oklch(0.22 0.03 350);
+    --lui-dark-secondary: oklch(0.76 0.11 10);
+    --lui-dark-on-secondary: oklch(0.2 0.03 10);
+    --lui-dark-accent: oklch(0.72 0.18 10);
+    --lui-dark-on-accent: oklch(0.22 0.03 350);
+    --lui-dark-on-danger: oklch(0.22 0.03 350);
   }
 
-  /* ---------- Dark: explicit override ---------- */
-  [data-mode="dark"], [data-mode="dark"][data-theme="default"] {
-    color-scheme: dark;
-    --lui-density-y: 0.75;
-    --lui-bg: oklch(0.22 0.02 260);
-    --lui-surface: #232c40;
-    --lui-surface: color-mix(in oklch, var(--lui-accent) 7%, var(--lui-bg));
-    --lui-text: oklch(0.95 0.01 95);
-    --lui-muted: oklch(0.7 0.03 260);
-    --lui-border: #3a4152;
-    --lui-border: color-mix(in oklch, var(--lui-text) calc(8% + var(--lui-contrast, 0.5) * 20%), var(--lui-bg));
-    --lui-primary: oklch(0.7 0.15 255);
-    --lui-primary-hover: #6eacfb;
-    --lui-primary-hover: color-mix(in oklch, var(--lui-primary) 88%, white);
-    --lui-primary-active: #7fb6fc;
-    --lui-primary-active: color-mix(in oklch, var(--lui-primary) 78%, white);
-    --lui-on-primary: oklch(0.2 0.03 260);
-    --lui-secondary: oklch(0.74 0.06 260);
-    --lui-on-secondary: oklch(0.2 0.03 260);
-    --lui-tone-base: #000000;
-    --lui-tone-pct: 36%;
-    --lui-on-danger: oklch(0.2 0.03 260);
-    --lui-secondary-hover: #a2b6d7;
-    --lui-secondary-hover: color-mix(in oklch, var(--lui-secondary) 88%, white);
-    --lui-secondary-active: #acbedb;
-    --lui-secondary-active: color-mix(in oklch, var(--lui-secondary) 78%, white);
-    --lui-accent: oklch(0.7 0.15 255);
-    --lui-accent-hover: #6eacfb;
-    --lui-accent-hover: color-mix(in oklch, var(--lui-accent) 88%, white);
-    --lui-accent-active: #7fb6fc;
-    --lui-accent-active: color-mix(in oklch, var(--lui-accent) 78%, white);
-    --lui-on-accent: oklch(0.2 0.03 260);
-    --lui-success: #6fd087;
-    --lui-success: oklch(0.78 0.14 150);
-    --lui-warning: #f7c15f;
-    --lui-warning: oklch(0.84 0.13 80);
-    --lui-danger: #ff7a73;
-    --lui-danger: oklch(0.74 0.17 25);
-    --lui-danger-hover: #ec5f5a;
-    --lui-danger-hover: color-mix(in oklch, var(--lui-danger) 88%, white);
-    --lui-danger-active: #f1746d;
-    --lui-danger-active: color-mix(in oklch, var(--lui-danger) 78%, white);
-    --lui-info: #7ac3ff;
-    --lui-info: oklch(0.8 0.13 250);
-    --lui-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
-    --lui-shadow-md: 0 4px 16px rgb(0 0 0 / 0.5);
-  }
-  [data-mode="dark"][data-theme="ocean"] {
-    color-scheme: dark;
-    --lui-bg: oklch(0.22 0.03 220);
-    --lui-surface: #213040;
-    --lui-surface: color-mix(in oklch, var(--lui-accent) 7%, var(--lui-bg));
-    --lui-text: oklch(0.95 0.01 210);
-    --lui-muted: oklch(0.7 0.04 220);
-    --lui-border: #2b3e44;
-    --lui-border: color-mix(in oklch, var(--lui-text) calc(8% + var(--lui-contrast, 0.5) * 20%), var(--lui-bg));
-    --lui-primary: oklch(0.75 0.13 200);
-    --lui-primary-hover: #46cdd4;
-    --lui-primary-hover: color-mix(in oklch, var(--lui-primary) 88%, white);
-    --lui-primary-active: #64d3d9;
-    --lui-primary-active: color-mix(in oklch, var(--lui-primary) 78%, white);
-    --lui-on-primary: oklch(0.2 0.03 220);
-    --lui-secondary: oklch(0.74 0.07 210);
-    --lui-on-secondary: oklch(0.2 0.03 230);
-    --lui-tone-base: #000000;
-    --lui-tone-pct: 36%;
-    --lui-on-danger: oklch(0.2 0.03 220);
-    --lui-secondary-hover: #85c0ca;
-    --lui-secondary-hover: color-mix(in oklch, var(--lui-secondary) 88%, white);
-    --lui-secondary-active: #93c7d0;
-    --lui-secondary-active: color-mix(in oklch, var(--lui-secondary) 78%, white);
-    --lui-accent: oklch(0.75 0.13 200);
-    --lui-accent-hover: #46cdd4;
-    --lui-accent-hover: color-mix(in oklch, var(--lui-accent) 88%, white);
-    --lui-accent-active: #64d3d9;
-    --lui-accent-active: color-mix(in oklch, var(--lui-accent) 78%, white);
-    --lui-on-accent: oklch(0.2 0.03 220);
-    --lui-success: #6fd087;
-    --lui-success: oklch(0.78 0.14 150);
-    --lui-warning: #f7c15f;
-    --lui-warning: oklch(0.84 0.13 80);
-    --lui-danger: #ff7a73;
-    --lui-danger: oklch(0.74 0.17 25);
-    --lui-danger-hover: #ec5f5a;
-    --lui-danger-hover: color-mix(in oklch, var(--lui-danger) 88%, white);
-    --lui-danger-active: #f1746d;
-    --lui-danger-active: color-mix(in oklch, var(--lui-danger) 78%, white);
-    --lui-info: #7ac3ff;
-    --lui-info: oklch(0.8 0.13 250);
-    --lui-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
-    --lui-shadow-md: 0 4px 16px rgb(0 0 0 / 0.5);
-  }
-  [data-mode="dark"][data-theme="squishy"] {
-    color-scheme: dark;
-    --lui-bg: oklch(0.23 0.03 350);
-    --lui-surface: #2c2633;
-    --lui-surface: color-mix(in oklch, var(--lui-accent) 7%, var(--lui-bg));
-    --lui-text: oklch(0.95 0.015 350);
-    --lui-muted: oklch(0.72 0.04 350);
-    --lui-border: #49373f;
-    --lui-border: color-mix(in oklch, var(--lui-text) calc(8% + var(--lui-contrast, 0.5) * 20%), var(--lui-bg));
-    --lui-primary: oklch(0.72 0.18 10);
-    --lui-primary-hover: #ff8098;
-    --lui-primary-hover: color-mix(in oklch, var(--lui-primary) 88%, white);
-    --lui-primary-active: #ff90a3;
-    --lui-primary-active: color-mix(in oklch, var(--lui-primary) 78%, white);
-    --lui-on-primary: oklch(0.22 0.03 350);
-    --lui-secondary: oklch(0.76 0.11 10);
-    --lui-on-secondary: oklch(0.2 0.03 10);
-    --lui-tone-base: #000000;
-    --lui-tone-pct: 36%;
-    --lui-on-danger: oklch(0.22 0.03 350);
-    --lui-secondary-hover: #f0a0ac;
-    --lui-secondary-hover: color-mix(in oklch, var(--lui-secondary) 88%, white);
-    --lui-secondary-active: #f1abb6;
-    --lui-secondary-active: color-mix(in oklch, var(--lui-secondary) 78%, white);
-    --lui-accent: oklch(0.72 0.18 10);
-    --lui-accent-hover: #ff8098;
-    --lui-accent-hover: color-mix(in oklch, var(--lui-accent) 88%, white);
-    --lui-accent-active: #ff90a3;
-    --lui-accent-active: color-mix(in oklch, var(--lui-accent) 78%, white);
-    --lui-on-accent: oklch(0.22 0.03 350);
-    --lui-success: #6fd087;
-    --lui-success: oklch(0.78 0.14 150);
-    --lui-warning: #f7c15f;
-    --lui-warning: oklch(0.84 0.13 80);
-    --lui-danger: #ff7a73;
-    --lui-danger: oklch(0.74 0.17 25);
-    --lui-danger-hover: #ec5f5a;
-    --lui-danger-hover: color-mix(in oklch, var(--lui-danger) 88%, white);
-    --lui-danger-active: #f1746d;
-    --lui-danger-active: color-mix(in oklch, var(--lui-danger) 78%, white);
-    --lui-info: #7ac3ff;
-    --lui-info: oklch(0.8 0.13 250);
-    --lui-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
-    --lui-shadow-md: 0 4px 16px rgb(0 0 0 / 0.5);
-  }
-
-  /* ---------- System auto (only when data-mode=auto or missing) ---------- */
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-mode]), [data-mode="auto"], [data-mode="auto"][data-theme="default"] {
-      color-scheme: dark;
-      --lui-bg: oklch(0.22 0.02 260);
-      --lui-surface: #232c40;
-    --lui-surface: color-mix(in oklch, var(--lui-accent) 7%, var(--lui-bg));
-      --lui-text: oklch(0.95 0.01 95);
-      --lui-muted: oklch(0.7 0.03 260);
-      --lui-border: #3a4152;
-      --lui-border: color-mix(in oklch, var(--lui-text) calc(8% + var(--lui-contrast, 0.5) * 20%), var(--lui-bg));
-      --lui-primary: oklch(0.7 0.15 255);
-      --lui-primary-hover: #6eacfb;
-      --lui-primary-hover: color-mix(in oklch, var(--lui-primary) 88%, white);
-      --lui-primary-active: #7fb6fc;
-      --lui-primary-active: color-mix(in oklch, var(--lui-primary) 78%, white);
-      --lui-on-primary: oklch(0.2 0.03 260);
-      --lui-secondary: oklch(0.74 0.06 260);
-      --lui-on-secondary: oklch(0.2 0.03 260);
-      --lui-tone-base: #000000;
-      --lui-tone-pct: 36%;
-      --lui-on-danger: oklch(0.2 0.03 260);
-      --lui-secondary-hover: #a2b6d7;
-      --lui-secondary-hover: color-mix(in oklch, var(--lui-secondary) 88%, white);
-      --lui-secondary-active: #acbedb;
-      --lui-secondary-active: color-mix(in oklch, var(--lui-secondary) 78%, white);
-      --lui-accent: oklch(0.7 0.15 255);
-      --lui-accent-hover: #6eacfb;
-      --lui-accent-hover: color-mix(in oklch, var(--lui-accent) 88%, white);
-      --lui-accent-active: #7fb6fc;
-      --lui-accent-active: color-mix(in oklch, var(--lui-accent) 78%, white);
-      --lui-on-accent: oklch(0.2 0.03 260);
-      --lui-success: #6fd087;
-      --lui-success: oklch(0.78 0.14 150);
-      --lui-warning: #f7c15f;
-      --lui-warning: oklch(0.84 0.13 80);
-      --lui-danger: #ff7a73;
-      --lui-danger: oklch(0.74 0.17 25);
-      --lui-danger-hover: #ec5f5a;
-      --lui-danger-hover: color-mix(in oklch, var(--lui-danger) 88%, white);
-      --lui-danger-active: #f1746d;
-      --lui-danger-active: color-mix(in oklch, var(--lui-danger) 78%, white);
-      --lui-info: #7ac3ff;
-      --lui-info: oklch(0.8 0.13 250);
-      --lui-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
-      --lui-shadow-md: 0 4px 16px rgb(0 0 0 / 0.5);
-    }
-    [data-mode="auto"][data-theme="ocean"] {
-      color-scheme: dark;
-      --lui-bg: oklch(0.22 0.03 220);
-      --lui-surface: #213040;
-    --lui-surface: color-mix(in oklch, var(--lui-accent) 7%, var(--lui-bg));
-      --lui-text: oklch(0.95 0.01 210);
-      --lui-muted: oklch(0.7 0.04 220);
-      --lui-border: #2b3e44;
-      --lui-border: color-mix(in oklch, var(--lui-text) calc(8% + var(--lui-contrast, 0.5) * 20%), var(--lui-bg));
-      --lui-primary: oklch(0.75 0.13 200);
-      --lui-primary-hover: #46cdd4;
-      --lui-primary-hover: color-mix(in oklch, var(--lui-primary) 88%, white);
-      --lui-primary-active: #64d3d9;
-      --lui-primary-active: color-mix(in oklch, var(--lui-primary) 78%, white);
-      --lui-on-primary: oklch(0.2 0.03 220);
-      --lui-secondary: oklch(0.74 0.07 210);
-      --lui-on-secondary: oklch(0.2 0.03 230);
-      --lui-tone-base: #000000;
-      --lui-tone-pct: 36%;
-      --lui-on-danger: oklch(0.2 0.03 220);
-      --lui-secondary-hover: #85c0ca;
-      --lui-secondary-hover: color-mix(in oklch, var(--lui-secondary) 88%, white);
-      --lui-secondary-active: #93c7d0;
-      --lui-secondary-active: color-mix(in oklch, var(--lui-secondary) 78%, white);
-      --lui-accent: oklch(0.75 0.13 200);
-      --lui-accent-hover: #46cdd4;
-      --lui-accent-hover: color-mix(in oklch, var(--lui-accent) 88%, white);
-      --lui-accent-active: #64d3d9;
-      --lui-accent-active: color-mix(in oklch, var(--lui-accent) 78%, white);
-      --lui-on-accent: oklch(0.2 0.03 220);
-      --lui-success: #6fd087;
-      --lui-success: oklch(0.78 0.14 150);
-      --lui-warning: #f7c15f;
-      --lui-warning: oklch(0.84 0.13 80);
-      --lui-danger: #ff7a73;
-      --lui-danger: oklch(0.74 0.17 25);
-      --lui-danger-hover: #ec5f5a;
-      --lui-danger-hover: color-mix(in oklch, var(--lui-danger) 88%, white);
-      --lui-danger-active: #f1746d;
-      --lui-danger-active: color-mix(in oklch, var(--lui-danger) 78%, white);
-      --lui-info: #7ac3ff;
-      --lui-info: oklch(0.8 0.13 250);
-      --lui-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
-      --lui-shadow-md: 0 4px 16px rgb(0 0 0 / 0.5);
-    }
-    [data-mode="auto"][data-theme="squishy"] {
-      color-scheme: dark;
-      --lui-bg: oklch(0.23 0.03 350);
-      --lui-surface: #2c2633;
-    --lui-surface: color-mix(in oklch, var(--lui-accent) 7%, var(--lui-bg));
-      --lui-text: oklch(0.95 0.015 350);
-      --lui-muted: oklch(0.72 0.04 350);
-      --lui-border: #49373f;
-      --lui-border: color-mix(in oklch, var(--lui-text) calc(8% + var(--lui-contrast, 0.5) * 20%), var(--lui-bg));
-      --lui-primary: oklch(0.72 0.18 10);
-      --lui-primary-hover: #ff8098;
-      --lui-primary-hover: color-mix(in oklch, var(--lui-primary) 88%, white);
-      --lui-primary-active: #ff90a3;
-      --lui-primary-active: color-mix(in oklch, var(--lui-primary) 78%, white);
-      --lui-on-primary: oklch(0.22 0.03 350);
-      --lui-secondary: oklch(0.76 0.11 10);
-      --lui-on-secondary: oklch(0.2 0.03 10);
-      --lui-tone-base: #000000;
-      --lui-tone-pct: 36%;
-      --lui-on-danger: oklch(0.22 0.03 350);
-      --lui-secondary-hover: #f0a0ac;
-      --lui-secondary-hover: color-mix(in oklch, var(--lui-secondary) 88%, white);
-      --lui-secondary-active: #f1abb6;
-      --lui-secondary-active: color-mix(in oklch, var(--lui-secondary) 78%, white);
-      --lui-accent: oklch(0.72 0.18 10);
-      --lui-accent-hover: #ff8098;
-      --lui-accent-hover: color-mix(in oklch, var(--lui-accent) 88%, white);
-      --lui-accent-active: #ff90a3;
-      --lui-accent-active: color-mix(in oklch, var(--lui-accent) 78%, white);
-      --lui-on-accent: oklch(0.22 0.03 350);
-      --lui-success: #6fd087;
-      --lui-success: oklch(0.78 0.14 150);
-      --lui-warning: #f7c15f;
-      --lui-warning: oklch(0.84 0.13 80);
-      --lui-danger: #ff7a73;
-      --lui-danger: oklch(0.74 0.17 25);
-      --lui-danger-hover: #ec5f5a;
-      --lui-danger-hover: color-mix(in oklch, var(--lui-danger) 88%, white);
-      --lui-danger-active: #f1746d;
-      --lui-danger-active: color-mix(in oklch, var(--lui-danger) 78%, white);
-      --lui-info: #7ac3ff;
-      --lui-info: oklch(0.8 0.13 250);
-      --lui-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
-      --lui-shadow-md: 0 4px 16px rgb(0 0 0 / 0.5);
-    }
-  }
-
-  /* ---------- Light-Force: makes sure light really stays light ---------- */
-  [data-mode="light"][data-theme="ocean"] { color-scheme: light; }
-  [data-mode="light"][data-theme="squishy"] { color-scheme: light; }
-
-  /* ---------- Select chevron: light stroke in dark mode ---------- */
+  /* ---------- Dark mapping: explicit (data-mode="dark") ----------
+     Every dark token is listed here once per copy. Values come from the
+     --lui-dark-* palette of the active theme; derivations (surface, border,
+     hovers) are the same formulas as in light mode, with white instead of black. */
   [data-mode="dark"] {
-    --lui-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23e8eaf0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-    --lui-calendar: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23e8eaf0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2'/%3E%3Cpath d='M16 2v4M8 2v4M3 10h18'/%3E%3C/svg%3E");
+    color-scheme: dark;
+    --lui-bg: var(--lui-dark-bg);
+    --lui-surface: color-mix(in oklch, var(--lui-accent) 7%, var(--lui-bg));
+    --lui-text: var(--lui-dark-text);
+    --lui-muted: var(--lui-dark-muted);
+    --lui-border: color-mix(in oklch, var(--lui-text) calc(8% + var(--lui-contrast, 0.5) * 20%), var(--lui-bg));
+    --lui-control-border: color-mix(in oklch, var(--lui-text) 55%, var(--lui-bg));
+    --lui-primary: var(--lui-dark-primary);
+    --lui-primary-hover: color-mix(in oklch, var(--lui-primary) 88%, white);
+    --lui-primary-active: color-mix(in oklch, var(--lui-primary) 78%, white);
+    --lui-on-primary: var(--lui-dark-on-primary);
+    --lui-secondary: var(--lui-dark-secondary);
+    --lui-secondary-hover: color-mix(in oklch, var(--lui-secondary) 88%, white);
+    --lui-secondary-active: color-mix(in oklch, var(--lui-secondary) 78%, white);
+    --lui-on-secondary: var(--lui-dark-on-secondary);
+    --lui-accent: var(--lui-dark-accent);
+    --lui-accent-hover: color-mix(in oklch, var(--lui-accent) 88%, white);
+    --lui-accent-active: color-mix(in oklch, var(--lui-accent) 78%, white);
+    --lui-on-accent: var(--lui-dark-on-accent);
+    --lui-on-danger: var(--lui-dark-on-danger);
+    --lui-tone-base: var(--lui-dark-tone-base);
+    --lui-tone-pct: var(--lui-dark-tone-pct);
+    --lui-success: var(--lui-dark-success);
+    --lui-warning: var(--lui-dark-warning);
+    --lui-danger: var(--lui-dark-danger);
+    --lui-danger-hover: color-mix(in oklch, var(--lui-danger) 88%, white);
+    --lui-danger-active: color-mix(in oklch, var(--lui-danger) 78%, white);
+    --lui-info: var(--lui-dark-info);
+    --lui-shadow-sm: var(--lui-dark-shadow-sm);
+    --lui-shadow-md: var(--lui-dark-shadow-md);
+    --lui-chevron: var(--lui-dark-chevron);
+    --lui-calendar: var(--lui-dark-calendar);
   }
+
+  /* ---------- Dark mapping: auto (system dark; no data-mode counts as auto) ----------
+     Must stay identical to the explicit copy above (checked by the browser tests). */
   @media (prefers-color-scheme: dark) {
     :root:not([data-mode]), [data-mode="auto"] {
-      --lui-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23e8eaf0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-      --lui-calendar: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23e8eaf0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2'/%3E%3Cpath d='M16 2v4M8 2v4M3 10h18'/%3E%3C/svg%3E");
+      color-scheme: dark;
+      --lui-bg: var(--lui-dark-bg);
+      --lui-surface: color-mix(in oklch, var(--lui-accent) 7%, var(--lui-bg));
+      --lui-text: var(--lui-dark-text);
+      --lui-muted: var(--lui-dark-muted);
+      --lui-border: color-mix(in oklch, var(--lui-text) calc(8% + var(--lui-contrast, 0.5) * 20%), var(--lui-bg));
+      --lui-control-border: color-mix(in oklch, var(--lui-text) 55%, var(--lui-bg));
+      --lui-primary: var(--lui-dark-primary);
+      --lui-primary-hover: color-mix(in oklch, var(--lui-primary) 88%, white);
+      --lui-primary-active: color-mix(in oklch, var(--lui-primary) 78%, white);
+      --lui-on-primary: var(--lui-dark-on-primary);
+      --lui-secondary: var(--lui-dark-secondary);
+      --lui-secondary-hover: color-mix(in oklch, var(--lui-secondary) 88%, white);
+      --lui-secondary-active: color-mix(in oklch, var(--lui-secondary) 78%, white);
+      --lui-on-secondary: var(--lui-dark-on-secondary);
+      --lui-accent: var(--lui-dark-accent);
+      --lui-accent-hover: color-mix(in oklch, var(--lui-accent) 88%, white);
+      --lui-accent-active: color-mix(in oklch, var(--lui-accent) 78%, white);
+      --lui-on-accent: var(--lui-dark-on-accent);
+      --lui-on-danger: var(--lui-dark-on-danger);
+      --lui-tone-base: var(--lui-dark-tone-base);
+      --lui-tone-pct: var(--lui-dark-tone-pct);
+      --lui-success: var(--lui-dark-success);
+      --lui-warning: var(--lui-dark-warning);
+      --lui-danger: var(--lui-dark-danger);
+      --lui-danger-hover: color-mix(in oklch, var(--lui-danger) 88%, white);
+      --lui-danger-active: color-mix(in oklch, var(--lui-danger) 78%, white);
+      --lui-info: var(--lui-dark-info);
+      --lui-shadow-sm: var(--lui-dark-shadow-sm);
+      --lui-shadow-md: var(--lui-dark-shadow-md);
+      --lui-chevron: var(--lui-dark-chevron);
+      --lui-calendar: var(--lui-dark-calendar);
     }
   }
+
   /* ---------- Corner shape: applies to literally every element (+pseudos) ----------
      Only where supported. Default `round` = no visible difference. */
   @supports (corner-shape: superellipse(1)) {

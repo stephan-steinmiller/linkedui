@@ -99,6 +99,36 @@ class ShippedBuild(unittest.TestCase):
         self.assertNotIn("/*", dist, "comment marker found in dist")
 
 
+class ThemeFilter(unittest.TestCase):
+    """--theme keeps base rules (a selector naming no theme, e.g. :root) and drops other themes."""
+
+    def keep(self, css_text, theme):
+        filtered, _dropped = minify.filter_theme(css_text, theme)
+        return filtered
+
+    def test_base_rule_listing_root_survives_other_theme(self):
+        src = ':root, [data-theme="default"] { --lui-density-y: 0.75; }'
+        self.assertIn("--lui-density-y", self.keep(src, "ocean"))
+
+    def test_other_theme_rule_is_dropped(self):
+        src = '[data-theme="ocean"] { --lui-radius: 10px; }'
+        self.assertNotIn("--lui-radius", self.keep(src, "default"))
+
+    def test_mode_rules_survive_every_theme(self):
+        src = '[data-mode="dark"] { --lui-bg: #000; }'
+        for theme in ("default", "ocean", "squishy"):
+            self.assertIn("--lui-bg", self.keep(src, theme))
+
+    def test_at_rule_kept_only_if_its_inner_rule_survives(self):
+        src = '@supports (corner-shape: superellipse(1)) { [data-theme="squishy"] { --lui-radius: 20px; } }'
+        self.assertNotIn("--lui-radius", self.keep(src, "ocean"))
+        self.assertIn("--lui-radius", self.keep(src, "squishy"))
+
+    def test_selector_list_naming_the_target_theme_is_kept(self):
+        src = '[data-theme="ocean"], [data-theme="default"] { --lui-x: 1; }'
+        self.assertIn("--lui-x", self.keep(src, "ocean"))
+
+
 class NoLegalComments(unittest.TestCase):
     """Even /*! legal comments are dropped, so the build ships no comments at all."""
 

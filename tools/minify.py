@@ -382,9 +382,12 @@ def _filter_rules(text, theme, dropped):
                 out.append(prelude + " {" + kept_inner + "}")
             continue
         mentions = set()
+        theme_free = False  # a selector naming no theme (e.g. :root) makes the rule base CSS
         for sel in _split_selectors(prelude):
-            mentions |= _theme_mentions(sel)
-        if mentions and theme not in mentions:
+            found = _theme_mentions(sel)
+            mentions |= found
+            theme_free = theme_free or not found
+        if mentions and not theme_free and theme not in mentions:
             # nur Fremd-Themes genannt -> weg. Nenne es beim ersten Vorkommen.
             for th in sorted(mentions):
                 if th not in dropped:

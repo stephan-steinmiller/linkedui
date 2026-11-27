@@ -10,7 +10,7 @@
       try {
         const q = new URLSearchParams(location.search);
         const t = localStorage.getItem("lui-theme") || q.get("theme"), m = localStorage.getItem("lui-mode") || q.get("mode");
-        if (t && ["default", "ocean", "squishy"].includes(t)) document.documentElement.dataset.theme = t;
+        if (t && /^[a-z][a-z0-9-]{0,39}$/.test(t)) document.documentElement.dataset.theme = t;
         if (m && ["auto", "light", "dark"].includes(m)) document.documentElement.dataset.mode = m;
       } catch (e) {}
     </script>

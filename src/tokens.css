@@ -44,6 +44,9 @@
     /* Border follows contrast (static fallback first for old browsers) */
     --lui-border: #e2e5ea;
     --lui-border: color-mix(in oklch, var(--lui-text) calc(8% + var(--lui-contrast, 0.5) * 20%), var(--lui-bg));
+    /* Control borders (inputs, selects, steppers, chips): 3:1 against the field
+       and the page (WCAG 1.4.11). Dividers and card edges keep --lui-border. */
+    --lui-control-border: color-mix(in oklch, var(--lui-text) 55%, var(--lui-bg));
 
     /* Primary */
     --lui-primary: oklch(0.555 0.16 255);
@@ -92,8 +95,8 @@
     --lui-wash-shimmer: rgb(128 128 128 / 0.18);
     /* Info is always blue — never primary, so it reads as info in any theme */
     --lui-info: oklch(0.65 0.16 250);
-    --lui-ring: #9db8f0;
-    --lui-ring: color-mix(in oklch, var(--lui-primary) 45%, white);
+    /* Focus ring: 3:1 against the page in every theme (WCAG 1.4.11). */
+    --lui-ring: color-mix(in oklch, var(--lui-primary) 80%, var(--lui-text));
 
     /* Select chevron as data URI (themeable via --lui-chevron override) */
     --lui-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23333a48' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");

@@ -4,6 +4,7 @@
   import Demo from '$lib/Demo.svelte';
   import { STRINGS } from '$lib/i18n';
   import { groupsEn } from '$lib/site-data';
+  import { THEME_OPTIONS } from '$lib/theme-options';
 
   const t = STRINGS.en;
 
@@ -31,9 +32,9 @@
   <form method="get" action="#builder" style="display:flex;gap:.5rem;align-items:center">
     <label class="visually-hidden" for="site-theme">{t.themeLabel}</label>
     <select id="site-theme" name="theme" data-lui-theme>
-      <option value="default">default</option>
-      <option value="ocean">ocean</option>
-      <option value="squishy">squishy + squircle</option>
+      {#each THEME_OPTIONS as opt}
+        <option value={opt.value}>{opt.label}</option>
+      {/each}
     </select>
     <label class="visually-hidden" for="site-mode">{t.modeLabel}</label>
     <select id="site-mode" name="mode" data-lui-mode>
