@@ -420,6 +420,20 @@ async function browserChecks(chromePath, fixtureDir, siteBase) {
 
 // ---------------------------------------------------------------------------
 
+// Chrome's child processes can keep writing to the profile for a moment after the
+// main process exits (seen on Linux CI). Retry, then warn: cleanup never fails the run.
+async function removeDir(dir) {
+  for (let attempt = 0; attempt < 25; attempt++) {
+    try {
+      fs.rmSync(dir, { recursive: true, force: true });
+      return;
+    } catch {
+      await sleep(200);
+    }
+  }
+  console.warn(`note: could not delete temp dir ${dir}; the OS will clean it up`);
+}
+
 async function main() {
   staticChecks();
   langChecks();
@@ -439,7 +453,7 @@ async function main() {
     check('browser run completed', false, String((e && e.message) || e).slice(0, 200));
   } finally {
     if (site) site.server.close();
-    fs.rmSync(fixtureDir, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 });
+    await removeDir(fixtureDir);
   }
   const failed = results.filter((r) => !r.ok).length;
   console.log(`\n${results.length - failed}/${results.length} checks passed`);
