@@ -148,6 +148,10 @@
     --lui-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.06);
     --lui-shadow-md: 0 4px 16px rgb(0 0 0 / 0.08);
     --lui-maxw: 72rem;
+    /* Width cap for form controls (text inputs, select, textarea, range,
+       progress, meter). .field lifts it; set it on any container to change
+       the measure for everything inside. */
+    --lui-field-maxw: 28rem;
     /* Layout rhythm (stack/cluster/grid/card/field gaps): deliberately NOT
        density-scaled. Density compacts controls, layout stays airy —
        otherwise everything sticks together at low density. */

@@ -92,6 +92,19 @@ class ShippedBuild(unittest.TestCase):
         self.assertTrue("@supports (position-anchor:--tab-active) and (anchor-scope:--tab-active)" in dist,
                         "tab anchor @supports block missing or malformed")
 
+    def test_dist_has_no_comments(self):
+        # Comments are documentation for src/ only. The shipped CSS carries none,
+        # not even /*! legal comments: the minifier drops every comment.
+        dist = (Path(minify.ROOT) / "dist" / "linkedui.min.css").read_text(encoding="utf-8")
+        self.assertNotIn("/*", dist, "comment marker found in dist")
+
+
+class NoLegalComments(unittest.TestCase):
+    """Even /*! legal comments are dropped, so the build ships no comments at all."""
+
+    def test_legal_comment_dropped(self):
+        self.assertEqual(css("a{b:c}/*! license */"), "a{b:c}")
+
 
 if __name__ == "__main__":
     unittest.main()

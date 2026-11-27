@@ -9,6 +9,11 @@
  * Design rules: single-line controls share exactly ONE height
  * (fixed `height` instead of min-height, see tradeoff note at button);
  * select chevron + checkbox check are theme variables (no external assets).
+ *
+ * Scope: these element rules only set defaults. They never select inside a
+ * component, so nested components keep their own layout. Form controls take
+ * their width cap from --lui-field-maxw (tokens.css): set that token on a
+ * container instead of overriding the control.
  */
 
 @layer base-classless {
@@ -115,7 +120,7 @@
     border: var(--lui-border-width) solid var(--lui-border);
     color: var(--lui-text);
     width: 100%;
-    max-width: 28rem;
+    max-width: var(--lui-field-maxw);
   }
   :where(textarea) {
     min-height: calc(var(--lui-control-h-md) * 2);
@@ -125,7 +130,7 @@
     border: var(--lui-border-width) solid var(--lui-border);
     color: var(--lui-text);
     width: 100%;
-    max-width: 28rem;
+    max-width: var(--lui-field-maxw);
   }
 
   /* Custom select chevron: the native arrow can't be positioned, hence
@@ -302,7 +307,7 @@
     /* Field tint (primary+bg family, stronger than cards) + input-like edge */
     border: var(--lui-border-width) solid var(--lui-border);
     width: 100%;
-    max-width: 28rem;
+    max-width: var(--lui-field-maxw);
     border-radius: var(--lui-radius-full);
     corner-shape: var(--lui-corner-shape);
     background: var(--lui-field);
@@ -403,7 +408,7 @@
     -webkit-appearance: none;
     appearance: none;
     width: 100%;
-    max-width: 28rem;
+    max-width: var(--lui-field-maxw);
     /* Gauge scale: three-quarters of --lui-check (thinner than controls,
        but on the same token so coarse pointers scale it too). */
     height: calc(var(--lui-check) * 0.75);
@@ -459,7 +464,7 @@
     -webkit-appearance: none;
     appearance: none;
     width: 100%;
-    max-width: 28rem;
+    max-width: var(--lui-field-maxw);
     /* Same gauge scale as progress. Padding is uniform on all sides
        (space-1): the engine-fixed fill (~0.5rem tall in WebKit) sits
        centered with an even ring — a taller box would only add air,

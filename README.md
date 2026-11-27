@@ -4,6 +4,7 @@ CSS-first UI library: classless base, variants via classes, theming via CSS vari
 No build step and no dependencies for consumers.
 
 - **Docs:** [WIKI.md](WIKI.md) (component markup reference, theming, build, file map).
+- **Changes:** [CHANGELOG.md](CHANGELOG.md) lists what changed for consumers.
 - **Use it:** `src/linkedui.css` (source) or `dist/linkedui.min.css` + `dist/enhance.min.js` (minified, checked in).
 - **Docs site:** SvelteKit app in `site/` (`npm run dev` / `npm run build` there).
 

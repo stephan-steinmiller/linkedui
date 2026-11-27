@@ -85,6 +85,7 @@
 
     <h2 id="forms">3. Forms &amp; input <small>src/base.css, classless unless noted</small></h2>
     <h3 id="fields">Fields</h3>
+    <p>Form controls (text inputs, <code>select</code>, <code>textarea</code>, range, <code>progress</code>, <code>meter</code>) stop at the width in <code>--lui-field-maxw</code> (default <code>28rem</code>). Inside <code>.field</code> the cap is lifted. To change it for a whole area, set the token on a container, for example <code>.sidebar-form { --lui-field-maxw: none; }</code>. Prefer the token over overriding the control itself.</p>
     <div class="lui-grid">
       <label class="field"><span>Name</span><input placeholder="Same height as buttons" /></label>
       <label class="field"><span>Choice</span><select><option>One</option><option>Two</option></select></label>

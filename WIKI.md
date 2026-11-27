@@ -49,6 +49,9 @@ try {
 3. **Everything is a token:** colors, radii, densities, heights — all `--lui-*` (`src/tokens.css`).
 4. **System theme by default:** `data-mode="auto"` follows `prefers-color-scheme`, pure CSS.
 5. **CSS only where it's clean:** hacks (checkbox hack etc.) are replaced with mini JS.
+6. **Scope:** element rules only set defaults and never select inside a component (no
+   descendant rules such as `.shell main .stack`). Adjust a component through the tokens on an
+   ancestor; write one class selector of your own only when no token exists.
 
 ## 3. Components (markup reference)
 
@@ -135,6 +138,11 @@ Single-line controls (button, input, select) share exactly one height
 `md`, `lg` (`--lui-control-h-lg`); coarse pointers keep a 44px touch
 floor on buttons. Checkbox/radio/switch/slider stay text-sized
 (`--lui-check`, 24px) by design.
+
+Form controls (text inputs, `select`, `textarea`, range, `progress`, `meter`) stop at the width
+in `--lui-field-maxw` (default `28rem`). Inside `.field` the cap is lifted. To change it for a
+whole area, set the token on a container, for example `.sidebar-form { --lui-field-maxw: none; }`.
+Prefer the token over overriding the control itself.
 
 ### Field hints — `src/components/card.css` (`.field`)
 
@@ -625,7 +633,7 @@ segmented and toasts), `--lui-density` (master) or `--lui-density-x`/`-y`,
 `--lui-control-h-sm/-md/-lg`, `--lui-check` (checkbox/radio/switch/slider),
 `--lui-control-py/-px`, `--lui-space-1..4`,
 `--lui-font-sans/-mono/-sm/-md/-lg/-xl/-2xl/-3xl`, `--lui-border-width`, `--lui-shadow-sm/-md`,
-`--lui-maxw`. Complete list: `src/tokens.css`.
+`--lui-maxw`, `--lui-field-maxw` (form-control width cap, see Forms). Complete list: `src/tokens.css`.
 
 ## 6. JS API (`src/enhance.js`, JSDoc in code)
 
@@ -669,6 +677,8 @@ python3 tools/test_minify.py               # minifier regression tests (stdlib)
   dark generics, `@supports`) always survive — correctness over max size.
 - After `src/` changes: run the script, check `git diff --stat dist/`
   (unexpected jumps hint at accidental bloat), commit.
+- Comments never reach `dist/`: every `/* … */` is dropped, `/*! … */` legal comments included.
+  `tools/test_minify.py` fails if a comment marker is found in the shipped CSS.
 - No mangling, no bundler: deliberately conservative (comments out,
   whitespace collapsed, strings/`url()`/`calc()` untouched). For real
   tree-shaking use lightningcss & co. — deliberately *not* part of the lib.
@@ -734,4 +744,5 @@ site/src/lib/content/wiki-src.html wiki single source, English
 site/src/lib/content/wiki-src-de.html wiki single source, German
 site/build/                   static export (generated, git-ignored)
 WIKI.md                       this file
+CHANGELOG.md                  version history for consumers
 ```

@@ -179,11 +179,11 @@
     display: flex;
     gap: var(--lui-space-2);
     padding: var(--lui-space-3) 0;
+    --lui-field-maxw: none; /* the composer is a full-width field */
   }
   .ai-composer textarea {
     flex: 1;
     min-width: 0;
-    max-width: none; /* base caps textarea width at 28rem — wrong for a full-width composer */
     min-height: 0; /* base forces two rows — a composer starts at one */
     height: var(--lui-control-h-md); /* same rhythm as buttons/inputs, JS grows it */
     line-height: 1.5;

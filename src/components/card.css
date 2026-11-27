@@ -80,7 +80,9 @@
     margin-block: 0;
   }
   .field > span { font-size: var(--lui-font-sm); font-weight: 600; }
-  .field input, .field select, .field textarea { max-width: none; }
+  /* Controls inside .field fill the row: the cap is lifted through the token
+     instead of listing every control (see --lui-field-maxw in tokens.css). */
+  .field { --lui-field-maxw: none; }
 
   /* Hint under the control (help text or validation message).
      Markup: <label class="field"><span>Name</span><input aria-describedby="x-hint" /><small class="hint" id="x-hint">…</small></label>
