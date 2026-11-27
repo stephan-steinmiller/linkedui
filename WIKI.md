@@ -144,7 +144,9 @@ in `--lui-field-maxw` (default `28rem`). Inside `.field` the cap is lifted. To c
 whole area, set the token on a container, for example `.sidebar-form { --lui-field-maxw: none; }`.
 Prefer the token over overriding the control itself.
 
-### Field hints — `src/components/card.css` (`.field`)
+Control borders (`--lui-control-border`) and the focus ring (`--lui-ring`) reach 3:1 against their surroundings in every theme (WCAG 1.4.11). Dividers and card edges keep `--lui-border`.
+
+### Field hints — `src/components/forms.css` (`.field`)
 
 Help or validation text under the control, linked via `aria-describedby`.
 Invalid: `data-invalid="true"` on the `.field` (or `aria-invalid="true"`
@@ -588,8 +590,9 @@ Error state: `.ai-msg[data-state="error"]`. Regenerated variants:
 
 Theme switcher (persistent + reload-free with JS; decorative without JS —
 the form submits `theme`/`mode` params that nothing reads, system `auto`
-applies). With JS, `?theme=ocean&mode=dark` links also work (validated,
-stored choice wins) — handy for sharing a theme view.
+applies). With JS, `?theme=ocean&mode=dark` links also work. Any lowercase theme name
+(letters, digits, hyphens) is accepted, so your own themes work the same way;
+other values are ignored. A stored choice wins — handy for sharing a theme view.
 
 ```html
 <select data-lui-theme>
@@ -606,9 +609,12 @@ stored choice wins) — handy for sharing a theme view.
 
 ### Custom themes
 
-Pattern in `src/themes.css` (header comment), easiest via the builder
-(`site/src/routes/+page.svelte` + `site/src/lib/Builder.svelte`): colors → radius/density/shape → copy the export or
-download `themes.css`. Shape rules: `--lui-radius` = boxes,
+Write the light values and a dark palette (`--lui-dark-*`, one value per name,
+the same names as the default block in `src/themes.css`). The dark mapping in
+`src/themes.css` applies the palette in `data-mode="dark"` and in auto. The builder
+(`site/src/routes/+page.svelte` + `site/src/lib/Builder.svelte`) exports a complete
+theme: colors → radius/density/shape → copy the export or download `themes.css`.
+Its explicit dark blocks still work: they override the mapping. Shape rules: `--lui-radius` = boxes,
 `--lui-radius-control` = controls (`999px` = pill for controls only),
 `--lui-corner-shape: round | superellipse(K)`. Compensate squircle radius
 (`base × (0.5 + 0.5 × K)`) **only** inside
@@ -626,11 +632,13 @@ shape, curve). Invalid values are ignored.
 
 Colors (all OKLCH): `--lui-bg`, `--lui-surface` (accent-tinted, never
 colorless), `--lui-field` (controls, contrast-driven), `--lui-text`, `--lui-muted`,
-`--lui-border` (contrast-driven), `--lui-primary` (+ `-hover`, `-active`, `--lui-on-primary`),
+`--lui-border` (contrast-driven), `--lui-control-border` (3:1 for control edges),
+`--lui-primary` (+ `-hover`, `-active`, `--lui-on-primary`),
 `--lui-secondary` (+ …), `--lui-accent` (+ `-hover`, `-active`, `--lui-on-accent`,
 feeds surfaces + `data-variant="accent"`), `--lui-success`, `--lui-warning`, `--lui-danger`
 (+ `-hover`, `-active`, `--lui-on-danger`),
-`--lui-info` (toast info, always blue), `--lui-ring`, `--lui-chevron` (select arrow as SVG data URI).
+`--lui-info` (toast info, always blue), `--lui-ring` (focus ring, 3:1 in every theme),
+`--lui-chevron` (select arrow as SVG data URI).
 
 Shape/size: `--lui-radius` (+ `-sm`, `-md`, `-lg`, `-full`), `--lui-radius-control`,
 `--lui-corner-shape`, `--lui-contrast` (0..1, drives separation of borders,
@@ -645,8 +653,14 @@ their tone toward: white in light, black in dark) and `--lui-tone-pct` (the
 tone's share: 50% light, 36% dark, so light ink keeps AA on dark tints).
 `--lui-wash`, `--lui-wash-strong`, `--lui-wash-faint`, `--lui-wash-shimmer`:
 neutral hover, ghost and shimmer washes. Components use these instead of
-hardcoded colors, so a theme can override them. Every dark block defines its
-own `--lui-secondary` and `--lui-on-secondary`; the light values are not reused.
+hardcoded colors, so a theme can override them. Each theme's dark palette defines its own `--lui-secondary` and
+`--lui-on-secondary`, so the light values are never reused in dark mode.
+
+Dark palette (`--lui-dark-*`): per theme `bg`, `text`, `muted`, `primary`, `on-primary`,
+`secondary`, `on-secondary`, `accent`, `on-accent` and `on-danger`; shared by all
+themes: `success`, `warning`, `danger`, `info`, `tone-base`, `tone-pct`, `shadow-sm`,
+`shadow-md`, `chevron` and `calendar`. The dark mapping in `src/themes.css` turns
+these into the tokens above, once for `data-mode="dark"` and once for auto.
 
 ## 6. JS API (`src/enhance.js`, JSDoc in code)
 
@@ -683,16 +697,18 @@ python3 tools/test_minify.py               # minifier regression tests (stdlib)
 ```
 
 - Browser checks: `node tools/browser-tests.cjs` covers behavior (dialog, OTP,
-  popover, toasts, reduced motion), dark-mode contrast, `<html lang>` and mobile
-  overflow. No npm packages; needs Chrome (set `CHROME_PATH` if it is not
+  popover, toasts, reduced motion), text contrast, non-text contrast (WCAG 1.4.11:
+  control borders, fills, focus rings), theme names, the two dark mappings,
+  `<html lang>` and mobile overflow on every page. No npm packages; needs Chrome (set `CHROME_PATH` if it is not
   auto-detected) and `npm run build` in `site/` for the site checks.
-- Full minified (all themes): CSS ~14.4 KB gzip (~13.7 KB with `--theme default`),
-  JS ~5.8 KB gzip (measured at the repo).
+- Full minified (all themes): CSS ~14.3 KB gzip (~13.8 KB with `--theme default`),
+  JS ~5.9 KB gzip (measured at the repo).
 - Custom entry: your own `@import` list (see `src/linkedui.css`), e.g. only
   the components you use — example: tokens+reset+base+button+card, default theme
-  ≈ 6.4 KB CSS gzip + 5.8 KB JS.
-- `--theme` filters `[data-theme="…"]` blocks; theme-free rules (fallbacks,
-  dark generics, `@supports`) always survive — correctness over max size.
+  ≈ 6.5 KB CSS gzip + 5.9 KB JS.
+- `--theme` filters `[data-theme="…"]` blocks. Rules without a theme name (the `:root`
+  base, the dark mapping, `@supports`) always survive, and so does a rule that lists
+  `:root` next to a theme — correctness over max size.
 - After `src/` changes: run the script, check `git diff --stat dist/`
   (unexpected jumps hint at accidental bloat), commit.
 - Comments never reach `dist/`: every `/* … */` is dropped, `/*! … */` legal comments included.
@@ -723,7 +739,8 @@ src/tokens.css                design tokens
 src/reset.css                 mini reset
 src/base.css                  classless base (buttons, forms, switch, slider, dialog …)
 src/components/button.css     .btn + variants/states/sizes
-src/components/card.css       container, grid, card, field, hints, empty state, check-chips, stepper, check
+src/components/card.css       container, grid, card, empty state, tables, toolbar, stat, footer, dropzone
+src/components/forms.css      field, hints, form-grid, input-group, stepper, check, check-chips, ticks
 src/components/code.css       code blocks: caption, copy button, line numbers, VBA/HTML/CSS highlighting
 src/components/layout.css     page structure: stack, cluster, split, sidebar shell, stage, hero
 src/components/steps.css      stepper (CSS counters)
@@ -742,7 +759,7 @@ src/components/rating.css     star rating (CSS-only)
 src/components/timeline.css   activity feed (CSS-only)
 src/components/carousel.css   scroll-snap slider (CSS-only)
 src/components/otp.css        OTP (separate boxes + paste-split)
-src/themes.css                all themes (default, ocean, squishy)
+src/themes.css                all themes (default, ocean, squishy) and the dark mapping
 src/enhance.js                progressive enhancement (JSDoc)
 tools/minify.py               stdlib-only minifier (-> dist/, --entry/--theme/--check)
 tools/test_minify.py          minifier regression tests (stdlib unittest)
@@ -759,6 +776,7 @@ site/src/routes/wiki/+page.svelte wiki home, English
 site/src/routes/wiki-de/+page.svelte wiki home, German
 site/src/routes/wiki/[slug]/+page.js entries + load (EN + -de twins)
 site/src/lib/theme.ts         builder math (derive/export/URL, pure functions)
+site/src/lib/theme-options.ts  built-in themes for the site's theme menus
 site/src/lib/Builder.svelte   builder UI (live preview, copy/download/share)
 site/src/lib/Demo.svelte      builder preview demos (all variants incl. segmented)
 site/src/lib/wiki.ts          wiki splitter (parse/processBody/rewriteHrefs, ported)

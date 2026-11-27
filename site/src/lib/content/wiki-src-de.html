@@ -100,14 +100,15 @@
   &lt;small class="hint" id="e-hint"&gt;Gültige E-Mail eingeben.&lt;/small&gt;
 &lt;/label&gt;
 &lt;!-- oder aria-invalid="true" direkt am Control --&gt;</code></pre>
-    <h3 id="input-group">Input-Gruppen <small>src/components/card.css</small></h3>
+    <p>Kontrollrahmen (Text-Felder, Selects, Textareas, Stepper, Input-Gruppen, Chips) und der Fokusring erreichen in jedem Theme mindestens 3:1 Kontrast zur Umgebung (WCAG 1.4.11). Trennlinien und Kartenkanten behalten das hellere <code>--lui-border</code>.</p>
+    <h3 id="input-group">Input-Gruppen <small>src/components/forms.css</small></h3>
     <div class="input-group" style="margin-block:var(--lui-space-2)">
       <span aria-hidden="true">€</span>
       <input aria-label="Betrag" placeholder="0,00" />
       <button class="btn" type="button">Senden</button>
     </div>
     <pre><code>&lt;div class="input-group"&gt;&lt;span aria-hidden="true"&gt;€&lt;/span&gt;&lt;input aria-label="Betrag" /&gt;&lt;button class="btn"&gt;Senden&lt;/button&gt;&lt;/div&gt;</code></pre>
-    <h3 id="stepper">Stepper <small>verbundenes −/Wert/+-Control — src/components/card.css</small></h3>
+    <h3 id="stepper">Stepper <small>verbundenes −/Wert/+-Control — src/components/forms.css</small></h3>
     <p>Zahleneingabe ohne fummelige Spinner: bündige Buttons, zentrierter Wert, ein Gruppen-Fokusring.
     Das Button-Verhalten ist App-JS — verbundene Kante und Fokusring kommen aus der Lib.</p>
     <div class="stepper" style="margin-block:var(--lui-space-2)">
@@ -116,7 +117,7 @@
       <button type="button" class="btn" aria-label="Erhöhen">+</button>
     </div>
     <pre><code>&lt;div class="stepper"&gt;&lt;button type="button" class="btn" aria-label="Verringern"&gt;−&lt;/button&gt;&lt;input type="number" value="1" aria-label="Menge" /&gt;&lt;button type="button" class="btn" aria-label="Erhöhen"&gt;+&lt;/button&gt;&lt;/div&gt;</code></pre>
-    <h3 id="form-grid">Formular-Grid <small>src/components/card.css</small></h3>
+    <h3 id="form-grid">Formular-Grid <small>src/components/forms.css</small></h3>
     <div class="form-grid">
       <label class="field"><span>Vorname</span><input placeholder="Ada" /></label>
       <label class="field"><span>Nachname</span><input placeholder="Lovelace" /></label>
@@ -349,15 +350,17 @@
     <p><span data-tooltip="Rein CSS" tabindex="0">Tooltip per Hover oder Fokus</span></p>
     <h3 id="dropdown">Dropdown <small>details-first, ohne JS</small></h3>
     <p><details class="dropdown" style="display:inline-block"><summary>Dropdown</summary><div><a href="#dropdown">Eintrag</a></div></details></p>
-    <h3 id="popover">Popover <small>details-first; ESC + Outside-Klick via enhance.js</small></h3>
+    <h3 id="popover">Popover <small>details-first; ESC, Outside-Klick und Pfeiltasten via enhance.js</small></h3>
     <p><details class="popover" data-placement="bottom" style="display:inline-block"><summary class="btn" data-variant="secondary">Popover</summary><div role="menu"><a href="#popover" role="menuitem">Eintrag</a><button type="button" role="menuitem">Aktion</button></div></details></p>
     <pre><code>&lt;details class="popover" data-placement="bottom"&gt; &lt;!-- top | bottom | left | right --&gt;
   &lt;summary&gt;Trigger&lt;/summary&gt;
   &lt;div role="menu"&gt;&lt;a href="…" role="menuitem"&gt;Eintrag&lt;/a&gt;&lt;/div&gt;
 &lt;/details&gt;
 &lt;!-- ESC + Outside-Klick via enhance.js (Toggle ist nativ) --&gt;</code></pre>
+    <p>Tastatur: Pfeiltaste nach unten oder oben auf dem Auslöser öffnet das Menü und setzt den Fokus auf den ersten bzw. letzten Eintrag. Escape schließt es und gibt den Fokus an den Auslöser zurück.</p>
     <h3 id="dialog">Dialog <small>nativ, enhance.js für showModal + Backdrop-Close</small></h3>
     <p><button class="btn" data-variant="secondary" type="button" data-lui-open="wiki-dialog">Dialog öffnen</button></p>
+    <p>Ein Klick auf das Padding des Dialogs lässt ihn offen; nur ein Klick auf den Backdrop schließt ihn.</p>
     <h3 id="drawer">Drawer <small>Dialog-Sheet via data-side</small></h3>
     <p><button class="btn" data-variant="secondary" type="button" data-lui-open="wiki-drawer">Drawer öffnen</button> ·
       <button class="btn" data-variant="secondary" type="button" data-lui-open="wiki-sheet">Sheet öffnen</button></p>
@@ -382,6 +385,7 @@
         data-lui-toast-message="Gespeichert."&gt;Toast zeigen&lt;/button&gt;
 &lt;!-- JS-API: luiToast({ tone, title, message, ms }) --&gt;</code></pre>
 
+    <p>Die automatische Ausblendung pausiert, solange die Maus über einem Toast liegt oder er den Fokus hat. <code>data-tone="danger"</code> wird mit <code>role="alert"</code> angekündigt, die übrigen Töne mit <code>role="status"</code>.</p>
     <h2 id="content">7. Inhalte &amp; Daten <small>src/base.css, classless sofern nicht anders angegeben</small></h2>
     <h3 id="table">Tabellen <small>src/components/card.css für Rahmen + Modifier</small></h3>
     <div class="table-wrap" style="margin-block:var(--lui-space-3)">
@@ -512,7 +516,7 @@
     <pre><code>&lt;html data-theme="default|ocean|squishy|eigenes" data-mode="auto|light|dark"&gt;
 &lt;select data-lui-theme&gt;…&lt;/select&gt;  &lt;!-- persistent via enhance.js --&gt;
 &lt;select data-lui-mode&gt;…&lt;/select&gt;</code></pre>
-    <p>Eigenes Theme: <a href="../index-de.html">Builder</a> → Export nach <code>src/themes.css</code>.
+    <p>Eigenes Theme: helle Werte plus eine dunkle Palette (<code>--lui-dark-*</code>, siehe <code>src/themes.css</code>). Das dunkle Mapping der Bibliothek wendet die Palette im dunklen und automatischen Modus an. Der <a href="../index-de.html">Builder</a> exportiert ebenfalls ein vollständiges Theme.
       Shape-Regeln: <code>--lui-radius</code> = Boxen, <code>--lui-radius-control</code> = Controls
       (<code>999px</code> = Pill nur dort), <code>--lui-corner-shape: round | superellipse(K)</code>
       plus Radius-Kompensation (<code>Basis × (0,5 + 0,5 × K)</code>) nur in
@@ -522,7 +526,8 @@
     <table>
       <thead><tr><th>Gruppe</th><th>Tokens</th></tr></thead>
       <tbody>
-        <tr><td>Farben</td><td><code>--lui-bg --lui-surface --lui-text --lui-muted --lui-border --lui-primary(-hover/-active) --lui-on-primary --lui-secondary(-…) --lui-on-secondary --lui-accent(-hover/-active) --lui-on-accent --lui-success --lui-warning --lui-danger --lui-ring --lui-chevron</code></td></tr>
+        <tr><td>Farben</td><td><code>--lui-bg --lui-surface --lui-text --lui-muted --lui-border --lui-control-border --lui-primary(-hover/-active) --lui-on-primary --lui-secondary(-…) --lui-on-secondary --lui-accent(-hover/-active) --lui-on-accent --lui-success --lui-warning --lui-danger --lui-ring --lui-chevron</code></td></tr>
+        <tr><td>Dunkle Palette</td><td><code>--lui-dark-bg --lui-dark-text --lui-dark-primary --lui-dark-secondary --lui-dark-accent --lui-dark-on-*</code> (pro Theme); <code>--lui-dark-success --lui-dark-warning --lui-dark-danger --lui-dark-info --lui-dark-shadow-sm/-md</code> (gemeinsam)</td></tr>
         <tr><td>Shape</td><td><code>--lui-radius(-sm/-md/-lg/-full) --lui-radius-control --lui-corner-shape</code></td></tr>
         <tr><td>Größe</td><td><code>--lui-density(-x/-y) --lui-control-h-sm/-md/-lg --lui-check --lui-contrast --lui-control-py/-px --lui-space-1..4 --lui-font-sans/-mono/-sm/-md/-lg --lui-border-width --lui-shadow-sm/-md --lui-maxw --lui-app-nav-w/-w-rail</code></td></tr>
       </tbody>

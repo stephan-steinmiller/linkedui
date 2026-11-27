@@ -100,14 +100,15 @@
   &lt;small class="hint" id="e-hint"&gt;Enter a valid email.&lt;/small&gt;
 &lt;/label&gt;
 &lt;!-- or aria-invalid="true" directly on the control --&gt;</code></pre>
-    <h3 id="input-group">Input groups <small>src/components/card.css</small></h3>
+    <p>Control borders (text inputs, selects, textareas, steppers, input groups, toggle chips) and the focus ring reach 3:1 against their surroundings in every theme (WCAG 1.4.11). Dividers and card edges keep the softer <code>--lui-border</code>.</p>
+    <h3 id="input-group">Input groups <small>src/components/forms.css</small></h3>
     <div class="input-group" style="margin-block:var(--lui-space-2)">
       <span aria-hidden="true">$</span>
       <input aria-label="Amount" placeholder="0.00" />
       <button class="btn" type="button">Send</button>
     </div>
     <pre><code>&lt;div class="input-group"&gt;&lt;span aria-hidden="true"&gt;$&lt;/span&gt;&lt;input aria-label="Amount" /&gt;&lt;button class="btn"&gt;Send&lt;/button&gt;&lt;/div&gt;</code></pre>
-    <h3 id="stepper">Stepper <small>joined −/value/+ control — src/components/card.css</small></h3>
+    <h3 id="stepper">Stepper <small>joined −/value/+ control — src/components/forms.css</small></h3>
     <p>Number entry without fiddly spinners: edge-flush buttons, centered value, one group focus ring.
     Button behavior is app JS — the joined edge and focus ring are the library.</p>
     <div class="stepper" style="margin-block:var(--lui-space-2)">
@@ -116,7 +117,7 @@
       <button type="button" class="btn" aria-label="Increase">+</button>
     </div>
     <pre><code>&lt;div class="stepper"&gt;&lt;button type="button" class="btn" aria-label="Decrease"&gt;−&lt;/button&gt;&lt;input type="number" value="1" aria-label="Quantity" /&gt;&lt;button type="button" class="btn" aria-label="Increase"&gt;+&lt;/button&gt;&lt;/div&gt;</code></pre>
-    <h3 id="form-grid">Form grid <small>src/components/card.css</small></h3>
+    <h3 id="form-grid">Form grid <small>src/components/forms.css</small></h3>
     <div class="form-grid">
       <label class="field"><span>First</span><input placeholder="Ada" /></label>
       <label class="field"><span>Last</span><input placeholder="Lovelace" /></label>
@@ -348,15 +349,17 @@
     <p><span data-tooltip="Pure CSS" tabindex="0">Hover or focus me for tooltip</span></p>
     <h3 id="dropdown">Dropdown <small>details-first, no JS</small></h3>
     <p><details class="dropdown" style="display:inline-block"><summary>Dropdown</summary><div><a href="#dropdown">Entry</a></div></details></p>
-    <h3 id="popover">Popover <small>details-first; ESC + outside-click via enhance.js</small></h3>
+    <h3 id="popover">Popover <small>details-first; Esc, outside-click and arrow keys via enhance.js</small></h3>
     <p><details class="popover" data-placement="bottom" style="display:inline-block"><summary class="btn" data-variant="secondary">Popover</summary><div role="menu"><a href="#popover" role="menuitem">Entry</a><button type="button" role="menuitem">Action</button></div></details></p>
     <pre><code>&lt;details class="popover" data-placement="bottom"&gt; &lt;!-- top | bottom | left | right --&gt;
   &lt;summary&gt;Trigger&lt;/summary&gt;
   &lt;div role="menu"&gt;&lt;a href="…" role="menuitem"&gt;Entry&lt;/a&gt;&lt;/div&gt;
 &lt;/details&gt;
 &lt;!-- ESC + outside-click close via enhance.js (toggle is native) --&gt;</code></pre>
+    <p>Keyboard: ArrowDown or ArrowUp on the trigger opens the menu and focuses the first or last item. Escape closes it and returns focus to the trigger.</p>
     <h3 id="dialog">Dialog <small>native, enhance.js for showModal + backdrop close</small></h3>
     <p><button class="btn" data-variant="secondary" type="button" data-lui-open="wiki-dialog">Open dialog</button></p>
+    <p>A click on the dialog's own padding keeps it open; only a click on the backdrop closes it.</p>
     <h3 id="drawer">Drawer <small>dialog sheet via data-side</small></h3>
     <p><button class="btn" data-variant="secondary" type="button" data-lui-open="wiki-drawer">Open drawer</button> ·
       <button class="btn" data-variant="secondary" type="button" data-lui-open="wiki-sheet">Open sheet</button></p>
@@ -381,6 +384,7 @@
         data-lui-toast-message="Saved."&gt;Show toast&lt;/button&gt;
 &lt;!-- JS API: luiToast({ tone, title, message, ms }) --&gt;</code></pre>
 
+    <p>Auto-dismiss pauses while a toast is hovered or focused. <code>data-tone="danger"</code> is announced with <code>role="alert"</code>; the other tones use <code>role="status"</code>.</p>
     <h2 id="content">7. Content &amp; data <small>src/base.css, classless unless noted</small></h2>
     <h3 id="table">Tables <small>src/components/card.css for frame + modifiers</small></h3>
     <div class="table-wrap" style="margin-block:var(--lui-space-3)">
@@ -512,7 +516,7 @@
     <pre><code>&lt;html data-theme="default|ocean|squishy|custom" data-mode="auto|light|dark"&gt;
 &lt;select data-lui-theme&gt;…&lt;/select&gt;  &lt;!-- persistent via enhance.js --&gt;
 &lt;select data-lui-mode&gt;…&lt;/select&gt;</code></pre>
-    <p>Custom theme: <a href="../index.html">builder</a> → export to <code>src/themes.css</code>.
+    <p>Custom theme: light values plus a dark palette (<code>--lui-dark-*</code>, see <code>src/themes.css</code>). The library's dark mapping applies the palette in dark and auto mode. The <a href="../index.html">builder</a> exports a complete theme too.
       Shape rules: <code>--lui-radius</code> = boxes, <code>--lui-radius-control</code> = controls
       (<code>999px</code> = pill for controls only), <code>--lui-corner-shape: round | superellipse(K)</code>
       plus radius compensation (<code>base × (0.5 + 0.5 × K)</code>) only inside
@@ -522,7 +526,8 @@
     <table>
       <thead><tr><th>Group</th><th>Tokens</th></tr></thead>
       <tbody>
-        <tr><td>Colors</td><td><code>--lui-bg --lui-surface --lui-field --lui-text --lui-muted --lui-border --lui-primary(-hover/-active) --lui-on-primary --lui-secondary(-…) --lui-on-secondary --lui-accent(-hover/-active) --lui-on-accent --lui-success --lui-warning --lui-danger --lui-info --lui-ring --lui-chevron</code></td></tr>
+        <tr><td>Colors</td><td><code>--lui-bg --lui-surface --lui-field --lui-text --lui-muted --lui-border --lui-control-border --lui-primary(-hover/-active) --lui-on-primary --lui-secondary(-…) --lui-on-secondary --lui-accent(-hover/-active) --lui-on-accent --lui-success --lui-warning --lui-danger --lui-info --lui-ring --lui-chevron</code></td></tr>
+        <tr><td>Dark palette</td><td><code>--lui-dark-bg --lui-dark-text --lui-dark-primary --lui-dark-secondary --lui-dark-accent --lui-dark-on-*</code> (per theme); <code>--lui-dark-success --lui-dark-warning --lui-dark-danger --lui-dark-info --lui-dark-shadow-sm/-md</code> (shared)</td></tr>
         <tr><td>Shape</td><td><code>--lui-radius(-sm/-md/-lg/-full) --lui-radius-control --lui-corner-shape</code></td></tr>
         <tr><td>Size</td><td><code>--lui-density(-x/-y) --lui-control-h-sm/-md/-lg --lui-check --lui-contrast --lui-control-py/-px --lui-space-1..4 --lui-font-sans/-mono/-sm/-md/-lg --lui-border-width --lui-shadow-sm/-md --lui-maxw --lui-app-nav-w/-w-rail</code></td></tr>
       </tbody>
