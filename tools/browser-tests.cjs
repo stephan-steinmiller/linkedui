@@ -34,6 +34,7 @@ const CHROME_CANDIDATES = [
   '/usr/bin/chromium-browser',
 ].filter(Boolean);
 const WCAG_AA_TEXT = 4.5;
+const WCAG_NONTEXT = 3; // WCAG 1.4.11: control boundaries, fills, tracks and focus rings
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const results = [];
@@ -100,6 +101,68 @@ function contrastProbe() {
   });
 }
 
+/** WCAG 1.4.11 for one control: its boundary, fill, switch track or focus ring vs the colors next to it. */
+function nonTextProbe(id) {
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = 1;
+  const ctx = cv.getContext('2d', { willReadFrequently: true });
+  const rgba = (c) => {
+    ctx.clearRect(0, 0, 1, 1);
+    ctx.fillStyle = c;
+    ctx.fillRect(0, 0, 1, 1);
+    const d = ctx.getImageData(0, 0, 1, 1).data;
+    return [d[0], d[1], d[2], d[3] / 255];
+  };
+  const over = (fg, bg) => [0, 1, 2].map((i) => fg[i] * fg[3] + bg[i] * (1 - fg[3])).concat([1]);
+  const lum = (c) => {
+    const f = (v) => {
+      v /= 255;
+      return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+    };
+    return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]);
+  };
+  const ratio = (a, b) => {
+    const x = lum(a), y = lum(b);
+    return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
+  };
+  const effBg = (el) => {
+    const stack = [];
+    let n = el;
+    while (n && n !== document.documentElement) {
+      const c = rgba(getComputedStyle(n).backgroundColor);
+      if (c[3] > 0) {
+        stack.push(c);
+        if (c[3] >= 1) break;
+      }
+      n = n.parentElement;
+    }
+    let acc = [255, 255, 255, 1];
+    for (let i = stack.length - 1; i >= 0; i--) acc = over(stack[i], acc);
+    return acc;
+  };
+  const el = document.getElementById(id);
+  const cs = getComputedStyle(el);
+  const outside = effBg(el.parentElement);
+  const inside = effBg(el);
+  const out = {};
+  const edge = rgba(cs.borderTopColor);
+  if (parseFloat(cs.borderTopWidth) > 0 && cs.borderTopStyle !== 'none' && edge[3] > 0) {
+    out.boundary = Math.min(ratio(over(edge, outside), outside), ratio(over(edge, inside), inside));
+  }
+  if (id === 'b-primary') out.fill = ratio(over(rgba(cs.backgroundColor), outside), outside);
+  if (id === 'w1') {
+    const t = rgba(getComputedStyle(el, '::before').backgroundColor);
+    if (t[3] > 0) out.track = ratio(over(t, outside), outside);
+  }
+  if (document.activeElement === el) {
+    out.focused = true;
+    if (parseFloat(cs.outlineWidth) > 0 && cs.outlineStyle !== 'none') {
+      out.focus = ratio(over(rgba(cs.outlineColor), outside), outside);
+    }
+  }
+  return out;
+}
+
 /** Horizontal overflow of the page at a given viewport width (clipped ancestors excluded). */
 function overflowProbe(width) {
   const offenders = [];
@@ -156,6 +219,18 @@ const FIXTURES = {
     <div class="alert c-alert-danger" data-tone="danger"><span>Err</span></div>
     <a class="c-link" href="#x">Link</a></main>`, { theme, mode }),
   toast: page(''),
+  nontext: (theme, mode) => page(`<main class="lui-container" style="display:grid;gap:1rem">
+    <label class="field"><span>Text</span><input id="t1" type="text" value="x"></label>
+    <label class="field"><span>Select</span><select id="s1"><option>one</option></select></label>
+    <label class="field"><span>Area</span><textarea id="a1"></textarea></label>
+    <label><input id="c1" type="checkbox"> <span>Checkbox</span></label>
+    <label><input id="r1" type="radio" name="nt"> <span>Radio</span></label>
+    <label class="switch"><input id="w1" type="checkbox" role="switch"> <span>Switch</span></label>
+    <div class="check-chips"><input id="chip1" type="checkbox"><label id="chip-l" for="chip1">Chip</label></div>
+    <div class="stepper" id="st"><button class="btn" type="button" aria-label="less">−</button><input value="1" aria-label="quantity"><button class="btn" type="button" aria-label="more">+</button></div>
+    <div class="input-group" id="ig"><input value="x" aria-label="value"><button class="btn" type="button">Go</button></div>
+    <div><button class="btn" id="b-outline" data-variant="outline">Outline</button> <button class="btn" id="b-primary">Primary</button></div>
+  </main>`, { theme, mode }),
 };
 
 // ---------------------------------------------------------------------------
@@ -174,6 +249,30 @@ function staticChecks() {
     });
   }
   check('components use tokens only (no literal colors)', offenders.length === 0, offenders.slice(0, 5).join(' '));
+}
+
+/** Dark mode is written twice (explicit and auto); the two copies must stay identical. */
+function themeChecks() {
+  const css = fs.readFileSync(path.join(SRC, 'themes.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+  const blockAfter = (selector) => {
+    const i = css.indexOf(selector);
+    if (i < 0) return null;
+    const open = css.indexOf('{', i);
+    let depth = 0;
+    for (let j = open; j < css.length; j++) {
+      if (css[j] === '{') depth++;
+      else if (css[j] === '}' && --depth === 0) return css.slice(open + 1, j);
+    }
+    return null;
+  };
+  const explicit = blockAfter('[data-mode="dark"] {');
+  const auto = blockAfter(':root:not([data-mode]), [data-mode="auto"] {');
+  const decls = (s) => s.split(';').map((d) => d.replace(/\s+/g, ' ').trim()).filter(Boolean);
+  const identical = !!explicit && !!auto && JSON.stringify(decls(explicit)) === JSON.stringify(decls(auto));
+  check('themes: explicit and auto dark mappings are identical', identical, identical ? '' : 'copies differ or were not found');
+  const used = [...new Set([...(explicit || '').matchAll(/var\((--lui-dark-[a-z0-9-]+)\)/g)].map((m) => m[1]))];
+  const missing = used.filter((name) => !new RegExp(`${name}\\s*:`).test(css));
+  check(`themes: every --lui-dark-* used by the dark mapping is defined (${used.length} names)`, missing.length === 0, missing.join(' '));
 }
 
 function langChecks() {
@@ -201,7 +300,9 @@ function serve(dir) {
     const server = http.createServer((req, res) => {
       let p = decodeURIComponent(new URL(req.url, 'http://x').pathname);
       if (p.endsWith('/')) p += 'index.html';
-      const file = path.normalize(path.join(dir, p));
+      let file = path.normalize(path.join(dir, p));
+      // Extensionless app URLs (/wiki/fields) map to the prerendered files (wiki/fields.html).
+      if ((!fs.existsSync(file) || fs.statSync(file).isDirectory()) && fs.existsSync(file + '.html')) file += '.html';
       if (!file.startsWith(dir) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) {
         res.writeHead(404); res.end('not found'); return;
       }
@@ -397,6 +498,52 @@ async function browserChecks(chromePath, fixtureDir, siteBase) {
       failures.length ? failures.slice(0, 6).join(', ') : `lowest ${lowest.ratio}:1 at ${lowest.where}`,
     );
 
+    // --- Non-text (WCAG 1.4.11): control boundaries, fills, tracks and focus rings ---
+    const NONTEXT_IDS = ['t1', 's1', 'a1', 'c1', 'r1', 'w1', 'chip-l', 'st', 'ig', 'b-outline', 'b-primary'];
+    const FOCUSABLE_IDS = new Set(['t1', 's1', 'a1', 'c1', 'r1', 'w1', 'b-outline', 'b-primary']);
+    const nonTextFails = [];
+    let nonTextPairs = 0;
+    for (const theme of ['default', 'ocean', 'squishy']) {
+      for (const mode of ['light', 'dark']) {
+        await b.viewport(900, 900);
+        await b.navigate(fixture(`nontext-${theme}-${mode}.html`, FIXTURES.nontext(theme, mode)));
+        for (const id of NONTEXT_IDS) {
+          if (FOCUSABLE_IDS.has(id)) {
+            // Real Tab presses: :focus-visible must apply, as it does for keyboard users.
+            await b.evaluate('document.activeElement && document.activeElement.blur && document.activeElement.blur()');
+            for (let i = 0; i < 25 && (await b.evaluate('document.activeElement && document.activeElement.id')) !== id; i++) {
+              await b.key('Tab', 'Tab', 9, '');
+            }
+          }
+          const row = await b.evaluate(`(${nonTextProbe.toString()})(${JSON.stringify(id)})`);
+          const where = `${theme}/${mode} ${id}`;
+          if (FOCUSABLE_IDS.has(id) && !row.focused) nonTextFails.push(`${where} not reachable by Tab`);
+          for (const kind of ['boundary', 'fill', 'track', 'focus']) {
+            if (typeof row[kind] !== 'number') continue;
+            nonTextPairs++;
+            if (row[kind] < WCAG_NONTEXT) nonTextFails.push(`${where} ${kind} ${row[kind].toFixed(2)}:1`);
+          }
+        }
+      }
+    }
+    check(
+      `non-text: control boundaries, fills and focus rings reach ${WCAG_NONTEXT}:1 in 3 themes x 2 modes (${nonTextPairs} pairs)`,
+      nonTextFails.length === 0,
+      nonTextFails.slice(0, 6).join(', '),
+    );
+
+    // --- Themes: a valid custom name in the URL is applied, an invalid one is ignored ---
+    const themeUrl = fixture('theme-query.html', FIXTURES.dialog);
+    await b.navigate(`${themeUrl}?theme=brand-x`);
+    const customTheme = await b.evaluate('document.documentElement.dataset.theme');
+    await b.navigate(`${themeUrl}?theme=${encodeURIComponent('Not Valid!')}`);
+    const invalidTheme = await b.evaluate('document.documentElement.dataset.theme');
+    check(
+      'themes: a custom name in the URL is applied, an invalid one is ignored',
+      customTheme === 'brand-x' && invalidTheme === 'default',
+      `custom=${customTheme} invalid=${invalidTheme}`,
+    );
+
     // --- Site: no horizontal overflow at phone width, on every built page ---
     if (!siteBase) {
       skip('site: no horizontal overflow at 375px', 'no site/build (run `npm run build` in site/)');
@@ -407,7 +554,11 @@ async function browserChecks(chromePath, fixtureDir, siteBase) {
       await b.viewport(375, 800, true);
       const bad = [];
       for (const rel of pages) {
-        await b.navigate(`${siteBase}/${rel}`);
+        // The app's URLs have no extension (/wiki/fields); serve() maps them to the .html files.
+        await b.navigate(`${siteBase}/${rel === 'index.html' ? '' : rel.replace(/\.html$/, '')}`);
+        // A 404 view would pass the overflow test without testing the page: fail it instead.
+        const h1 = await b.evaluate("((document.querySelector('h1') || {}).textContent || '').trim()");
+        if (/^404$|can.t be found/.test(h1)) bad.push(`${rel} shows an error view`);
         const r = await b.evaluate(`(${overflowProbe.toString()})(375)`);
         if (r.scrollW > 375) bad.push(`${rel} scrollW=${r.scrollW} ${r.offenders.join(',')}`);
       }
@@ -436,6 +587,7 @@ async function removeDir(dir) {
 
 async function main() {
   staticChecks();
+  themeChecks();
   langChecks();
 
   const chromePath = CHROME_CANDIDATES.find((p) => fs.existsSync(p));
