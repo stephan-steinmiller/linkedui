@@ -336,8 +336,10 @@ it only selects a value.
 ### Popover menu — `src/components/popover.css` + `enhance.js`
 
 Trigger + floating panel, `details`-first (click/Enter/Space/Tab work
-without JS). With JS: ESC + outside-click close, ArrowUp/Down/Home/End
-move between `menuitem`s. Placements: top |
+without JS). With JS: ESC closes and returns focus to the trigger;
+outside-click closes; ArrowDown/ArrowUp on the trigger open the menu and
+focus its first/last item; ArrowUp/Down/Home/End move between `menuitem`s.
+Placements: top |
 bottom (default) | left | right — same vocabulary as toasts.
 
 ```html
@@ -371,6 +373,8 @@ Tinted cards (info | success | warning | danger) with icon, title, message.
 Static in flow, or live stacked bottom-right via the `.toasts` container.
 No-JS: static markup only. With JS: `showToast()` (auto-dismiss, close
 button) or declarative triggers — also exposed as `window.luiToast`.
+Auto-dismiss pauses while a toast is hovered or focused. `tone="danger"`
+announces as `role="alert"`; other tones announce as `role="status"`.
 
 ```html
 <div class="toast" data-tone="success" role="status">
@@ -391,7 +395,8 @@ button) or declarative triggers — also exposed as `window.luiToast`.
 </dialog>
 ```
 
-ESC + backdrop click included for modal (`showModal()`) dialogs. Without
+ESC + backdrop click included for modal (`showModal()`) dialogs; a click on
+the dialog's own padding does not close it. Without
 JS: set the `open` attribute (no native ESC there — add your own handler).
 
 ### Drawer — `src/components/drawer.css` (no extra JS)
@@ -635,6 +640,14 @@ segmented and toasts), `--lui-density` (master) or `--lui-density-x`/`-y`,
 `--lui-font-sans/-mono/-sm/-md/-lg/-xl/-2xl/-3xl`, `--lui-border-width`, `--lui-shadow-sm/-md`,
 `--lui-maxw`, `--lui-field-maxw` (form-control width cap, see Forms). Complete list: `src/tokens.css`.
 
+Tints and washes: `--lui-tone-base` (the color alerts, badges and toasts mix
+their tone toward: white in light, black in dark) and `--lui-tone-pct` (the
+tone's share: 50% light, 36% dark, so light ink keeps AA on dark tints).
+`--lui-wash`, `--lui-wash-strong`, `--lui-wash-faint`, `--lui-wash-shimmer`:
+neutral hover, ghost and shimmer washes. Components use these instead of
+hardcoded colors, so a theme can override them. Every dark block defines its
+own `--lui-secondary` and `--lui-on-secondary`; the light values are not reused.
+
 ## 6. JS API (`src/enhance.js`, JSDoc in code)
 
 | Function | Purpose |
@@ -669,10 +682,15 @@ python3 tools/minify.py --theme default    # only this theme (+ generics)
 python3 tools/test_minify.py               # minifier regression tests (stdlib)
 ```
 
-- Full minified: CSS ~13 KB gzip, JS ~4.2 KB gzip (measured at the repo).
+- Browser checks: `node tools/browser-tests.cjs` covers behavior (dialog, OTP,
+  popover, toasts, reduced motion), dark-mode contrast, `<html lang>` and mobile
+  overflow. No npm packages; needs Chrome (set `CHROME_PATH` if it is not
+  auto-detected) and `npm run build` in `site/` for the site checks.
+- Full minified (all themes): CSS ~14.4 KB gzip (~13.7 KB with `--theme default`),
+  JS ~5.8 KB gzip (measured at the repo).
 - Custom entry: your own `@import` list (see `src/linkedui.css`), e.g. only
   the components you use — example: tokens+reset+base+button+card, default theme
-  ≈ 6 KB CSS gzip + 4.2 KB JS.
+  ≈ 6.4 KB CSS gzip + 5.8 KB JS.
 - `--theme` filters `[data-theme="…"]` blocks; theme-free rules (fallbacks,
   dark generics, `@supports`) always survive — correctness over max size.
 - After `src/` changes: run the script, check `git diff --stat dist/`
@@ -706,6 +724,7 @@ src/reset.css                 mini reset
 src/base.css                  classless base (buttons, forms, switch, slider, dialog …)
 src/components/button.css     .btn + variants/states/sizes
 src/components/card.css       container, grid, card, field, hints, empty state, check-chips, stepper, check
+src/components/code.css       code blocks: caption, copy button, line numbers, VBA/HTML/CSS highlighting
 src/components/layout.css     page structure: stack, cluster, split, sidebar shell, stage, hero
 src/components/steps.css      stepper (CSS counters)
 src/components/quiz.css       single-choice quiz cards
@@ -726,9 +745,12 @@ src/components/otp.css        OTP (separate boxes + paste-split)
 src/themes.css                all themes (default, ocean, squishy)
 src/enhance.js                progressive enhancement (JSDoc)
 tools/minify.py               stdlib-only minifier (-> dist/, --entry/--theme/--check)
+tools/test_minify.py          minifier regression tests (stdlib unittest)
+tools/browser-tests.cjs       browser regression tests (Node 22+ and Chrome, no npm packages)
 dist/linkedui.min.css         generated (checked in, vgl. ## 7)
 dist/enhance.min.js           generated (checked in, vgl. ## 7)
 site/svelte.config.js         adapter-static (pages/assets -> site/build/, prerendered)
+site/src/hooks.server.ts      sets <html lang> per route in the prerendered HTML (de / en)
 site/src/app.css              site-only chrome (builder panels, NOT lib)
 site/src/app.html             html shell (+ anti-FOUC theme restore)
 site/src/routes/+page.svelte  theme builder, English (dogfoods the lib)

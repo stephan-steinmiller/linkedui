@@ -14,7 +14,7 @@
     --tab-pill: var(--lui-surface);
     --tab-pill: color-mix(in oklch, var(--lui-primary) 12%, var(--lui-surface));
     --tab-edge: var(--lui-border);
-    --tab-hover: rgb(128 128 128 / 0.12);
+    --tab-hover: var(--lui-wash);
     --tab-hover: color-mix(in oklch, var(--lui-primary) 12%, transparent);
     --tab-accent: var(--lui-primary);
     position: relative;
@@ -26,14 +26,14 @@
   .tabs[data-variant="secondary"] {
     --tab-pill: var(--lui-surface);
     --tab-pill: color-mix(in oklch, var(--lui-secondary) 12%, var(--lui-surface));
-    --tab-hover: rgb(128 128 128 / 0.12);
+    --tab-hover: var(--lui-wash);
     --tab-hover: color-mix(in oklch, var(--lui-secondary) 12%, transparent);
     --tab-accent: var(--lui-secondary);
   }
   .tabs[data-variant="accent"] {
     --tab-pill: var(--lui-surface);
     --tab-pill: color-mix(in oklch, var(--lui-accent) 12%, var(--lui-surface));
-    --tab-hover: rgb(128 128 128 / 0.12);
+    --tab-hover: var(--lui-wash);
     --tab-hover: color-mix(in oklch, var(--lui-accent) 12%, transparent);
     --tab-accent: var(--lui-accent);
   }

@@ -150,6 +150,9 @@
   @keyframes lui-blink {
     50% { opacity: 0; }
   }
+  @media (prefers-reduced-motion: reduce) {
+    .ai-caret::after { animation: none; }
+  }
   /* Empty state: greeting + model line + suggestion chips */
   .ai-hero {
     display: flex;

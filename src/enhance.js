@@ -1,7 +1,7 @@
 /**
  * linkedui - enhance.js
  * =====================
- * Progressive enhancement for the linkedui CSS library (<3 KB, no build tools,
+ * Progressive enhancement for the linkedui CSS library (about 6 KB gzipped, no build tools,
  * no dependencies). Everything works WITHOUT this script (system theme via CSS,
  * `dialog[open]`, `<details>` dropdowns/accordion, radio tabs) - with it things
  * become persistent, convenient, and more accessible.
@@ -146,9 +146,14 @@
     document.querySelectorAll("dialog [data-lui-close]").forEach((btn) => {
       btn.addEventListener("click", () => btn.closest("dialog")?.close());
     });
+    // Backdrop = the dialog element itself AND the click lies outside its box.
+    // (`e.target === dlg` alone also matches clicks on the dialog's own padding.)
     document.querySelectorAll("dialog").forEach((dlg) => {
       dlg.addEventListener("click", (e) => {
-        if (e.target === dlg) dlg.close();
+        if (e.target !== dlg) return;
+        const r = dlg.getBoundingClientRect();
+        const inside = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+        if (!inside) dlg.close();
       });
     });
   }
@@ -171,7 +176,22 @@
   function bindPopovers() {
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
-        document.querySelectorAll("details.popover[open]").forEach((d) => d.removeAttribute("open"));
+        // Close every open popover; focus returns to its trigger if focus was inside.
+        document.querySelectorAll("details.popover[open]").forEach((d) => {
+          const hadFocus = d.contains(document.activeElement);
+          d.removeAttribute("open");
+          if (hadFocus) d.querySelector(":scope > summary")?.focus();
+        });
+        return;
+      }
+      // Arrow keys on the trigger open the menu and move focus into it (APG menu button).
+      const trigger = e.target.closest?.("details.popover > summary");
+      if (trigger && (e.key === "ArrowDown" || e.key === "ArrowUp")) {
+        const d = trigger.parentElement;
+        e.preventDefault();
+        d.open = true;
+        const entries = [...d.querySelectorAll('[role="menuitem"]')].filter((el) => !el.disabled);
+        (e.key === "ArrowDown" ? entries[0] : entries[entries.length - 1])?.focus();
         return;
       }
       if (e.key !== "ArrowDown" && e.key !== "ArrowUp" && e.key !== "Home" && e.key !== "End") return;
@@ -395,7 +415,8 @@
     const el = document.createElement("div");
     el.className = "toast";
     el.dataset.tone = tone;
-    el.setAttribute("role", "status");
+    // Danger interrupts (assertive alert); other tones are polite status updates.
+    el.setAttribute("role", tone === "danger" ? "alert" : "status");
     const body = document.createElement("div");
     if (title) {
       const t = document.createElement("strong");
@@ -414,7 +435,19 @@
     close.textContent = "×";
     el.append(body, close);
     tray.appendChild(el);
-    if (ms > 0) setTimeout(() => el.remove(), ms);
+    if (ms > 0) {
+      // Auto-dismiss, but hold while hovered or focused: reading time and keyboard users.
+      let timer = null, left = ms, t0 = 0, holds = 0;
+      const run = () => { if (timer || holds) return; t0 = Date.now(); timer = setTimeout(() => el.remove(), left); };
+      const halt = () => { if (!timer) return; clearTimeout(timer); timer = null; left -= Date.now() - t0; };
+      const hold = () => { holds++; halt(); };
+      const release = () => { holds = Math.max(0, holds - 1); if (!holds) run(); };
+      el.addEventListener("pointerenter", hold);
+      el.addEventListener("pointerleave", release);
+      el.addEventListener("focusin", hold);
+      el.addEventListener("focusout", release);
+      run();
+    }
     return el;
   }
 

@@ -13,7 +13,7 @@
 </script>
 
 <svelte:head>
-  <title>linkedui — CSS-first UI + Theme Builder</title>
+  <title>linkedui — CSS-first UI + Theme-Builder</title>
   <meta
     name="description"
     content="Classless Basis, Varianten via Klassen, Theming via CSS-Variablen. Ohne JS nutzbar, mit JS besser."

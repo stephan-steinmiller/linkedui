@@ -54,7 +54,7 @@
     background: transparent;
     color: var(--lui-primary);
   }  .btn[data-variant="ghost"]:hover {
-    background: rgb(128 128 128 / 0.12);
+    background: var(--lui-wash);
     background: color-mix(in oklch, var(--lui-primary) 12%, transparent);
   }
   /* Plain: opt out of button styling for fully custom buttons (emoji
@@ -72,7 +72,7 @@
   .btn[data-variant="plain"]:hover { background: none; }
   .btn[data-variant="plain"]:active { background: none; transform: none; }
   .btn[data-variant="ghost"]:active {
-    background: rgb(128 128 128 / 0.2);
+    background: var(--lui-wash-strong);
     background: color-mix(in oklch, var(--lui-primary) 22%, transparent);
     transform: translateY(1px);
   }
@@ -95,11 +95,11 @@
     border-color: var(--lui-secondary);
   }
   .btn[data-variant="outline"]:hover {
-    background: rgb(128 128 128 / 0.12);
+    background: var(--lui-wash);
     background: color-mix(in oklch, var(--lui-secondary) 12%, transparent);
   }
   .btn[data-variant="outline"]:active {
-    background: rgb(128 128 128 / 0.2);
+    background: var(--lui-wash-strong);
     background: color-mix(in oklch, var(--lui-secondary) 22%, transparent);
     transform: translateY(1px);
   }

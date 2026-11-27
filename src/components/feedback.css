@@ -25,30 +25,24 @@
      contrast-scaled): tinted fill + tinted edge, pure-tone left bar. */
   .alert[data-tone="success"] {
     border: var(--lui-border-width) solid var(--lui-border);
-    border: var(--lui-border-width) solid color-mix(in oklch, var(--lui-success) calc(70% + var(--lui-contrast, 0.5) * 25%), var(--lui-bg));
-    border: var(--lui-border-width) solid color-mix(in oklch, var(--lui-success) calc(70% + var(--lui-contrast, 0.5) * 25%), light-dark(#ffffff, #000000));
+    border: var(--lui-border-width) solid color-mix(in oklch, var(--lui-success) calc(70% + var(--lui-contrast, 0.5) * 25%), var(--lui-tone-base));
     border-left: 4px solid var(--lui-success);
     background: var(--lui-surface);
-    background: color-mix(in oklch, var(--lui-success) calc(50% + var(--lui-contrast, 0.5) * 30%), var(--lui-bg));
-    background: color-mix(in oklch, var(--lui-success) calc(50% + var(--lui-contrast, 0.5) * 30%), light-dark(#ffffff, #000000));
+    background: color-mix(in oklch, var(--lui-success) calc(var(--lui-tone-pct) + var(--lui-contrast, 0.5) * 30%), var(--lui-tone-base));
   }
   .alert[data-tone="warning"] {
     border: var(--lui-border-width) solid var(--lui-border);
-    border: var(--lui-border-width) solid color-mix(in oklch, var(--lui-warning) calc(70% + var(--lui-contrast, 0.5) * 25%), var(--lui-bg));
-    border: var(--lui-border-width) solid color-mix(in oklch, var(--lui-warning) calc(70% + var(--lui-contrast, 0.5) * 25%), light-dark(#ffffff, #000000));
+    border: var(--lui-border-width) solid color-mix(in oklch, var(--lui-warning) calc(70% + var(--lui-contrast, 0.5) * 25%), var(--lui-tone-base));
     border-left: 4px solid var(--lui-warning);
     background: var(--lui-surface);
-    background: color-mix(in oklch, var(--lui-warning) calc(50% + var(--lui-contrast, 0.5) * 30%), var(--lui-bg));
-    background: color-mix(in oklch, var(--lui-warning) calc(50% + var(--lui-contrast, 0.5) * 30%), light-dark(#ffffff, #000000));
+    background: color-mix(in oklch, var(--lui-warning) calc(var(--lui-tone-pct) + var(--lui-contrast, 0.5) * 30%), var(--lui-tone-base));
   }
   .alert[data-tone="danger"] {
     border: var(--lui-border-width) solid var(--lui-border);
-    border: var(--lui-border-width) solid color-mix(in oklch, var(--lui-danger) calc(70% + var(--lui-contrast, 0.5) * 25%), var(--lui-bg));
-    border: var(--lui-border-width) solid color-mix(in oklch, var(--lui-danger) calc(70% + var(--lui-contrast, 0.5) * 25%), light-dark(#ffffff, #000000));
+    border: var(--lui-border-width) solid color-mix(in oklch, var(--lui-danger) calc(70% + var(--lui-contrast, 0.5) * 25%), var(--lui-tone-base));
     border-left: 4px solid var(--lui-danger);
     background: var(--lui-surface);
-    background: color-mix(in oklch, var(--lui-danger) calc(50% + var(--lui-contrast, 0.5) * 30%), var(--lui-bg));
-    background: color-mix(in oklch, var(--lui-danger) calc(50% + var(--lui-contrast, 0.5) * 30%), light-dark(#ffffff, #000000));
+    background: color-mix(in oklch, var(--lui-danger) calc(var(--lui-tone-pct) + var(--lui-contrast, 0.5) * 30%), var(--lui-tone-base));
   }
 
   .badge {
@@ -66,20 +60,20 @@
      alerts — tinted fill + tinted edge. Accent included for highlights.
      <span class="badge" data-tone="success">7d: 85%</span> */
   .badge[data-tone="success"] {
-    border: var(--lui-border-width) solid color-mix(in oklch, var(--lui-success) calc(70% + var(--lui-contrast, 0.5) * 25%), var(--lui-bg));
-    background: color-mix(in oklch, var(--lui-success) calc(50% + var(--lui-contrast, 0.5) * 30%), var(--lui-bg));
+    border: var(--lui-border-width) solid color-mix(in oklch, var(--lui-success) calc(70% + var(--lui-contrast, 0.5) * 25%), var(--lui-tone-base));
+    background: color-mix(in oklch, var(--lui-success) calc(var(--lui-tone-pct) + var(--lui-contrast, 0.5) * 30%), var(--lui-tone-base));
   }
   .badge[data-tone="warning"] {
-    border: var(--lui-border-width) solid color-mix(in oklch, var(--lui-warning) calc(70% + var(--lui-contrast, 0.5) * 25%), var(--lui-bg));
-    background: color-mix(in oklch, var(--lui-warning) calc(50% + var(--lui-contrast, 0.5) * 30%), var(--lui-bg));
+    border: var(--lui-border-width) solid color-mix(in oklch, var(--lui-warning) calc(70% + var(--lui-contrast, 0.5) * 25%), var(--lui-tone-base));
+    background: color-mix(in oklch, var(--lui-warning) calc(var(--lui-tone-pct) + var(--lui-contrast, 0.5) * 30%), var(--lui-tone-base));
   }
   .badge[data-tone="danger"] {
-    border: var(--lui-border-width) solid color-mix(in oklch, var(--lui-danger) calc(70% + var(--lui-contrast, 0.5) * 25%), var(--lui-bg));
-    background: color-mix(in oklch, var(--lui-danger) calc(50% + var(--lui-contrast, 0.5) * 30%), var(--lui-bg));
+    border: var(--lui-border-width) solid color-mix(in oklch, var(--lui-danger) calc(70% + var(--lui-contrast, 0.5) * 25%), var(--lui-tone-base));
+    background: color-mix(in oklch, var(--lui-danger) calc(var(--lui-tone-pct) + var(--lui-contrast, 0.5) * 30%), var(--lui-tone-base));
   }
   .badge[data-tone="accent"] {
-    border: var(--lui-border-width) solid color-mix(in oklch, var(--lui-accent) calc(70% + var(--lui-contrast, 0.5) * 25%), var(--lui-bg));
-    background: color-mix(in oklch, var(--lui-accent) calc(50% + var(--lui-contrast, 0.5) * 30%), var(--lui-bg));
+    border: var(--lui-border-width) solid color-mix(in oklch, var(--lui-accent) calc(70% + var(--lui-contrast, 0.5) * 25%), var(--lui-tone-base));
+    background: color-mix(in oklch, var(--lui-accent) calc(var(--lui-tone-pct) + var(--lui-contrast, 0.5) * 30%), var(--lui-tone-base));
   }
 
   /* Chip: removable token (active filters, selections). Static badge look
@@ -122,7 +116,7 @@
   }
   .chip [data-lui-chip-close]:hover {
     opacity: 1;
-    background: rgb(128 128 128 / 0.12);
+    background: var(--lui-wash);
     background: color-mix(in oklch, var(--lui-primary) 12%, transparent);
   }
   .chip [data-lui-chip-close]:focus-visible {
@@ -142,7 +136,7 @@
     corner-shape: var(--lui-corner-shape);
     background: var(--lui-surface);
     /* Neutral shimmer band (intentionally unthemed gray: visible on every tint). */
-    background-image: linear-gradient(100deg, transparent 20%, rgb(128 128 128 / 0.18) 50%, transparent 80%);
+    background-image: linear-gradient(100deg, transparent 20%, var(--lui-wash-shimmer) 50%, transparent 80%);
     background-size: 200% 100%;
     animation: lui-shimmer 1.4s linear infinite;
     color: transparent;

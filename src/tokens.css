@@ -79,6 +79,17 @@
     --lui-danger-active: #9a2225;
     --lui-danger-active: color-mix(in oklch, var(--lui-danger) 78%, black);
     --lui-on-danger: oklch(0.99 0 0);
+    /* Tone tints (alerts, badges, toasts, quiz): fills mix the tone toward
+       --lui-tone-base at --lui-tone-pct. Dark themes flip the base to black and
+       lower the share so light ink keeps AA contrast on the tinted fill. */
+    --lui-tone-base: #ffffff;
+    --lui-tone-pct: 50%;
+    /* Neutral washes (hover, ghost, shimmer): scheme-agnostic on purpose,
+       overridable per theme like every other token. */
+    --lui-wash: rgb(128 128 128 / 0.12);
+    --lui-wash-strong: rgb(128 128 128 / 0.2);
+    --lui-wash-faint: rgb(128 128 128 / 0.06);
+    --lui-wash-shimmer: rgb(128 128 128 / 0.18);
     /* Info is always blue — never primary, so it reads as info in any theme */
     --lui-info: oklch(0.65 0.16 250);
     --lui-ring: #9db8f0;

@@ -1,0 +1,34 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"  # browser-tests.cjs uses the built-in WebSocket (Node 22+)
+
+      - name: Minifier output is current and its tests pass
+        run: |
+          python3 tools/minify.py --check
+          python3 tools/test_minify.py
+
+      - name: Docs site checks and build
+        working-directory: site
+        run: |
+          npm ci
+          npm run check
+          npm run build
+
+      - name: Browser checks (behavior, contrast, lang, mobile overflow)
+        run: node tools/browser-tests.cjs

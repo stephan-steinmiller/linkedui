@@ -79,14 +79,14 @@
   }
   .menu > a:hover,
   .menu > .menu-group > a:hover {
-    background: rgb(128 128 128 / 0.12);
+    background: var(--lui-wash);
     background: color-mix(in oklch, var(--lui-primary) 12%, transparent);
   }
   .menu > a[aria-current="page"],
   .menu > .menu-group > a[aria-current="page"] {
     color: var(--lui-primary);
     font-weight: 600;
-    background: rgb(128 128 128 / 0.12);
+    background: var(--lui-wash);
     background: color-mix(in oklch, var(--lui-primary) 12%, transparent);
   }
   .menu > a:focus-visible,
@@ -132,13 +132,13 @@
     min-width: 0;
   }
   .menu .menu-sub > a:hover {
-    background: rgb(128 128 128 / 0.12);
+    background: var(--lui-wash);
     background: color-mix(in oklch, var(--lui-primary) 12%, transparent);
   }
   .menu .menu-sub > a[aria-current="page"] {
     color: var(--lui-primary);
     font-weight: 600;
-    background: rgb(128 128 128 / 0.12);
+    background: var(--lui-wash);
     background: color-mix(in oklch, var(--lui-primary) 12%, transparent);
   }
   .menu .menu-sub > a:focus-visible {
@@ -172,7 +172,7 @@
   .menu > button:hover,
   .menu > .menu-group > button:hover,
   .menu .menu-sub > button:hover {
-    background: rgb(128 128 128 / 0.12);
+    background: var(--lui-wash);
     background: color-mix(in oklch, var(--lui-primary) 12%, transparent);
   }
   .menu > button:focus-visible,
@@ -277,7 +277,7 @@
   details.dropdown[open] > div > button { text-align: left; }
   details.dropdown[open] > div > a:hover,
   details.dropdown[open] > div > button:hover {
-    background: rgb(128 128 128 / 0.12);
+    background: var(--lui-wash);
     background: color-mix(in oklch, var(--lui-primary) 12%, transparent);
   }
   details.dropdown[open] > div > a:active,
@@ -406,11 +406,11 @@
        out. Lightness adapts (lighter card on dark bg, darker on light bg),
        amount scales with --lui-contrast. Fallbacks first. */
     background: var(--lui-surface);
-    background: color-mix(in oklch, var(--lui-toast-tone) calc(50% + var(--lui-contrast, 0.5) * 30%), var(--lui-bg));
-    background: color-mix(in oklch, var(--lui-toast-tone) calc(50% + var(--lui-contrast, 0.5) * 30%), light-dark(#ffffff, #000000));
+    background: color-mix(in oklch, var(--lui-toast-tone) calc(var(--lui-tone-pct) + var(--lui-contrast, 0.5) * 30%), var(--lui-bg));
+    background: color-mix(in oklch, var(--lui-toast-tone) calc(var(--lui-tone-pct) + var(--lui-contrast, 0.5) * 30%), var(--lui-tone-base));
     border: var(--lui-border-width) solid var(--lui-border);
     border: var(--lui-border-width) solid color-mix(in oklch, var(--lui-toast-tone) calc(70% + var(--lui-contrast, 0.5) * 25%), var(--lui-bg));
-    border: var(--lui-border-width) solid color-mix(in oklch, var(--lui-toast-tone) calc(70% + var(--lui-contrast, 0.5) * 25%), light-dark(#ffffff, #000000));
+    border: var(--lui-border-width) solid color-mix(in oklch, var(--lui-toast-tone) calc(70% + var(--lui-contrast, 0.5) * 25%), var(--lui-tone-base));
     border-radius: var(--lui-radius-lg);
     padding: var(--lui-space-2) var(--lui-space-3);
     box-shadow: var(--lui-shadow-md);
@@ -490,7 +490,7 @@
   }
   .pagination a:hover {
     border-color: var(--lui-primary);
-    background: rgb(128 128 128 / 0.12);
+    background: var(--lui-wash);
     background: color-mix(in oklch, var(--lui-primary) 12%, transparent);
   }
   .pagination a:focus-visible {

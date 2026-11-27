@@ -112,7 +112,7 @@
     background: var(--lui-surface);
   }
   .code-block[data-variant="bare"] > [data-lui-copy]:hover {
-    background: rgb(128 128 128 / 0.12);
+    background: var(--lui-wash);
     background: color-mix(in oklch, var(--lui-primary) 12%, transparent);
   }
   .code-block[data-variant="bare"] > pre {

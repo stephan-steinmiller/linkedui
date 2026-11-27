@@ -14,5 +14,6 @@ No build step and no dependencies for consumers.
 python3 tools/minify.py           # rebuild dist/ after src/ changes
 python3 tools/minify.py --check   # verify dist/ is current
 python3 tools/test_minify.py      # minifier regression tests
+node tools/browser-tests.cjs       # browser checks (needs Chrome; site/ built first)
 cd site && npm run check          # svelte-check for the docs site
 ```

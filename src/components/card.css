@@ -288,7 +288,7 @@
   }
   .check-chips > label:hover {
     color: var(--lui-text);
-    background: rgb(128 128 128 / 0.12);
+    background: var(--lui-wash);
     background: color-mix(in oklch, var(--lui-primary) 12%, var(--lui-field));
   }
   .check-chips > input:checked + label {
@@ -297,7 +297,7 @@
     color: var(--lui-on-primary);
   }
   .check-chips[data-variant="secondary"] > label:hover {
-    background: rgb(128 128 128 / 0.12);
+    background: var(--lui-wash);
     background: color-mix(in oklch, var(--lui-secondary) 12%, var(--lui-field));
   }
   .check-chips[data-variant="secondary"] > input:checked + label {
@@ -305,7 +305,7 @@
     color: var(--lui-on-secondary);
   }
   .check-chips[data-variant="accent"] > label:hover {
-    background: rgb(128 128 128 / 0.12);
+    background: var(--lui-wash);
     background: color-mix(in oklch, var(--lui-accent) 12%, var(--lui-field));
   }
   .check-chips[data-variant="accent"] > input:checked + label {
@@ -368,13 +368,13 @@
     text-align: left;
   }
   table[data-stripes="true"] > tbody > tr:nth-child(even) {
-    background: rgb(128 128 128 / 0.06);
+    background: var(--lui-wash-faint);
     background: color-mix(in oklch, var(--lui-accent) 6%, transparent);
   }
   /* Hover intentionally uses the primary family while stripes use accent:
      the two never fully merge, so a hovered striped row stays visible. */
   table[data-hover="true"] > tbody > tr:hover {
-    background: rgb(128 128 128 / 0.12);
+    background: var(--lui-wash);
     background: color-mix(in oklch, var(--lui-primary) 12%, transparent);
   }
   table[data-sticky="true"] > thead > tr > th {

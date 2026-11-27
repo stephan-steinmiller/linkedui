@@ -65,12 +65,12 @@
   }
   .app-nav > a:hover {
     color: var(--lui-text);
-    background: rgb(128 128 128 / 0.12);
+    background: var(--lui-wash);
     background: color-mix(in oklch, var(--lui-primary) 12%, transparent);
   }
   .app-nav > a[aria-current="page"] {
     color: var(--lui-primary);
-    background: rgb(128 128 128 / 0.12);
+    background: var(--lui-wash);
     background: color-mix(in oklch, var(--lui-primary) 12%, transparent);
   }
   .app-nav > a:focus-visible {
@@ -109,7 +109,7 @@
   }
   .app-nav-toggle > summary:hover {
     color: var(--lui-text);
-    background: rgb(128 128 128 / 0.12);
+    background: var(--lui-wash);
     background: color-mix(in oklch, var(--lui-primary) 12%, transparent);
   }
   .app-nav-toggle > summary:focus-visible {
